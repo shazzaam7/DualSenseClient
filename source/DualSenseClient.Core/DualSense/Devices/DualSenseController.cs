@@ -148,46 +148,46 @@ public class DualSenseController : IDisposable
     private void ProcessInputReport(byte[] data, int length)
     {
         byte reportId = data[0];
-        byte[] strippedData;
 
         if (ConnectionType == ConnectionType.Bluetooth)
         {
-            if (reportId != 0x31)
+            switch (reportId)
             {
-                Logger.Warning($"Invalid Bluetooth report ID: 0x{reportId:X2} (expected 0x31)");
-                return;
+                case 0x31:
+                    if (length < 10)
+                    {
+                        Logger.Warning($"Bluetooth report too short: {length} bytes (minimum 10)");
+                        return;
+                    }
+                    byte[] stripped31 = new byte[length - 2];
+                    Array.Copy(data, 2, stripped31, 0, length - 2);
+                    Logger.Trace($"Stripped BT 0x31 headers: {length} -> {stripped31.Length} bytes");
+                    ParseInputData(stripped31);
+                    break;
+                case 0x01:
+                    // DualSense is in "simple" Bluetooth state (0x01)
+                    // Sending out an "Output Report" resets it to the "normal" Bluetooth state (0x31)
+                    Logger.Warning($"Controller is in simple Bluetooth state");
+                    SendOutputReport();
+                    break;
+                default:
+                    Logger.Warning($"Unknown Bluetooth report ID: 0x{reportId:X2}");
+                    break;
             }
-
-            if (length < 10)
-            {
-                Logger.Warning($"Bluetooth report too short: {length} bytes (minimum 10)");
-                return;
-            }
-
-            strippedData = new byte[length - 2];
-            Array.Copy(data, 2, strippedData, 0, length - 2);
-            Logger.Trace($"Stripped BT headers: {length} -> {strippedData.Length} bytes");
         }
         else
         {
+            // USB mode (only 0x01 expected)
             if (reportId != 0x01)
             {
                 Logger.Warning($"Invalid USB report ID: 0x{reportId:X2} (expected 0x01)");
                 return;
             }
 
-            if (length < 10)
-            {
-                Logger.Warning($"USB report too short: {length} bytes (minimum 10)");
-                return;
-            }
-
-            strippedData = new byte[length - 1];
-            Array.Copy(data, 1, strippedData, 0, length - 1);
-            Logger.Trace($"Stripped USB header: {length} -> {strippedData.Length} bytes");
+            byte[] strippedUsb = new byte[length - 1];
+            Array.Copy(data, 1, strippedUsb, 0, length - 1);
+            ParseInputData(strippedUsb);
         }
-
-        ParseInputData(strippedData);
     }
 
     private void ParseInputData(byte[] data)
