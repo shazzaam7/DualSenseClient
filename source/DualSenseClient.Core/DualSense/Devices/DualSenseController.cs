@@ -343,6 +343,16 @@ public class DualSenseController : IDisposable
         }
     }
 
+    public bool DisconnectBluetooth()
+    {
+        if (!IsBluetooth || MacAddress == null)
+        {
+            return false;
+        }
+
+        return BluetoothHelper.Disconnect(MacAddress);
+    }
+
     private void HandleDisconnection()
     {
         if (!IsConnected)
