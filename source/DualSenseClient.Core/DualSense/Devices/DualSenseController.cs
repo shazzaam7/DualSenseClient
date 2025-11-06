@@ -2,6 +2,7 @@
 using DualSenseClient.Core.DualSense.Enums;
 using DualSenseClient.Core.DualSense.Reports;
 using DualSenseClient.Core.Logging;
+using DualSenseClient.Core.Utils;
 using HidSharp;
 
 namespace DualSenseClient.Core.DualSense.Devices;
@@ -11,6 +12,7 @@ public class DualSenseController : IDisposable
     private readonly HidStream _stream;
     private readonly CancellationTokenSource _cts;
     private readonly Task _readTask;
+    private Lock _writeLock = new Lock();
 
     // Properties
     public HidDevice Device { get; }
@@ -238,6 +240,107 @@ public class DualSenseController : IDisposable
             X = (ushort)((touchData >> 8) & 0xFFF), // bits 8-19 (12 bits)
             Y = (ushort)((touchData >> 20) & 0xFFF) // bits 20-31 (12 bits)
         };
+    }
+
+    public bool SetLightbar(byte red, byte green, byte blue)
+    {
+        CurrentLightbarColor = new LightbarColor(red, green, blue);
+        CurrentLightbarBehavior = LightbarBehavior.Custom;
+        return SendOutputReport();
+    }
+
+    public bool SetPlayerLeds(PlayerLed leds, PlayerLedBrightness brightness = PlayerLedBrightness.High)
+    {
+        CurrentPlayerLeds = leds;
+        CurrentPlayerLedBrightness = brightness;
+        return SendOutputReport();
+    }
+
+    public bool SetMicLed(MicLed led)
+    {
+        CurrentMicLed = led;
+        return SendOutputReport();
+    }
+
+    private bool SendOutputReport()
+    {
+        if (!IsConnected)
+        {
+            return false;
+        }
+
+        lock (_writeLock)
+        {
+            try
+            {
+                byte[] report;
+
+                if (IsBluetooth)
+                {
+                    report = new byte[78];
+                    report[0] = 0x31; // BT Report ID
+                    report[1] = 0x02; // BT header flag
+
+                    // Feature mask
+                    report[2] = 0xFF;
+                    report[3] = 0xF7;
+
+                    // Lightbar
+                    report[41] = 0x02; // Enable lightbar mods
+                    report[43] = (byte)CurrentLightbarBehavior;
+                    report[46] = CurrentLightbarColor.Red;
+                    report[47] = CurrentLightbarColor.Green;
+                    report[48] = CurrentLightbarColor.Blue;
+
+                    // Player LEDs
+                    report[44] = (byte)CurrentPlayerLedBrightness;
+                    report[45] = (byte)(0x20 | (byte)CurrentPlayerLeds);
+
+                    // Mic LED
+                    report[11] = (byte)CurrentMicLed;
+
+                    // Calculate CRC32
+                    uint crc = CRC32DualSense.Compute(report, 0, 74);
+                    report[74] = (byte)(crc & 0xFF);
+                    report[75] = (byte)((crc >> 8) & 0xFF);
+                    report[76] = (byte)((crc >> 16) & 0xFF);
+                    report[77] = (byte)((crc >> 24) & 0xFF);
+                }
+                else
+                {
+                    report = new byte[48];
+                    report[0] = 0x02; // USB Report ID
+
+                    // Feature mask
+                    report[1] = 0xFF;
+                    report[2] = 0xF7;
+
+                    // Lightbar
+                    report[40] = 0x02; // Enable lightbar mods
+                    report[42] = (byte)CurrentLightbarBehavior;
+                    report[45] = CurrentLightbarColor.Red;
+                    report[46] = CurrentLightbarColor.Green;
+                    report[47] = CurrentLightbarColor.Blue;
+
+                    // Player LEDs
+                    report[43] = (byte)CurrentPlayerLedBrightness;
+                    report[44] = (byte)(0x20 | (byte)CurrentPlayerLeds);
+
+                    // Mic LED
+                    report[10] = (byte)CurrentMicLed;
+                }
+
+                _stream.Write(report);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failed to send output report");
+                Logger.LogExceptionDetails(ex);
+                HandleDisconnection();
+                return false;
+            }
+        }
     }
 
     private void HandleDisconnection()
