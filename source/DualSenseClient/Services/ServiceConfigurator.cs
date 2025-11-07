@@ -1,5 +1,6 @@
 ﻿using System;
 using DualSenseClient.Core.DualSense;
+using DualSenseClient.Core.Settings;
 using DualSenseClient.ViewModels;
 using DualSenseClient.ViewModels.Pages;
 using DualSenseClient.Views;
@@ -16,6 +17,8 @@ public static class ServiceConfigurator
         // Core
         services.AddSingleton<DualSenseManager>();
         services.AddSingleton<NavigationService>();
+        services.AddSingleton<IApplicationSettings, ApplicationSettings>();
+        services.AddSingleton<ISettingsManager, SettingsManager>();
 
         // ViewModels
         services.AddSingleton<MainWindowViewModel>();

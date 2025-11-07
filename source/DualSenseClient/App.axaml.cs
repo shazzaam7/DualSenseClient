@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using DualSenseClient.Core.Logging;
+using DualSenseClient.Core.Settings;
 using DualSenseClient.Services;
 using DualSenseClient.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,6 +36,9 @@ public class App : Application
             DisableAvaloniaDataAnnotationValidation();
             Services = ServiceConfigurator.ConfigureServices();
             MainWindow mainWindow = Services.GetRequiredService<MainWindow>();
+
+            ISettingsManager settingsManager = Services.GetRequiredService<ISettingsManager>();
+            Logger.SetLogLevel(LogLevelHelper.FromString(settingsManager.Application.Debug.Logger.Level));
 
             mainWindow.Opened += (_, _) =>
             {
