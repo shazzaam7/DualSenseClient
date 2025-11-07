@@ -175,22 +175,119 @@ public class DualSenseManager : IDisposable
                 return;
             }
 
-            DualSenseController controller = new DualSenseController(device, stream);
+            DualSenseController newController = new DualSenseController(device, stream);
 
             lock (_lock)
             {
-                _controllers[device.DevicePath] = controller;
+                // Check for duplicate controllers
+                DualSenseController? duplicateController = FindDuplicateController(newController);
+
+                if (duplicateController != null)
+                {
+                    Logger.Info($"Detected same controller connected via both {duplicateController.ConnectionType} and {newController.ConnectionType}");
+
+                    switch (newController.ConnectionType)
+                    {
+                        // New connection is USB, existing is Bluetooth, disconnect Bluetooth
+                        case ConnectionType.USB when duplicateController.ConnectionType == ConnectionType.Bluetooth:
+                        {
+                            Logger.Info("Replacing Bluetooth connection with USB connection");
+
+                            string oldPath = duplicateController.Device.DevicePath;
+
+                            // Remove the Bluetooth controller from dictionary
+                            _controllers.Remove(oldPath);
+
+                            // Try to disconnect Bluetooth
+                            try
+                            {
+                                duplicateController.DisconnectBluetooth();
+                                Logger.Debug("Bluetooth disconnection initiated");
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.Warning($"Failed to disconnect Bluetooth: {ex.Message}");
+                            }
+
+                            // Dispose the old controller
+                            duplicateController.Dispose();
+
+                            // Add the new USB controller
+                            _controllers[device.DevicePath] = newController;
+
+                            Logger.Info($"Controller switched to USB: {device.GetProductName()} - {device.DevicePath}");
+
+                            // Fire disconnected event for old path
+                            ControllerDisconnected?.Invoke(this, oldPath);
+
+                            // Fire connected event for new controller
+                            ControllerConnected?.Invoke(this, newController);
+
+                            return;
+                        }
+                        // If new connection is Bluetooth and existing is USB, ignore the new Bluetooth connection
+                        // New connection is Bluetooth and existing is USB (Shouldn't happen, but we dispose the Bluetooth)
+                        case ConnectionType.Bluetooth when duplicateController.ConnectionType == ConnectionType.USB:
+                            Logger.Info("USB connection already exists for this controller, ignoring Bluetooth connection");
+                            newController.Dispose();
+                            return;
+                        // Both same type (shouldn't happen, but log it out, dispose the new one)
+                        default:
+                            Logger.Warning($"Same controller detected twice with same connection type: {newController.ConnectionType}");
+                            newController.Dispose();
+                            return;
+                    }
+                }
+
+                // No duplicates
+                _controllers[device.DevicePath] = newController;
             }
 
-            Logger.Info($"Controller added: {device.GetProductName()} ({controller.ConnectionType}) - {device.DevicePath}");
+            Logger.Info($"Controller added: {device.GetProductName()} ({newController.ConnectionType}) - {device.DevicePath}");
 
-            ControllerConnected?.Invoke(this, controller);
+            ControllerConnected?.Invoke(this, newController);
         }
         catch (Exception ex)
         {
             Logger.Error($"Error adding controller: {device.GetProductName()}");
             Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
         }
+    }
+
+    /// <summary>
+    /// Finds if the same physical controller is already connected with a different connection type
+    /// </summary>
+    private DualSenseController? FindDuplicateController(DualSenseController newController)
+    {
+        string? newMac = newController.MacAddress;
+        foreach (DualSenseController existingController in _controllers.Values)
+        {
+            // Skip if the device path is the same (shouldn't happen)
+            if (existingController.Device.DevicePath == newController.Device.DevicePath)
+            {
+                continue;
+            }
+
+            string? existingMac = existingController.MacAddress;
+
+            // Match by MAC address
+            if (!string.IsNullOrEmpty(newMac) && !string.IsNullOrEmpty(existingMac))
+            {
+                if (NormalizeMacAddress(newMac) == NormalizeMacAddress(existingMac))
+                {
+                    Logger.Debug($"Found duplicate controller by MAC: {newMac}");
+                    return existingController;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    // TODO: Move this into utils to reduce code duplication
+    private string NormalizeMacAddress(string mac)
+    {
+        return mac.Replace(":", "").Replace("-", "").ToLowerInvariant();
     }
 
     private void RemoveController(string path)
