@@ -1,0 +1,94 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ic="using:FluentIcons.Avalonia.Fluent"
+             xmlns:vm="clr-namespace:DualSenseClient.ViewModels.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DualSenseClient.Views.Controls.ControllerSelectorControl"
+             x:DataType="vm:ControllerSelectorViewModel">
+    <Design.DataContext>
+        <vm:ControllerSelectorViewModel />
+    </Design.DataContext>
+
+    <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+            CornerRadius="8"
+            Padding="20">
+        <StackPanel Spacing="15">
+            <!-- Card Header -->
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <ic:SymbolIcon Symbol="XboxController"
+                               FontSize="20"
+                               Margin="0,0,10,0"
+                               VerticalAlignment="Center" />
+                <TextBlock Text="Controller Selection"
+                           FontSize="16"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Grid.Column="1" />
+                <Border Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                        CornerRadius="12"
+                        Padding="10,4"
+                        Grid.Column="2">
+                    <TextBlock Text="{Binding Controllers.Count, StringFormat='{}{0} Connected'}"
+                               FontSize="12"
+                               FontWeight="SemiBold" />
+                </Border>
+            </Grid>
+
+            <!-- Separator -->
+            <Border Height="1"
+                    Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+
+            <!-- No Controllers Message -->
+            <Border IsVisible="{Binding !HasControllers}"
+                    Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                    CornerRadius="8"
+                    Padding="30,40">
+                <StackPanel Spacing="12" HorizontalAlignment="Center">
+                    <ic:SymbolIcon Symbol="XboxControllerError"
+                                   FontSize="64"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="No DualSense controllers connected"
+                               HorizontalAlignment="Center"
+                               FontSize="16"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                    <TextBlock Text="Please connect a controller via USB or Bluetooth"
+                               FontSize="13"
+                               HorizontalAlignment="Center"
+                               Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Controller ComboBox -->
+            <ComboBox ItemsSource="{Binding Controllers}"
+                      SelectedItem="{Binding SelectedController}"
+                      IsVisible="{Binding HasControllers}"
+                      HorizontalAlignment="Stretch"
+                      PlaceholderText="Select a controller">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="{Binding Name}" />
+
+                            <!-- Connection type badge with icon -->
+                            <Border Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                    CornerRadius="4"
+                                    Padding="6,2">
+                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                    <ic:FluentIcon Icon="{Binding ConnectionIcon}"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="{Binding ConnectionType}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </StackPanel>
+    </Border>
+</UserControl>

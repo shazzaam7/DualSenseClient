@@ -3,12 +3,158 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:ic="using:FluentIcons.Avalonia.Fluent"
              xmlns:vm="clr-namespace:DualSenseClient.ViewModels.Pages"
+             xmlns:controls="clr-namespace:DualSenseClient.Views.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DualSenseClient.Views.Pages.HomePage"
              x:DataType="vm:HomePageViewModel">
     <Design.DataContext>
         <vm:HomePageViewModel />
     </Design.DataContext>
-    Home Page/Dashboard
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="20" MaxWidth="800">
+            <!-- Controller Selection Control -->
+            <controls:ControllerSelectorControl DataContext="{Binding ControllerSelector}" />
+
+            <!-- Controller Information Card -->
+            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="20"
+                    IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <StackPanel Spacing="20">
+                    <!-- Card Header -->
+                    <Grid ColumnDefinitions="Auto,*">
+                        <ic:SymbolIcon Symbol="Info"
+                                       FontSize="20"
+                                       Margin="0,0,10,0"
+                                       VerticalAlignment="Center" />
+                        <TextBlock Text="Controller Information"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"
+                                   Grid.Column="1" />
+                    </Grid>
+
+                    <!-- Separator -->
+                    <Border Height="1"
+                            Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+
+                    <!-- DualSense Image with Battery -->
+                    <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                            CornerRadius="12"
+                            Padding="30">
+                        <StackPanel Spacing="20" HorizontalAlignment="Center">
+                            <!-- Controller Image -->
+                            <Border Width="320"
+                                    Height="220"
+                                    Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                    CornerRadius="12">
+                                <StackPanel VerticalAlignment="Center" Spacing="12">
+                                    <!--
+                                    <ic:SymbolIcon Symbol="XboxController"
+                                                   FontSize="96"
+                                                   Foreground="{DynamicResource AccentFillColorDefaultBrush}" />
+                                    <TextBlock Text="{Binding SelectedController.Name}"
+                                               HorizontalAlignment="Center"
+                                               FontSize="18"
+                                               FontWeight="SemiBold" />-->
+                                    <Image Source="/Assets/Controller Illustration/With Buttons.png" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Battery Display -->
+                            <Border Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                                    CornerRadius="10"
+                                    Padding="24,16">
+                                <StackPanel Orientation="Horizontal"
+                                            Spacing="16"
+                                            HorizontalAlignment="Center">
+                                    <!-- Battery Icon - Use ChargingIcon when charging, otherwise BatteryIcon -->
+                                    <ic:SymbolIcon Symbol="{Binding SelectedController.ChargingIcon}"
+                                                   FontSize="36"
+                                                   VerticalAlignment="Center"
+                                                   IsVisible="{Binding SelectedController.IsCharging}" />
+
+                                    <ic:SymbolIcon Symbol="{Binding SelectedController.BatteryIcon}"
+                                                   FontSize="36"
+                                                   VerticalAlignment="Center"
+                                                   IsVisible="{Binding !SelectedController.IsCharging}" />
+
+                                    <!-- Battery Info -->
+                                    <StackPanel Spacing="4" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding SelectedController.BatteryText}"
+                                                   FontSize="18"
+                                                   FontWeight="SemiBold" />
+                                        <ProgressBar Value="{Binding SelectedController.BatteryLevel}"
+                                                     Maximum="100"
+                                                     Width="160"
+                                                     Height="8" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Controller Details -->
+                    <StackPanel Spacing="10">
+                        <!-- Connection Type -->
+                        <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                                        CornerRadius="6"
+                                        Width="36"
+                                        Height="36"
+                                        VerticalAlignment="Center">
+                                    <ic:SymbolIcon Symbol="PlugConnected"
+                                                   FontSize="18" />
+                                </Border>
+                                <StackPanel Grid.Column="1"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="Connection Type"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="{Binding SelectedController.ConnectionType}"
+                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               Margin="0,2,0,0" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- MAC Address -->
+                        <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                                CornerRadius="8"
+                                Padding="16,12">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <Border Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                                        CornerRadius="6"
+                                        Width="36"
+                                        Height="36"
+                                        VerticalAlignment="Center">
+                                    <ic:SymbolIcon Symbol="Bluetooth"
+                                                   FontSize="18" />
+                                </Border>
+                                <StackPanel Grid.Column="1"
+                                            Margin="12,0,0,0"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="MAC Address"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                    <TextBlock Text="{Binding SelectedController.MacAddress}"
+                                               FontSize="14"
+                                               FontWeight="SemiBold"
+                                               FontFamily="Consolas"
+                                               Margin="0,2,0,0" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

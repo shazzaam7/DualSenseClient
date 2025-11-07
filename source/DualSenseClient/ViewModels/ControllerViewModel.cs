@@ -1,0 +1,157 @@
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
+using DualSenseClient.Core.DualSense.Devices;
+using DualSenseClient.Core.DualSense.Reports;
+using DualSenseClient.Core.Settings.Models;
+
+namespace DualSenseClient.ViewModels;
+
+public partial class ControllerViewModel : ObservableObject, IDisposable
+{
+    private readonly DualSenseController _controller;
+    private readonly ControllerInfo? _controllerInfo;
+    private CancellationTokenSource? _animationCts;
+
+    [ObservableProperty] private string _name;
+
+    [ObservableProperty] private string _devicePath;
+
+    [ObservableProperty] private string _connectionType;
+
+    [ObservableProperty] private string _connectionIcon;
+
+    [ObservableProperty] private string _macAddress;
+
+    [ObservableProperty] private double _batteryLevel;
+
+    [ObservableProperty] private bool _isCharging;
+
+    [ObservableProperty] private bool _isFullyCharged;
+
+    [ObservableProperty] private string _batteryIcon;
+
+    [ObservableProperty] private string _chargingIcon = "BatteryCharge";
+
+    [ObservableProperty] private string _batteryText;
+
+    public ControllerViewModel(DualSenseController controller, ControllerInfo? controllerInfo)
+    {
+        _controller = controller;
+        _controllerInfo = controllerInfo;
+
+        Name = controllerInfo?.Name ?? "DualSense Controller";
+        DevicePath = controller.Device.DevicePath;
+        ConnectionType = controller.ConnectionType.ToString();
+        ConnectionIcon = controller.ConnectionType == Core.DualSense.Enums.ConnectionType.Bluetooth
+            ? "BluetoothConnected"
+            : "UsbPlug";
+        MacAddress = controller.MacAddress ?? "N/A";
+
+        UpdateBatteryState(controller.Battery);
+    }
+
+    public void UpdateBatteryState(BatteryState battery)
+    {
+        BatteryLevel = battery.BatteryLevel;
+
+        bool wasCharging = IsCharging;
+        IsCharging = battery.IsCharging;
+        IsFullyCharged = battery.IsFullyCharged;
+
+        // Update battery icon based on level and charging state
+        BatteryIcon = GetBatteryIcon(battery);
+        BatteryText = GetBatteryText(battery);
+
+        // Start or stop charging animation
+        if (IsCharging && !wasCharging)
+        {
+            StartChargingAnimation();
+        }
+        else if (!IsCharging && wasCharging)
+        {
+            StopChargingAnimation();
+        }
+    }
+
+    private void StartChargingAnimation()
+    {
+        // Cancel any existing animation
+        StopChargingAnimation();
+
+        _animationCts = new CancellationTokenSource();
+        CancellationToken token = _animationCts.Token;
+
+        Task.Run(async () =>
+        {
+            int frame = 0;
+            while (!token.IsCancellationRequested)
+            {
+                // Cycle through BatteryCharge0 to BatteryCharge10
+                string icon = $"BatteryCharge{frame}";
+
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    ChargingIcon = icon;
+                });
+
+                frame = (frame + 1) % 11; // 0-10, then loop back
+
+                await Task.Delay(150, token); // Change frame every 150ms
+            }
+        }, token);
+    }
+
+    private void StopChargingAnimation()
+    {
+        _animationCts?.Cancel();
+        _animationCts?.Dispose();
+        _animationCts = null;
+        ChargingIcon = "BatteryCharge";
+    }
+
+    private string GetBatteryIcon(BatteryState battery)
+    {
+        if (battery.IsCharging)
+        {
+            return "BatteryCharge";
+        }
+
+        return battery.BatteryLevel switch
+        {
+            >= 90 => "Battery10",
+            >= 80 => "Battery9",
+            >= 70 => "Battery8",
+            >= 60 => "Battery7",
+            >= 50 => "Battery6",
+            >= 40 => "Battery5",
+            >= 30 => "Battery4",
+            >= 20 => "Battery3",
+            >= 10 => "Battery2",
+            >= 5 => "Battery1",
+            _ => "Battery0"
+        };
+    }
+
+    private string GetBatteryText(BatteryState battery)
+    {
+        if (battery.IsFullyCharged)
+        {
+            return "Fully Charged";
+        }
+
+        if (battery.IsCharging)
+        {
+            return $"Charging - {battery.BatteryLevel:F0}%";
+        }
+
+        return $"{battery.BatteryLevel:F0}%";
+    }
+
+    public void Dispose()
+    {
+        StopChargingAnimation();
+    }
+}

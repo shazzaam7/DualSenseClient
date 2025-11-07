@@ -2,6 +2,7 @@
 using DualSenseClient.Core.DualSense;
 using DualSenseClient.Core.Settings;
 using DualSenseClient.ViewModels;
+using DualSenseClient.ViewModels.Controls;
 using DualSenseClient.ViewModels.Pages;
 using DualSenseClient.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,7 @@ public static class ServiceConfigurator
         services.AddSingleton<ISettingsManager, SettingsManager>();
 
         // ViewModels
+        services.AddSingleton<ControllerSelectorViewModel>();
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<HomePageViewModel>();
