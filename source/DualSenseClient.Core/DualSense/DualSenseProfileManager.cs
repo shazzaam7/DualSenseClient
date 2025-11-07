@@ -7,14 +7,14 @@ using HidSharp;
 
 namespace DualSenseClient.Core.DualSense;
 
-public class ProfileManager
+public class DualSenseProfileManager
 {
     // Properties
     private readonly ISettingsManager _settingsManager;
     private readonly DualSenseManager _dualSenseManager;
 
     // Constructor
-    public ProfileManager(ISettingsManager settingsManager, DualSenseManager dualSenseManager)
+    public DualSenseProfileManager(ISettingsManager settingsManager, DualSenseManager dualSenseManager)
     {
         _settingsManager = settingsManager;
         _dualSenseManager = dualSenseManager;
@@ -22,8 +22,12 @@ public class ProfileManager
         // Subscribe to controller events
         _dualSenseManager.ControllerConnected += OnControllerConnected;
         _dualSenseManager.ControllerDisconnected += OnControllerDisconnected;
+
+        // Apply profiles to already connected controllers
+        InitializeExistingControllers();
     }
 
+    // Functions
     private void OnControllerConnected(object? sender, DualSenseController controller)
     {
         Logger.Info($"Controller connected, applying profile");
@@ -45,7 +49,59 @@ public class ProfileManager
     private void OnControllerDisconnected(object? sender, string devicePath)
     {
         Logger.Info($"Controller disconnected: {devicePath}");
-        // Settings are already saved when connected, nothing to do here
+        // Settings are already saved when connected
+        // TODO: When adding changes, do a save here
+    }
+
+    /// <summary>
+    /// Applies profiles to controllers that are already connected at startup
+    /// </summary>
+    private void InitializeExistingControllers()
+    {
+        Logger.Info("Checking for already connected controllers...");
+
+        List<DualSenseController> connectedControllers = _dualSenseManager.Controllers.Values.ToList();
+
+        if (connectedControllers.Count == 0)
+        {
+            Logger.Debug("No controllers currently connected");
+            return;
+        }
+
+        Logger.Info($"Found {connectedControllers.Count} connected controller(s), applying profiles");
+
+        bool settingsChanged = false;
+
+        foreach (DualSenseController controller in connectedControllers)
+        {
+            try
+            {
+                Logger.Debug($"Processing existing controller: {controller.Device.GetProductName()}");
+
+                // Get or create controller info
+                ControllerInfo controllerInfo = GetOrCreateControllerInfo(controller);
+
+                // Update last seen
+                controllerInfo.LastSeen = DateTime.UtcNow;
+                controllerInfo.LastConnectionType = controller.ConnectionType;
+
+                // Apply profile
+                ApplyProfile(controller, controllerInfo);
+
+                settingsChanged = true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to initialize existing controller: {controller.Device.GetProductName()}");
+                Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+            }
+        }
+
+        // Save settings if any controller was processed
+        if (settingsChanged)
+        {
+            _settingsManager.SaveAll();
+        }
     }
 
     private ControllerInfo GetOrCreateControllerInfo(DualSenseController controller)
@@ -64,27 +120,14 @@ public class ProfileManager
             }
         }
 
-        // Try to find by serial number (if available)
-        string? serialNumber = TryGetSerialNumber(controller.Device);
-        if (!string.IsNullOrEmpty(serialNumber))
-        {
-            ControllerInfo? existing = settings.KnownControllers.Values.FirstOrDefault(c => c.SerialNumber == serialNumber);
-
-            if (existing != null)
-            {
-                Logger.Debug($"Found existing controller by serial: {serialNumber}");
-                return existing;
-            }
-        }
-
         // Create new controller info
-        string controllerId = GenerateControllerId(controller, serialNumber);
+        string controllerId = GenerateControllerId(controller);
         ControllerInfo controllerInfo = new ControllerInfo
         {
             Id = controllerId,
             Name = $"DualSense {settings.KnownControllers.Count + 1}",
             MacAddress = controller.MacAddress,
-            SerialNumber = serialNumber,
+            SerialNumber = TryGetSerialNumber(controller.Device),
             ProfileId = settings.DefaultProfileId,
             LastSeen = DateTime.UtcNow,
             LastConnectionType = controller.ConnectionType
@@ -102,20 +145,13 @@ public class ProfileManager
         return controllerInfo;
     }
 
-    private string GenerateControllerId(DualSenseController controller, string? serialNumber)
+    private string GenerateControllerId(DualSenseController controller)
     {
-        // Prefer MAC address as ID for Bluetooth controllers
         if (!string.IsNullOrEmpty(controller.MacAddress))
         {
-            return $"BT_{controller.MacAddress.Replace(":", "")}";
+            return $"{controller.MacAddress.Replace(":", "")}";
         }
-
-        // Use serial number if available
-        return !string.IsNullOrEmpty(serialNumber)
-            ? $"SN_{serialNumber}"
-            :
-            // Fallback to generated GUID
-            $"DS_{Guid.NewGuid():N}".Substring(0, 12);
+        throw new Exception("Couldn't find MAC address of the controller");
     }
 
     private string? TryGetSerialNumber(HidDevice device)
@@ -147,20 +183,27 @@ public class ProfileManager
         Logger.Info($"Applying profile '{profile.Name}' to {controllerInfo.Name}");
 
         // Apply lightbar settings
-        controller.SetLightbar(
-            profile.Lightbar.Red,
-            profile.Lightbar.Green,
-            profile.Lightbar.Blue
-        );
+        controller.SetLightbar(profile.Lightbar.Red, profile.Lightbar.Green, profile.Lightbar.Blue);
 
         // Apply player LEDs
-        controller.SetPlayerLeds(
-            profile.PlayerLeds.Pattern,
-            profile.PlayerLeds.Brightness
-        );
+        controller.SetPlayerLeds(profile.PlayerLeds.Pattern, profile.PlayerLeds.Brightness);
 
         // Apply mic LED
         controller.SetMicLed(profile.MicLed);
+    }
+
+    /// <summary>
+    /// Manually refreshes profiles for all connected controllers
+    /// </summary>
+    public void RefreshAllProfiles()
+    {
+        Logger.Info("Refreshing profiles for all connected controllers");
+
+        foreach (DualSenseController controller in _dualSenseManager.Controllers.Values)
+        {
+            ControllerInfo controllerInfo = GetOrCreateControllerInfo(controller);
+            ApplyProfile(controller, controllerInfo);
+        }
     }
 
     public void CreateDefaultProfile()
@@ -171,8 +214,8 @@ public class ProfileManager
         {
             Id = "default",
             Name = "Default",
-            Lightbar = new LightbarSettings { Red = 0, Green = 0, Blue = 255 },
-            PlayerLeds = new PlayerLedSettings { Pattern = PlayerLed.LED_1 },
+            Lightbar = new LightbarSettings { Red = 0, Green = 0, Blue = 0 },
+            PlayerLeds = new PlayerLedSettings { Pattern = PlayerLed.None },
             MicLed = MicLed.Off
         };
 

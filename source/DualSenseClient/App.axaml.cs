@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
+using DualSenseClient.Core.DualSense;
 using DualSenseClient.Core.Logging;
 using DualSenseClient.Core.Settings;
 using DualSenseClient.Services;
@@ -39,6 +40,8 @@ public class App : Application
 
             ISettingsManager settingsManager = Services.GetRequiredService<ISettingsManager>();
             Logger.SetLogLevel(LogLevelHelper.FromString(settingsManager.Application.Debug.Logger.Level));
+            _ = Services.GetRequiredService<DualSenseManager>();
+            _ = Services.GetRequiredService<DualSenseProfileManager>();
 
             mainWindow.Opened += (_, _) =>
             {

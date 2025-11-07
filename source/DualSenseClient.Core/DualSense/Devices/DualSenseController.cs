@@ -50,16 +50,23 @@ public class DualSenseController : IDisposable
         Logger.Info($"Controller mode detected: {ConnectionType}");
         Logger.Debug($"Max output report length: {device.GetMaxOutputReportLength()}");
 
-        if (ConnectionType == ConnectionType.Bluetooth)
+        // Try to extract MAC address for both USB and Bluetooth
+        MacAddress = BluetoothHelper.ExtractMacAddress(device);
+
+        if (MacAddress != null)
         {
-            MacAddress = BluetoothHelper.ExtractMacAddress(device);
+            Logger.Info($"Hardware MAC address: {MacAddress}");
+        }
+        else
+        {
+            Logger.Warning("Failed to extract MAC address from device");
+
+            // For USB, try to get it from the controller itself via feature report
+            MacAddress = TryGetMacAddressFromController();
+
             if (MacAddress != null)
             {
-                Logger.Info($"Bluetooth MAC address: {MacAddress}");
-            }
-            else
-            {
-                Logger.Warning("Failed to extract Bluetooth MAC address");
+                Logger.Info($"MAC address from controller: {MacAddress}");
             }
         }
 
@@ -70,6 +77,35 @@ public class DualSenseController : IDisposable
     }
 
     // Functions
+    /// <summary>
+    /// Attempts to retrieve MAC address directly from the controller via feature report (In case BluetoothHelper fails)
+    /// </summary>
+    private string? TryGetMacAddressFromController()
+    {
+        try
+        {
+            // DualSense stores MAC address in feature report 0x09
+            byte[] report = new byte[20];
+            report[0] = 0x09;
+
+            _stream.GetFeature(report);
+
+            // MAC address is at bytes 1-6
+            if (report.Length >= 7)
+            {
+                string mac = $"{report[6]:X2}:{report[5]:X2}:{report[4]:X2}:{report[3]:X2}:{report[2]:X2}:{report[1]:X2}";
+                Logger.Debug($"Extracted MAC from feature report: {mac}");
+                return mac;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Debug($"Could not retrieve MAC from feature report: {ex.Message}");
+        }
+
+        return null;
+    }
+
     private async Task ReadLoop(CancellationToken ct)
     {
         Logger.Debug("Read loop started");

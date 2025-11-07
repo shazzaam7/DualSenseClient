@@ -16,6 +16,7 @@ public static class ServiceConfigurator
 
         // Core
         services.AddSingleton<DualSenseManager>();
+        services.AddSingleton<DualSenseProfileManager>();
         services.AddSingleton<NavigationService>();
         services.AddSingleton<IApplicationSettings, ApplicationSettings>();
         services.AddSingleton<ISettingsManager, SettingsManager>();
