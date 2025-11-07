@@ -16,10 +16,9 @@ public class DualSenseManager : IDisposable
 
     private readonly Dictionary<string, DualSenseController> _controllers = new Dictionary<string, DualSenseController>();
     private readonly Lock _lock = new Lock();
-    private Timer? _scanTimer;
-    private int _scanIntervalMs;
     private bool _disposed;
     private bool _scanningEnabled = true;
+    private DeviceList? _deviceList;
 
     // Events
     public event EventHandler<DualSenseController>? ControllerConnected;
@@ -38,15 +37,37 @@ public class DualSenseManager : IDisposable
     }
 
     // Constructor
-    public DualSenseManager(int scanIntervalMs = 2000)
+    public DualSenseManager()
     {
-        _scanIntervalMs = scanIntervalMs;
-        Logger.Info($"Initializing DualSense Manager (scan interval: {_scanIntervalMs}ms)");
-        _scanTimer = new Timer(ScanForDevices, null, 0, _scanIntervalMs);
+        Logger.Info("Initializing DualSense Manager");
+
+        // Get the device list and subscribe to changes
+        _deviceList = DeviceList.Local;
+        _deviceList.Changed += OnDeviceListChanged;
+
+        // Initial scan
+        ScanForDevices();
+
         Logger.Debug("DualSense Manager started");
     }
 
-    // Functions
+    private void OnDeviceListChanged(object? sender, DeviceListChangedEventArgs e)
+    {
+        if (_disposed || !_scanningEnabled)
+        {
+            return;
+        }
+
+        Logger.Trace("Device list changed event received");
+
+        // Debounce multiple rapid changes
+        Task.Run(async () =>
+        {
+            await Task.Delay(100); // Small delay to batch rapid changes
+            ScanForDevices();
+        });
+    }
+
     /// <summary>
     /// Enables scanning if it was previously stopped.
     /// </summary>
@@ -59,13 +80,12 @@ public class DualSenseManager : IDisposable
 
         lock (_lock)
         {
-            if (_scanTimer == null)
-            {
-                Logger.Info("Starting DualSense scan timer");
-                _scanTimer = new Timer(ScanForDevices, null, 0, _scanIntervalMs);
-            }
             _scanningEnabled = true;
+            Logger.Info("DualSense scanning enabled");
         }
+
+        // Perform immediate scan
+        ScanForDevices();
     }
 
     /// <summary>
@@ -80,43 +100,23 @@ public class DualSenseManager : IDisposable
 
         lock (_lock)
         {
-            if (_scanTimer != null)
-            {
-                Logger.Info("Stopping DualSense scan timer");
-                _scanTimer.Dispose();
-                _scanTimer = null;
-            }
             _scanningEnabled = false;
+            Logger.Info("DualSense scanning disabled");
         }
     }
 
     /// <summary>
-    /// Changes the scan interval. If scanning is active, updates the timer immediately.
+    /// Manually triggers a device scan
     /// </summary>
-    public void SetScanInterval(int newIntervalMs)
+    public void RefreshDevices()
     {
-        if (_disposed)
+        if (!_disposed && _scanningEnabled)
         {
-            return;
-        }
-        if (newIntervalMs <= 0)
-        {
-            Logger.Warning("Invalid scan interval specified; must be > 0ms");
-            return;
-        }
-
-        lock (_lock)
-        {
-            _scanIntervalMs = newIntervalMs;
-            if (_scanTimer != null)
-            {
-                Logger.Info($"Updating DualSense scan interval to {newIntervalMs}ms");
-                _scanTimer.Change(0, newIntervalMs);
-            }
+            ScanForDevices();
         }
     }
 
-    private void ScanForDevices(object? state)
+    private void ScanForDevices()
     {
         if (_disposed || !_scanningEnabled)
         {
@@ -127,7 +127,7 @@ public class DualSenseManager : IDisposable
         {
             Logger.Trace("Scanning for DualSense devices...");
 
-            HidDevice[] devices = DeviceList.Local.GetHidDevices()
+            HidDevice[] devices = _deviceList!.GetHidDevices()
                 .Where(d => d.VendorID == SonyVid)
                 .Where(d => KnownPids.Contains(d.ProductID))
                 .ToArray();
@@ -258,11 +258,13 @@ public class DualSenseManager : IDisposable
         Logger.Debug("Disposing DualSense Manager");
         _disposed = true;
 
+        if (_deviceList != null)
+        {
+            _deviceList.Changed -= OnDeviceListChanged;
+        }
+
         lock (_lock)
         {
-            _scanTimer?.Dispose();
-            _scanTimer = null;
-
             foreach (DualSenseController controller in _controllers.Values)
             {
                 try
