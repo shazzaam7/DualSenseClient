@@ -478,7 +478,7 @@ public class DualSenseController : IDisposable
         report[45] = (byte)(0x20 | (byte)CurrentPlayerLeds);
 
         // Mic LED
-        report[11] = (byte)CurrentMicLed;
+        report[10] = (byte)CurrentMicLed;
 
         // Calculate and append CRC32
         uint crc = CRC32DualSense.Compute(report, 0, 74);
@@ -513,7 +513,7 @@ public class DualSenseController : IDisposable
         report[44] = (byte)(0x20 | (byte)CurrentPlayerLeds);
 
         // Mic LED
-        report[10] = (byte)CurrentMicLed;
+        report[9] = (byte)CurrentMicLed;
 
         return report;
     }
