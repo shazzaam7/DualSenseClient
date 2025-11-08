@@ -6,7 +6,7 @@
              xmlns:vm="clr-namespace:DualSenseClient.ViewModels"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DualSenseClient.Views.Controls.ControllerInformation"
-             x:DataType="vm:ControllerViewModel">
+             x:DataType="vm:ControllerViewModelBase">
     <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
             CornerRadius="8"
             Padding="20">

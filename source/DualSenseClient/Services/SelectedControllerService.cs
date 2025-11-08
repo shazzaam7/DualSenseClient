@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -20,17 +19,17 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
     // Properties
     private readonly DualSenseManager _dualSenseManager;
     private readonly ISettingsManager _settingsManager;
-    private readonly Dictionary<string, ControllerViewModel> _controllerViewModels = new();
+    private readonly Dictionary<string, ControllerViewModelBase> _controllerViewModels = new();
     private readonly Lock _lock = new Lock();
     private string? _lastSelectedMacAddress;
     private bool _isTransitioning;
     private CancellationTokenSource? _transitionCts;
 
-    [ObservableProperty] private ControllerViewModel? _selectedController;
+    [ObservableProperty] private ControllerViewModelBase? _selectedController;
 
-    [ObservableProperty] private ObservableCollection<ControllerViewModel> _availableControllers = new();
+    [ObservableProperty] private ObservableCollection<ControllerViewModelBase> _availableControllers = new();
 
-    public event EventHandler<ControllerViewModel?>? SelectedControllerChanged;
+    public event EventHandler<ControllerViewModelBase?>? SelectedControllerChanged;
 
 
     // Constructor
@@ -69,7 +68,7 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
 
     private async void OnControllerConnected(object? sender, DualSenseController controller)
     {
-        ControllerViewModel vm;
+        ControllerViewModelBase vm;
         string? normalizedMac = null;
         bool shouldSelect = false;
 
@@ -113,7 +112,7 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
 
     private async void OnControllerDisconnected(object? sender, string devicePath)
     {
-        ControllerViewModel? vm;
+        ControllerViewModelBase? vm;
         bool wasSelected = false;
         string? macAddress = null;
 
@@ -181,10 +180,10 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
         }
     }
 
-    private ControllerViewModel AddControllerViewModelInternal(DualSenseController controller)
+    private ControllerViewModelBase AddControllerViewModelInternal(DualSenseController controller)
     {
         ControllerInfo? controllerInfo = GetControllerInfo(controller);
-        ControllerViewModel vm = new ControllerViewModel(controller, controllerInfo);
+        ControllerViewModelBase vm = new ControllerViewModelBase(controller, controllerInfo);
 
         // Battery updates
         controller.InputChanged += (_, _) =>
@@ -202,14 +201,14 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
 
         lock (_lock)
         {
-            foreach (ControllerViewModel controller in _controllerViewModels.Values)
+            foreach (ControllerViewModelBase controller in _controllerViewModels.Values)
             {
                 AvailableControllers.Add(controller);
             }
         }
     }
 
-    public void SelectController(ControllerViewModel? controller)
+    public void SelectController(ControllerViewModelBase? controller)
     {
         lock (_lock)
         {
@@ -217,7 +216,7 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
         }
     }
 
-    private void SelectControllerInternal(ControllerViewModel? controller)
+    private void SelectControllerInternal(ControllerViewModelBase? controller)
     {
         if (SelectedController != controller)
         {
@@ -251,7 +250,7 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
         lock (_lock)
         {
             string normalized = NormalizeMacAddress(macAddress);
-            ControllerViewModel? controller = _controllerViewModels.Values.FirstOrDefault(c => !string.IsNullOrEmpty(c.MacAddress) && NormalizeMacAddress(c.MacAddress) == normalized);
+            ControllerViewModelBase? controller = _controllerViewModels.Values.FirstOrDefault(c => !string.IsNullOrEmpty(c.MacAddress) && NormalizeMacAddress(c.MacAddress) == normalized);
 
             if (controller != null)
             {
@@ -260,7 +259,7 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
         }
     }
 
-    public IEnumerable<ControllerViewModel> GetAllControllers()
+    public IEnumerable<ControllerViewModelBase> GetAllControllers()
     {
         lock (_lock)
         {

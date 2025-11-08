@@ -14,7 +14,7 @@
     </Design.DataContext>
     <ScrollViewer>
         <StackPanel Margin="20" Spacing="20" MaxWidth="800">
-            <!-- Controller Selection Control -->
+            <!-- Controller Selection -->
             <controls:ControllerSelector DataContext="{Binding ControllerSelector}" />
 
             <!-- Controller Information -->
@@ -23,8 +23,8 @@
             </Border>
 
             <!-- Controller Monitor -->
-            <Border IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
-                <controls:ControllerMonitor DataContext="{Binding SelectedController}" />
+            <Border IsVisible="{Binding MonitorViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <controls:ControllerMonitor DataContext="{Binding MonitorViewModel}" />
             </Border>
         </StackPanel>
     </ScrollViewer>

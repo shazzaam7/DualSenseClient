@@ -9,12 +9,12 @@ public partial class ControllerSelectorViewModel : ViewModelBase
     private readonly SelectedControllerService _selectedControllerService;
     private bool _isUpdating;
 
-    public ObservableCollection<ControllerViewModel> Controllers => _selectedControllerService.AvailableControllers;
+    public ObservableCollection<ControllerViewModelBase> Controllers => _selectedControllerService.AvailableControllers;
 
     public bool HasControllers => Controllers.Count > 0;
 
     // Constructor
-    public ControllerViewModel? SelectedController
+    public ControllerViewModelBase? SelectedController
     {
         get => _selectedControllerService.SelectedController;
         set

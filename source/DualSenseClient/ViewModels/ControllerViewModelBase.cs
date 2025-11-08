@@ -4,50 +4,37 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DualSenseClient.Core.DualSense.Devices;
-using DualSenseClient.Core.DualSense.Enums;
 using DualSenseClient.Core.DualSense.Reports;
 using DualSenseClient.Core.Settings.Models;
 
 namespace DualSenseClient.ViewModels;
 
-public partial class ControllerViewModel : ObservableObject, IDisposable
+/// <summary>
+/// Base ViewModel for controller
+/// </summary>
+public partial class ControllerViewModelBase : ObservableObject, IDisposable
 {
     // Properties
-    private readonly DualSenseController _controller;
-    private readonly ControllerInfo? _controllerInfo;
+    protected readonly DualSenseController _controller;
+    protected readonly ControllerInfo? _controllerInfo;
     private CancellationTokenSource? _animationCts;
 
     [ObservableProperty] private string _name;
-
     [ObservableProperty] private string _devicePath;
-
     [ObservableProperty] private string _connectionType;
-
     [ObservableProperty] private string _connectionIcon;
-
     [ObservableProperty] private string _macAddress;
-
     [ObservableProperty] private double _batteryLevel;
-
     [ObservableProperty] private bool _isCharging;
-
     [ObservableProperty] private bool _isFullyCharged;
-
     [ObservableProperty] private string _batteryIcon = "Battery";
-
     [ObservableProperty] private string _chargingIcon = "BatteryCharge";
-
     [ObservableProperty] private string _batteryText = string.Empty;
 
-    public InputState InputState => _controller.Input;
-    public LightbarColor CurrentLightbarColor => _controller.CurrentLightbarColor;
-    public LightbarBehavior CurrentLightbarBehavior => _controller.CurrentLightbarBehavior;
-    public PlayerLed CurrentPlayerLeds => _controller.CurrentPlayerLeds;
-    public PlayerLedBrightness CurrentPlayerLedBrightness => _controller.CurrentPlayerLedBrightness;
-    public MicLed CurrentMicLed => _controller.CurrentMicLed;
+    public DualSenseController Controller => _controller;
 
     // Constructor
-    public ControllerViewModel(DualSenseController controller, ControllerInfo? controllerInfo)
+    public ControllerViewModelBase(DualSenseController controller, ControllerInfo? controllerInfo)
     {
         _controller = controller;
         _controllerInfo = controllerInfo;
@@ -55,27 +42,13 @@ public partial class ControllerViewModel : ObservableObject, IDisposable
         Name = controllerInfo?.Name ?? "DualSense Controller";
         DevicePath = controller.Device.DevicePath;
         ConnectionType = controller.ConnectionType.ToString();
-        ConnectionIcon = controller.ConnectionType == Core.DualSense.Enums.ConnectionType.Bluetooth
-            ? "BluetoothConnected"
-            : "UsbPlug";
+        ConnectionIcon = controller.ConnectionType == Core.DualSense.Enums.ConnectionType.Bluetooth ? "BluetoothConnected" : "UsbPlug";
         MacAddress = controller.MacAddress ?? "N/A";
 
         UpdateBatteryState(controller.Battery);
-
-        _controller.InputChanged += OnInputChanged;
     }
 
     // Functions
-    private void OnInputChanged(object? sender, InputState inputState)
-    {
-        OnPropertyChanged(nameof(InputState));
-        OnPropertyChanged(nameof(CurrentLightbarColor));
-        OnPropertyChanged(nameof(CurrentLightbarBehavior));
-        OnPropertyChanged(nameof(CurrentPlayerLeds));
-        OnPropertyChanged(nameof(CurrentPlayerLedBrightness));
-        OnPropertyChanged(nameof(CurrentMicLed));
-    }
-
     public void UpdateBatteryState(BatteryState battery)
     {
         BatteryLevel = battery.BatteryLevel;
@@ -84,11 +57,9 @@ public partial class ControllerViewModel : ObservableObject, IDisposable
         IsCharging = battery.IsCharging;
         IsFullyCharged = battery.IsFullyCharged;
 
-        // Update battery icon based on level and charging state
         BatteryIcon = GetBatteryIcon(battery);
         BatteryText = GetBatteryText(battery);
 
-        // Start or stop charging animation
         if (IsCharging && !wasCharging)
         {
             StartChargingAnimation();
@@ -99,9 +70,8 @@ public partial class ControllerViewModel : ObservableObject, IDisposable
         }
     }
 
-    private void StartChargingAnimation()
+    protected void StartChargingAnimation()
     {
-        // Cancel any existing animation
         StopChargingAnimation();
 
         _animationCts = new CancellationTokenSource();
@@ -112,7 +82,6 @@ public partial class ControllerViewModel : ObservableObject, IDisposable
             int frame = 0;
             while (!token.IsCancellationRequested)
             {
-                // Cycle through BatteryCharge0 to BatteryCharge10
                 string icon = $"BatteryCharge{frame}";
 
                 await Dispatcher.UIThread.InvokeAsync(() =>
@@ -120,14 +89,13 @@ public partial class ControllerViewModel : ObservableObject, IDisposable
                     ChargingIcon = icon;
                 });
 
-                frame = (frame + 1) % 11; // 0-10, then loop back
-
-                await Task.Delay(150, token); // Change frame every 150ms
+                frame = (frame + 1) % 11;
+                await Task.Delay(150, token);
             }
         }, token);
     }
 
-    private void StopChargingAnimation()
+    protected void StopChargingAnimation()
     {
         _animationCts?.Cancel();
         _animationCts?.Dispose();
@@ -173,9 +141,8 @@ public partial class ControllerViewModel : ObservableObject, IDisposable
         return $"{battery.BatteryLevel:F0}%";
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
-        _controller.InputChanged -= OnInputChanged;
         StopChargingAnimation();
     }
 }
