@@ -1,97 +1,51 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
-using DualSenseClient.Core.DualSense;
-using DualSenseClient.Core.DualSense.Devices;
-using DualSenseClient.Core.Settings;
-using DualSenseClient.Core.Settings.Models;
+﻿using System.Collections.ObjectModel;
+using DualSenseClient.Services;
 
 namespace DualSenseClient.ViewModels.Controls;
 
-public partial class ControllerSelectorViewModel : ViewModelBase, IDisposable
+public partial class ControllerSelectorViewModel : ViewModelBase
 {
-    private readonly DualSenseManager _dualSenseManager;
-    private readonly ISettingsManager _settingsManager;
+    // Properties
+    private readonly SelectedControllerService _selectedControllerService;
+    private bool _isUpdating;
 
-    [ObservableProperty] private ObservableCollection<ControllerViewModel> _controllers = [];
+    public ObservableCollection<ControllerViewModel> Controllers => _selectedControllerService.AvailableControllers;
 
-    [ObservableProperty] private ControllerViewModel? _selectedController;
+    public bool HasControllers => Controllers.Count > 0;
 
-    [ObservableProperty] private bool _hasControllers;
-
-    public ControllerSelectorViewModel(DualSenseManager dualSenseManager, ISettingsManager settingsManager)
+    // Constructor
+    public ControllerViewModel? SelectedController
     {
-        _dualSenseManager = dualSenseManager;
-        _settingsManager = settingsManager;
-
-        // Subscribe to controller events
-        _dualSenseManager.ControllerConnected += OnControllerConnected;
-        _dualSenseManager.ControllerDisconnected += OnControllerDisconnected;
-
-        // Load existing controllers
-        RefreshControllers();
-    }
-
-    private void OnControllerConnected(object? sender, DualSenseController controller)
-    {
-        RefreshControllers();
-    }
-
-    private void OnControllerDisconnected(object? sender, string devicePath)
-    {
-        RefreshControllers();
-    }
-
-    private void RefreshControllers()
-    {
-        string? currentSelection = SelectedController?.DevicePath;
-
-        Controllers.Clear();
-
-        foreach (DualSenseController controller in _dualSenseManager.Controllers.Values)
+        get => _selectedControllerService.SelectedController;
+        set
         {
-            ControllerInfo? controllerInfo = GetControllerInfo(controller);
-            ControllerViewModel vm = new ControllerViewModel(controller, controllerInfo);
-            Controllers.Add(vm);
-
-            // Subscribe to input changes for battery updates
-            controller.InputChanged += (_, _) => vm.UpdateBatteryState(controller.Battery);
+            if (!_isUpdating && value != _selectedControllerService.SelectedController)
+            {
+                _selectedControllerService.SelectController(value);
+            }
         }
-
-        HasControllers = Controllers.Count > 0;
-
-        // Restore selection or select first
-        if (currentSelection != null)
-        {
-            SelectedController = Controllers.FirstOrDefault(c => c.DevicePath == currentSelection);
-        }
-
-        SelectedController ??= Controllers.FirstOrDefault();
     }
 
-    private ControllerInfo? GetControllerInfo(DualSenseController controller)
+    // Functions
+    public ControllerSelectorViewModel(SelectedControllerService selectedControllerService)
     {
-        ControllerSettings settings = _settingsManager.Application.Controllers;
+        _selectedControllerService = selectedControllerService;
 
-        // Try to find by MAC
-        if (!string.IsNullOrEmpty(controller.MacAddress))
+        // Subscribe to changes
+        _selectedControllerService.PropertyChanged += OnServicePropertyChanged;
+        _selectedControllerService.AvailableControllers.CollectionChanged += (_, _) =>
         {
-            return settings.KnownControllers.Values.FirstOrDefault(c => c.MacAddress == controller.MacAddress);
-        }
-
-        return null;
+            OnPropertyChanged(nameof(HasControllers));
+        };
     }
 
-    public void Dispose()
+    private void OnServicePropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        _dualSenseManager.ControllerConnected -= OnControllerConnected;
-        _dualSenseManager.ControllerDisconnected -= OnControllerDisconnected;
-
-        // Dispose all controller view models
-        foreach (ControllerViewModel controller in Controllers)
+        if (e.PropertyName == nameof(SelectedControllerService.SelectedController))
         {
-            controller.Dispose();
+            _isUpdating = true;
+            OnPropertyChanged(nameof(SelectedController));
+            _isUpdating = false;
         }
     }
 }

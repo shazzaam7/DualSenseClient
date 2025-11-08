@@ -16,6 +16,7 @@ public static class ServiceConfigurator
         ServiceCollection services = new ServiceCollection();
 
         // Core
+        services.AddSingleton<SelectedControllerService>();
         services.AddSingleton<DualSenseManager>();
         services.AddSingleton<DualSenseProfileManager>();
         services.AddSingleton<NavigationService>();

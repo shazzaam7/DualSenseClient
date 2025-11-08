@@ -62,8 +62,9 @@
             </Border>
 
             <!-- Controller ComboBox -->
-            <ComboBox ItemsSource="{Binding Controllers}"
-                      SelectedItem="{Binding SelectedController}"
+            <ComboBox x:Name="ControllerComboBox"
+                      ItemsSource="{Binding Controllers}"
+                      SelectedItem="{Binding SelectedController, Mode=TwoWay}"
                       IsVisible="{Binding HasControllers}"
                       HorizontalAlignment="Stretch"
                       PlaceholderText="Select a controller">
@@ -88,6 +89,17 @@
                         </StackPanel>
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
+
+                <!-- This forces refresh on collection changes -->
+                <ComboBox.Styles>
+                    <Style Selector="ComboBox">
+                        <Setter Property="ItemsPanel">
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </Setter>
+                    </Style>
+                </ComboBox.Styles>
             </ComboBox>
         </StackPanel>
     </Border>
