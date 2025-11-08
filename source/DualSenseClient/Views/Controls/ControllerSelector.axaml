@@ -5,7 +5,7 @@
              xmlns:ic="using:FluentIcons.Avalonia.Fluent"
              xmlns:vm="clr-namespace:DualSenseClient.ViewModels.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="DualSenseClient.Views.Controls.ControllerSelectorControl"
+             x:Class="DualSenseClient.Views.Controls.ControllerSelector"
              x:DataType="vm:ControllerSelectorViewModel">
     <Design.DataContext>
         <vm:ControllerSelectorViewModel />

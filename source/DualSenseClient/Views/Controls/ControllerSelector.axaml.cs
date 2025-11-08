@@ -4,11 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DualSenseClient.Views.Controls;
 
-public partial class ControllerSelectorControl : UserControl
+public partial class ControllerSelector : UserControl
 {
     private ControllerSelectorViewModel _viewModel { get; set; }
 
-    public ControllerSelectorControl()
+    public ControllerSelector()
     {
         InitializeComponent();
         _viewModel = App.Services.GetRequiredService<ControllerSelectorViewModel>();
