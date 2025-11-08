@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using DualSenseClient.Core.Bluetooth;
 using DualSenseClient.Core.DualSense.Enums;
 using DualSenseClient.Core.DualSense.Reports;
@@ -27,7 +28,7 @@ public class DualSenseController : IDisposable
 
     // Current Controller State
     public BatteryState Battery { get; private set; } = new BatteryState();
-    public LightbarColor CurrentLightbarColor { get; private set; }
+    public LightbarColor CurrentLightbarColor { get; private set; } = new LightbarColor(0, 0, 255);
     public LightbarBehavior CurrentLightbarBehavior { get; private set; }
     public PlayerLed CurrentPlayerLeds { get; private set; }
     public PlayerLedBrightness CurrentPlayerLedBrightness { get; private set; }

@@ -1,25 +1,27 @@
-﻿namespace DualSenseClient.Core.DualSense.Enums;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace DualSenseClient.Core.DualSense.Enums;
 
 /// <summary>
 /// Color of the DualSense Lightbar.
 /// </summary>
-public struct LightbarColor
+public partial class LightbarColor : ObservableObject
 {
     // Properties
     /// <summary>
     /// Red component of the color (0-255)
     /// </summary>
-    public byte Red;
+    [ObservableProperty] private byte _red;
 
     /// <summary>
     /// Green component of the color (0-255)
     /// </summary>
-    public byte Green;
+    [ObservableProperty] private byte _green;
 
     /// <summary>
     /// Blue component of the color (0-255)
     /// </summary>
-    public byte Blue;
+    [ObservableProperty] private byte _blue;
 
     // Constructor
     /// <summary>

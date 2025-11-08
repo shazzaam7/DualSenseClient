@@ -1,72 +1,74 @@
-﻿namespace DualSenseClient.Core.DualSense.Reports;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-public class InputState
+namespace DualSenseClient.Core.DualSense.Reports;
+
+public partial class InputState : ObservableObject
 {
     // Analog sticks (0-255, center is 128)
-    public byte LeftStickX { get; set; } = 128;
-    public byte LeftStickY { get; set; } = 128;
-    public byte RightStickX { get; set; } = 128;
-    public byte RightStickY { get; set; } = 128;
+    [ObservableProperty] private byte _leftStickX = 128;
+    [ObservableProperty] private byte _leftStickY = 128;
+    [ObservableProperty] private byte _rightStickX = 128;
+    [ObservableProperty] private byte _rightStickY = 128;
 
     // Analog triggers (0-255)
-    public byte L2 { get; set; }
-    public byte R2 { get; set; }
+    [ObservableProperty] private byte _l2;
+    [ObservableProperty] private byte _r2;
 
     // Digital trigger buttons
-    public bool L2Button { get; set; }
-    public bool R2Button { get; set; }
+    [ObservableProperty] private bool _l2Button;
+    [ObservableProperty] private bool _r2Button;
 
     // D-Pad
-    public bool DPadUp { get; set; }
-    public bool DPadDown { get; set; }
-    public bool DPadLeft { get; set; }
-    public bool DPadRight { get; set; }
+    [ObservableProperty] private bool _dPadUp;
+    [ObservableProperty] private bool _dPadDown;
+    [ObservableProperty] private bool _dPadLeft;
+    [ObservableProperty] private bool _dPadRight;
 
     // Face buttons
-    public bool Cross { get; set; }
-    public bool Circle { get; set; }
-    public bool Square { get; set; }
-    public bool Triangle { get; set; }
+    [ObservableProperty] private bool _cross;
+    [ObservableProperty] private bool _circle;
+    [ObservableProperty] private bool _square;
+    [ObservableProperty] private bool _triangle;
 
     // Shoulder buttons
-    public bool L1 { get; set; }
-    public bool R1 { get; set; }
-    public bool L3 { get; set; }
-    public bool R3 { get; set; }
+    [ObservableProperty] private bool _l1;
+    [ObservableProperty] private bool _r1;
+    [ObservableProperty] private bool _l3;
+    [ObservableProperty] private bool _r3;
 
     // System buttons
-    public bool Create { get; set; }
-    public bool Options { get; set; }
-    public bool PS { get; set; }
-    public bool TouchPadClick { get; set; }
-    public bool Mute { get; set; }
+    [ObservableProperty] private bool _create;
+    [ObservableProperty] private bool _options;
+    [ObservableProperty] private bool _pS;
+    [ObservableProperty] private bool _touchPadClick;
+    [ObservableProperty] private bool _mute;
 
     // Gyroscope (Angular Velocity)
-    public short GyroX { get; set; }
-    public short GyroY { get; set; }
-    public short GyroZ { get; set; }
+    [ObservableProperty] private short _gyroX;
+    [ObservableProperty] private short _gyroY;
+    [ObservableProperty] private short _gyroZ;
 
     // Accelerometer
-    public short AccelX { get; set; }
-    public short AccelY { get; set; }
-    public short AccelZ { get; set; }
+    [ObservableProperty] private short _accelX;
+    [ObservableProperty] private short _accelY;
+    [ObservableProperty] private short _accelZ;
 
     // Touchpad
-    public TouchPoint Touch1 { get; set; } = new();
-    public TouchPoint Touch2 { get; set; } = new();
+    [ObservableProperty] private TouchPoint _touch1 = new TouchPoint();
+    [ObservableProperty] private TouchPoint _touch2 = new TouchPoint();
 
     // Connection status
-    public bool IsHeadphoneConnected { get; set; }
-    public bool IsMicConnected { get; set; }
-    public bool IsMicMuted { get; set; }
-    public bool IsUsbDataConnected { get; set; }
-    public bool IsUsbPowerConnected { get; set; }
+    [ObservableProperty] private bool _isHeadphoneConnected;
+    [ObservableProperty] private bool _isMicConnected;
+    [ObservableProperty] private bool _isMicMuted;
+    [ObservableProperty] private bool _isUsbDataConnected;
+    [ObservableProperty] private bool _isUsbPowerConnected;
 }
 
-public class TouchPoint
+public partial class TouchPoint : ObservableObject
 {
-    public byte Index { get; set; }
-    public bool IsActive { get; set; }
-    public ushort X { get; set; } // 0-1919
-    public ushort Y { get; set; } // 0-1079
+    [ObservableProperty] private byte _index;
+    [ObservableProperty] private bool _isActive;
+    [ObservableProperty] private ushort _x; // 0-1919
+    [ObservableProperty] private ushort _y; // 0-1079
 }

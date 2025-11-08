@@ -155,6 +155,10 @@
                     </StackPanel>
                 </StackPanel>
             </Border>
+
+            <Border IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <controls:ControllerMonitor DataContext="{Binding SelectedController}" />
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

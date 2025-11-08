@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DualSenseClient.Core.DualSense.Devices;
+using DualSenseClient.Core.DualSense.Enums;
 using DualSenseClient.Core.DualSense.Reports;
 using DualSenseClient.Core.Settings.Models;
 
@@ -11,6 +12,7 @@ namespace DualSenseClient.ViewModels;
 
 public partial class ControllerViewModel : ObservableObject, IDisposable
 {
+    // Properties
     private readonly DualSenseController _controller;
     private readonly ControllerInfo? _controllerInfo;
     private CancellationTokenSource? _animationCts;
@@ -31,12 +33,20 @@ public partial class ControllerViewModel : ObservableObject, IDisposable
 
     [ObservableProperty] private bool _isFullyCharged;
 
-    [ObservableProperty] private string _batteryIcon;
+    [ObservableProperty] private string _batteryIcon = "Battery";
 
     [ObservableProperty] private string _chargingIcon = "BatteryCharge";
 
-    [ObservableProperty] private string _batteryText;
+    [ObservableProperty] private string _batteryText = string.Empty;
 
+    public InputState InputState => _controller.Input;
+    public LightbarColor CurrentLightbarColor => _controller.CurrentLightbarColor;
+    public LightbarBehavior CurrentLightbarBehavior => _controller.CurrentLightbarBehavior;
+    public PlayerLed CurrentPlayerLeds => _controller.CurrentPlayerLeds;
+    public PlayerLedBrightness CurrentPlayerLedBrightness => _controller.CurrentPlayerLedBrightness;
+    public MicLed CurrentMicLed => _controller.CurrentMicLed;
+
+    // Constructor
     public ControllerViewModel(DualSenseController controller, ControllerInfo? controllerInfo)
     {
         _controller = controller;
@@ -51,6 +61,19 @@ public partial class ControllerViewModel : ObservableObject, IDisposable
         MacAddress = controller.MacAddress ?? "N/A";
 
         UpdateBatteryState(controller.Battery);
+
+        _controller.InputChanged += OnInputChanged;
+    }
+
+    // Functions
+    private void OnInputChanged(object? sender, InputState inputState)
+    {
+        OnPropertyChanged(nameof(InputState));
+        OnPropertyChanged(nameof(CurrentLightbarColor));
+        OnPropertyChanged(nameof(CurrentLightbarBehavior));
+        OnPropertyChanged(nameof(CurrentPlayerLeds));
+        OnPropertyChanged(nameof(CurrentPlayerLedBrightness));
+        OnPropertyChanged(nameof(CurrentMicLed));
     }
 
     public void UpdateBatteryState(BatteryState battery)
@@ -152,6 +175,7 @@ public partial class ControllerViewModel : ObservableObject, IDisposable
 
     public void Dispose()
     {
+        _controller.InputChanged -= OnInputChanged;
         StopChargingAnimation();
     }
 }
