@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Avalonia.Data;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
 using DualSenseClient.Core.DualSense.Enums;
@@ -117,6 +118,37 @@ public class ByteToPercentageConverter : IValueConverter
         }
         byte byteValue = (byte)Math.Clamp((percentage / 100.0) * 255.0, 0, 255);
         return byteValue;
+    }
+}
+
+public class EnumToBooleanConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value == null || parameter == null)
+        {
+            return false;
+        }
+
+        // Check if the current enum value matches the parameter
+        string parameterString = parameter.ToString()!;
+        return value.ToString() == parameterString;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value == null || parameter == null)
+        {
+            return null;
+        }
+
+        // Only convert back if the radio button is checked
+        if (value is bool isChecked && isChecked && parameter is string parameterString)
+        {
+            return Enum.Parse(targetType, parameterString);
+        }
+
+        return false;
     }
 }
 

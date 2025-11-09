@@ -26,6 +26,11 @@
             <Border IsVisible="{Binding MonitorViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
                 <controls:ControllerMonitor DataContext="{Binding MonitorViewModel}" />
             </Border>
+            
+            <!-- Controller Profiles -->
+            <Border IsVisible="{Binding ProfileViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <controls:ControllerProfile DataContext="{Binding ProfileViewModel}" />
+            </Border>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

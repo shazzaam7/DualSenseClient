@@ -104,7 +104,7 @@ public class DualSenseProfileManager
         }
     }
 
-    private ControllerInfo GetOrCreateControllerInfo(DualSenseController controller)
+    public ControllerInfo GetOrCreateControllerInfo(DualSenseController controller)
     {
         ControllerSettings settings = _settingsManager.Application.Controllers;
 
@@ -269,6 +269,247 @@ public class DualSenseProfileManager
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Gets all available profiles
+    /// </summary>
+    public Dictionary<string, ControllerProfile> GetAllProfiles()
+    {
+        return _settingsManager.Application.Controllers.Profiles;
+    }
+
+    /// <summary>
+    /// Gets a profile by ID
+    /// </summary>
+    public ControllerProfile? GetProfile(string profileId)
+    {
+        return _settingsManager.Application.Controllers.Profiles.TryGetValue(profileId, out ControllerProfile? profile) ? profile : null;
+    }
+
+    /// <summary>
+    /// Gets the default profile
+    /// </summary>
+    public ControllerProfile GetDefaultProfile()
+    {
+        string? defaultId = _settingsManager.Application.Controllers.DefaultProfileId;
+
+        if (defaultId != null && _settingsManager.Application.Controllers.Profiles.TryGetValue(defaultId, out ControllerProfile? profile))
+        {
+            return profile;
+        }
+
+        // Create default if it doesn't exist
+        CreateDefaultProfile();
+
+        defaultId = _settingsManager.Application.Controllers.DefaultProfileId;
+        return _settingsManager.Application.Controllers.Profiles[defaultId!];
+    }
+
+    /// <summary>
+    /// Gets the profile assigned to a specific controller
+    /// </summary>
+    public ControllerProfile GetControllerProfile(string controllerId)
+    {
+        if (_settingsManager.Application.Controllers.KnownControllers.TryGetValue(controllerId, out ControllerInfo? controllerInfo) && controllerInfo.ProfileId != null &&
+            _settingsManager.Application.Controllers.Profiles.TryGetValue(controllerInfo.ProfileId, out ControllerProfile? profile))
+        {
+            return profile;
+        }
+
+        return GetDefaultProfile();
+    }
+
+    /// <summary>
+    /// Creates a new profile
+    /// </summary>
+    public ControllerProfile CreateProfile(string name)
+    {
+        ControllerProfile profile = new ControllerProfile
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = name,
+            Lightbar = new LightbarSettings
+            {
+                Behavior = LightbarBehavior.Custom,
+                Red = 0,
+                Green = 0,
+                Blue = 255
+            },
+            PlayerLeds = new PlayerLedSettings
+            {
+                Pattern = PlayerLed.None,
+                Brightness = PlayerLedBrightness.High
+            },
+            MicLed = MicLed.Off
+        };
+
+        SaveProfile(profile);
+        Logger.Info($"Created new profile: {name} ({profile.Id})");
+
+        return profile;
+    }
+
+    /// <summary>
+    /// Saves a profile
+    /// </summary>
+    public void SaveProfile(ControllerProfile profile)
+    {
+        _settingsManager.Application.Controllers.Profiles[profile.Id] = profile;
+        _settingsManager.SaveAll();
+        Logger.Debug($"Saved profile: {profile.Name} ({profile.Id})");
+    }
+
+    /// <summary>
+    /// Deletes a profile
+    /// </summary>
+    public bool DeleteProfile(string profileId)
+    {
+        if (_settingsManager.Application.Controllers.DefaultProfileId == profileId)
+        {
+            Logger.Warning($"Cannot delete default profile: {profileId}");
+            return false;
+        }
+
+        // Remove profile assignment from controllers and assign default
+        string? defaultProfileId = _settingsManager.Application.Controllers.DefaultProfileId;
+        foreach (ControllerInfo controller in _settingsManager.Application.Controllers.KnownControllers.Values)
+        {
+            if (controller.ProfileId == profileId)
+            {
+                controller.ProfileId = defaultProfileId;
+            }
+        }
+
+        bool removed = _settingsManager.Application.Controllers.Profiles.Remove(profileId);
+        if (removed)
+        {
+            _settingsManager.SaveAll();
+            Logger.Info($"Deleted profile: {profileId}");
+        }
+
+        return removed;
+    }
+
+    /// <summary>
+    /// Sets the default profile
+    /// </summary>
+    public void SetDefaultProfile(string profileId)
+    {
+        if (_settingsManager.Application.Controllers.Profiles.ContainsKey(profileId))
+        {
+            _settingsManager.Application.Controllers.DefaultProfileId = profileId;
+            _settingsManager.SaveAll();
+            Logger.Info($"Set default profile: {profileId}");
+        }
+    }
+
+    /// <summary>
+    /// Duplicates an existing profile
+    /// </summary>
+    public ControllerProfile DuplicateProfile(string sourceProfileId, string newName)
+    {
+        ControllerProfile? sourceProfile = GetProfile(sourceProfileId);
+        if (sourceProfile == null)
+        {
+            throw new ArgumentException($"Profile not found: {sourceProfileId}");
+        }
+
+        ControllerProfile newProfile = new ControllerProfile
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = newName,
+            Lightbar = new LightbarSettings
+            {
+                Behavior = sourceProfile.Lightbar.Behavior,
+                Red = sourceProfile.Lightbar.Red,
+                Green = sourceProfile.Lightbar.Green,
+                Blue = sourceProfile.Lightbar.Blue
+            },
+            PlayerLeds = new PlayerLedSettings
+            {
+                Pattern = sourceProfile.PlayerLeds.Pattern,
+                Brightness = sourceProfile.PlayerLeds.Brightness
+            },
+            MicLed = sourceProfile.MicLed
+        };
+
+        SaveProfile(newProfile);
+        Logger.Info($"Duplicated profile {sourceProfileId} to {newProfile.Id} ({newName})");
+
+        return newProfile;
+    }
+
+    /// <summary>
+    /// Creates a profile from current controller state
+    /// </summary>
+    public ControllerProfile CreateProfileFromController(DualSenseController controller, string name)
+    {
+        LightbarColor lightbar = controller.CurrentLightbarColor;
+
+        ControllerProfile profile = new ControllerProfile
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = name,
+            Lightbar = new LightbarSettings
+            {
+                Behavior = controller.CurrentLightbarBehavior,
+                Red = lightbar.Red,
+                Green = lightbar.Green,
+                Blue = lightbar.Blue
+            },
+            PlayerLeds = new PlayerLedSettings
+            {
+                Pattern = controller.CurrentPlayerLeds,
+                Brightness = controller.CurrentPlayerLedBrightness
+            },
+            MicLed = controller.CurrentMicLed
+        };
+
+        SaveProfile(profile);
+        Logger.Info($"Created profile from controller state: {name}");
+
+        return profile;
+    }
+
+    /// <summary>
+    /// Applies a profile to a controller
+    /// </summary>
+    public void ApplyProfileToController(DualSenseController controller, ControllerProfile profile)
+    {
+        Logger.Info($"Applying profile '{profile.Name}' to controller");
+
+        // Apply lightbar settings
+        controller.SetLightbar(profile.Lightbar.Red, profile.Lightbar.Green, profile.Lightbar.Blue);
+
+        // Apply player LEDs
+        controller.SetPlayerLeds(profile.PlayerLeds.Pattern, profile.PlayerLeds.Brightness);
+
+        // Apply mic LED
+        controller.SetMicLed(profile.MicLed);
+
+        Logger.Debug($"Profile applied: Lightbar=RGB({profile.Lightbar.Red},{profile.Lightbar.Green},{profile.Lightbar.Blue}), PlayerLEDs={profile.PlayerLeds.Pattern}, MicLED={profile.MicLed}");
+    }
+
+    /// <summary>
+    /// Gets all known controllers
+    /// </summary>
+    public Dictionary<string, ControllerInfo> GetKnownControllers()
+    {
+        return _settingsManager.Application.Controllers.KnownControllers;
+    }
+
+    /// <summary>
+    /// Updates a controller's name
+    /// </summary>
+    public void UpdateControllerName(string controllerId, string newName)
+    {
+        if (_settingsManager.Application.Controllers.KnownControllers.TryGetValue(controllerId, out var controllerInfo))
+        {
+            controllerInfo.Name = newName;
+            _settingsManager.SaveAll();
+            Logger.Info($"Updated controller name: {controllerId} -> {newName}");
+        }
     }
 
     public void Dispose()

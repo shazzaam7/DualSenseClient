@@ -1,4 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel.__Internals;
+using DualSenseClient.Core.DualSense;
+using DualSenseClient.Core.Settings;
+using DualSenseClient.Core.Settings.Models;
 using DualSenseClient.Services;
 using DualSenseClient.ViewModels.Controls;
 
@@ -11,13 +15,18 @@ public partial class HomePageViewModel : ViewModelBase
 
     private readonly SelectedControllerService _selectedControllerService;
 
-    [ObservableProperty] private ControllerViewModelBase? _selectedController;
-    [ObservableProperty] private ControllerMonitorViewModel? _monitorViewModel;
+    private readonly DualSenseProfileManager _profileManager;
 
-    public HomePageViewModel(ControllerSelectorViewModel controllerSelector, SelectedControllerService selectedControllerService)
+    [ObservableProperty] private ControllerViewModelBase? _selectedController;
+    [ObservableProperty] private ControllerInfo? _selectedControllerInfo;
+    [ObservableProperty] private ControllerMonitorViewModel? _monitorViewModel;
+    [ObservableProperty] private ControllerProfileViewModel? _profileViewModel;
+
+    public HomePageViewModel(ControllerSelectorViewModel controllerSelector, SelectedControllerService selectedControllerService, DualSenseProfileManager profileManager)
     {
         _controllerSelector = controllerSelector;
         _selectedControllerService = selectedControllerService;
+        _profileManager = profileManager;
 
         _selectedControllerService.PropertyChanged += (_, e) =>
         {
@@ -27,13 +36,18 @@ public partial class HomePageViewModel : ViewModelBase
 
                 if (SelectedController != null)
                 {
+                    SelectedControllerInfo = _profileManager.GetOrCreateControllerInfo(SelectedController!.Controller);
                     MonitorViewModel?.Dispose();
-                    MonitorViewModel = new ControllerMonitorViewModel(SelectedController.Controller, null);
+                    ProfileViewModel?.Dispose();
+                    MonitorViewModel = new ControllerMonitorViewModel(SelectedController.Controller, SelectedControllerInfo);
+                    ProfileViewModel = new ControllerProfileViewModel(SelectedController.Controller, SelectedControllerInfo, _profileManager);
                 }
                 else
                 {
                     MonitorViewModel?.Dispose();
+                    ProfileViewModel?.Dispose();
                     MonitorViewModel = null;
+                    ProfileViewModel = null;
                 }
             }
         };
@@ -41,7 +55,9 @@ public partial class HomePageViewModel : ViewModelBase
         SelectedController = _selectedControllerService.SelectedController;
         if (SelectedController != null)
         {
-            MonitorViewModel = new ControllerMonitorViewModel(SelectedController.Controller, null);
+            SelectedControllerInfo = _profileManager.GetOrCreateControllerInfo(SelectedController!.Controller);
+            MonitorViewModel = new ControllerMonitorViewModel(SelectedController.Controller, SelectedControllerInfo);
+            ProfileViewModel = new ControllerProfileViewModel(SelectedController.Controller, SelectedControllerInfo, _profileManager);
         }
     }
 }
