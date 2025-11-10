@@ -375,18 +375,43 @@
                                 <Ellipse Width="16"
                                          Height="16"
                                          Fill="{DynamicResource AccentFillColorDefaultBrush}"
-                                         IsVisible="{Binding InputState.Touch1.IsActive}"
-                                         Canvas.Left="{Binding InputState.Touch1.X, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter=200;1920}"
-                                         Canvas.Top="{Binding InputState.Touch1.Y, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter=110;1080}" />
+                                         Opacity="0.8"
+                                         IsVisible="{Binding TouchpadState.Touch1.IsActive}"
+                                         Canvas.Left="{Binding TouchpadState.Touch1.X, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='200;1920'}"
+                                         Canvas.Top="{Binding TouchpadState.Touch1.Y, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='110;1080'}" />
+
                                 <!-- Touch Point 2 -->
                                 <Ellipse Width="16"
                                          Height="16"
                                          Fill="{DynamicResource SystemFillColorCautionBrush}"
-                                         IsVisible="{Binding InputState.Touch2.IsActive}"
-                                         Canvas.Left="{Binding InputState.Touch2.X, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter=200;1920}"
-                                         Canvas.Top="{Binding InputState.Touch2.Y, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter=110;1080}" />
+                                         Opacity="0.8"
+                                         IsVisible="{Binding TouchpadState.Touch2.IsActive}"
+                                         Canvas.Left="{Binding TouchpadState.Touch2.X, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='200;1920'}"
+                                         Canvas.Top="{Binding TouchpadState.Touch2.Y, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='110;1080'}" />
                             </Canvas>
                         </Border>
+
+                        <!-- Touch Info (Debugging) -->
+                        <StackPanel Spacing="4">
+                            <TextBlock FontSize="10"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                <Run Text="Touch 1: " />
+                                <Run Text="{Binding TouchpadState.Touch1.IsActive, StringFormat='Active={0}'}" />
+                                <Run Text=" | X=" />
+                                <Run Text="{Binding TouchpadState.Touch1.X}" />
+                                <Run Text=" Y=" />
+                                <Run Text="{Binding TouchpadState.Touch1.Y}" />
+                            </TextBlock>
+                            <TextBlock FontSize="10"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                <Run Text="Touch 2: " />
+                                <Run Text="{Binding TouchpadState.Touch2.IsActive, StringFormat='Active={0}'}" />
+                                <Run Text=" | X=" />
+                                <Run Text="{Binding TouchpadState.Touch2.X}" />
+                                <Run Text=" Y=" />
+                                <Run Text="{Binding TouchpadState.Touch2.Y}" />
+                            </TextBlock>
+                        </StackPanel>
 
                         <!-- Click Button -->
                         <Border Background="{Binding InputState.TouchPadClick, Converter={StaticResource BoolToButtonBackgroundConverter}}"
@@ -478,15 +503,15 @@
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                                 <TextBlock FontSize="11" FontFamily="Consolas">
                                     <Run Text="X: " />
-                                    <Run Text="{Binding InputState.GyroX}" />
+                                    <Run Text="{Binding MotionState.GyroX}" />
                                 </TextBlock>
                                 <TextBlock FontSize="11" FontFamily="Consolas">
                                     <Run Text="Y: " />
-                                    <Run Text="{Binding InputState.GyroY}" />
+                                    <Run Text="{Binding MotionState.GyroY}" />
                                 </TextBlock>
                                 <TextBlock FontSize="11" FontFamily="Consolas">
                                     <Run Text="Z: " />
-                                    <Run Text="{Binding InputState.GyroZ}" />
+                                    <Run Text="{Binding MotionState.GyroZ}" />
                                 </TextBlock>
                             </StackPanel>
 
@@ -497,15 +522,15 @@
                                            Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
                                 <TextBlock FontSize="11" FontFamily="Consolas">
                                     <Run Text="X: " />
-                                    <Run Text="{Binding InputState.AccelX}" />
+                                    <Run Text="{Binding MotionState.AccelX}" />
                                 </TextBlock>
                                 <TextBlock FontSize="11" FontFamily="Consolas">
                                     <Run Text="Y: " />
-                                    <Run Text="{Binding InputState.AccelY}" />
+                                    <Run Text="{Binding MotionState.AccelY}" />
                                 </TextBlock>
                                 <TextBlock FontSize="11" FontFamily="Consolas">
                                     <Run Text="Z: " />
-                                    <Run Text="{Binding InputState.AccelZ}" />
+                                    <Run Text="{Binding MotionState.AccelZ}" />
                                 </TextBlock>
                             </StackPanel>
                         </Grid>

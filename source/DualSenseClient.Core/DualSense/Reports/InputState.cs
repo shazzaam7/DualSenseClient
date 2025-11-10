@@ -42,27 +42,6 @@ public partial class InputState : ObservableObject
     [ObservableProperty] private bool _pS;
     [ObservableProperty] private bool _touchPadClick;
     [ObservableProperty] private bool _mute;
-
-    // Gyroscope (Angular Velocity)
-    [ObservableProperty] private short _gyroX;
-    [ObservableProperty] private short _gyroY;
-    [ObservableProperty] private short _gyroZ;
-
-    // Accelerometer
-    [ObservableProperty] private short _accelX;
-    [ObservableProperty] private short _accelY;
-    [ObservableProperty] private short _accelZ;
-
-    // Touchpad
-    [ObservableProperty] private TouchPoint _touch1 = new TouchPoint();
-    [ObservableProperty] private TouchPoint _touch2 = new TouchPoint();
-
-    // Connection status
-    [ObservableProperty] private bool _isHeadphoneConnected;
-    [ObservableProperty] private bool _isMicConnected;
-    [ObservableProperty] private bool _isMicMuted;
-    [ObservableProperty] private bool _isUsbDataConnected;
-    [ObservableProperty] private bool _isUsbPowerConnected;
 }
 
 public partial class TouchPoint : ObservableObject
