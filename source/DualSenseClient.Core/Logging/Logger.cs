@@ -32,7 +32,10 @@ public static class Logger
             Condition = "level == LogLevel.Error",
             ForegroundColor = ConsoleOutputColor.Red
         });
+        _config.AddTarget(consoleTarget);
+        _config.AddRule(LogLevel.Trace, LogLevel.Fatal, consoleTarget);
 
+#if !DEBUG
         // File target
         FileTarget fileTarget = new FileTarget("file")
         {
@@ -43,13 +46,9 @@ public static class Logger
             ArchiveEvery = FileArchivePeriod.Day,
             MaxArchiveFiles = 7
         };
-
-        _config.AddTarget(consoleTarget);
         _config.AddTarget(fileTarget);
-
-        // Default Rules: All levels to both
-        _config.AddRule(LogLevel.Trace, LogLevel.Fatal, consoleTarget);
         _config.AddRule(LogLevel.Trace, LogLevel.Fatal, fileTarget);
+#endif
 
         LogManager.Configuration = _config;
         _logger = LogManager.GetCurrentClassLogger();
