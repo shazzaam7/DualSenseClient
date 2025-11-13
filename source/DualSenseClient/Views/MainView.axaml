@@ -25,7 +25,8 @@
                 </ui:NavigationViewItem.Content>
             </ui:NavigationViewItem>
 
-            <ui:NavigationViewItem Tag="Monitor">
+            <ui:NavigationViewItem Tag="Monitor"
+                                   IsVisible="{Binding HasSelectedController}">
                 <ui:NavigationViewItem.Content>
                     <ic:SymbolIcon Symbol="EyeCircle" FontSize="24" />
                 </ui:NavigationViewItem.Content>
