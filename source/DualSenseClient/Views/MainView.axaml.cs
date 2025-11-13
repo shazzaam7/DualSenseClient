@@ -21,11 +21,16 @@ public partial class MainView : UserControl
         _viewModel = App.Services.GetRequiredService<MainViewModel>();
         _navigationService = App.Services.GetRequiredService<NavigationService>();
         DataContext = _viewModel;
-        _navigationService.NavigateToTag("Home", ContentFrame);
-        SetSelectedIcon(NavView.MenuItems.OfType<NavigationViewItem>().FirstOrDefault(x => (string)x.Tag! == "Home"));
 
 #if DEBUG
         DebugItem.IsVisible = true;
+        NavView.SelectedItem = NavView.FooterMenuItems.OfType<NavigationViewItem>().FirstOrDefault(x => (string)x.Tag! == "Debug");
+        _navigationService.NavigateToTag("Debug", ContentFrame);
+        SetSelectedIcon(NavView.FooterMenuItems.OfType<NavigationViewItem>().FirstOrDefault(x => (string)x.Tag! == "Debug"));
+#else
+        NavView.SelectedItem = NavView.MenuItems.OfType<NavigationViewItem>().FirstOrDefault(x => (string)x.Tag! == "Home");
+        _navigationService.NavigateToTag("Home", ContentFrame);
+        SetSelectedIcon(NavView.MenuItems.OfType<NavigationViewItem>().FirstOrDefault(x => (string)x.Tag! == "Home"));
 #endif
     }
 
