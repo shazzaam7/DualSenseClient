@@ -13,6 +13,31 @@
         <vm:HomePageViewModel />
     </Design.DataContext>
     <ScrollViewer>
+        <Panel>
+            <!-- No Controller Connected -->
+            <StackPanel Spacing="16" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNull}}">
+                <ic:SymbolIcon Symbol="XboxControllerError"
+                               FontSize="72"
+                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                               HorizontalAlignment="Center" />
+                <TextBlock Text="No controller connected"
+                           HorizontalAlignment="Center"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                <TextBlock Text="Please connect a controller to your PC"
+                           FontSize="14"
+                           HorizontalAlignment="Center"
+                           TextWrapping="Wrap"
+                           MaxWidth="400"
+                           TextAlignment="Center"
+                           Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
+            </StackPanel>
 
+            <!-- Controller Information -->
+            <Border IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <controls:ControllerInformation DataContext="{Binding SelectedController}" />
+            </Border>
+        </Panel>
     </ScrollViewer>
 </UserControl>

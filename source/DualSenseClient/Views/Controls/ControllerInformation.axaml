@@ -11,23 +11,6 @@
             CornerRadius="8"
             Padding="20">
         <StackPanel Spacing="20">
-            <!-- Card Header -->
-            <Grid ColumnDefinitions="Auto,*">
-                <ic:SymbolIcon Symbol="Info"
-                               FontSize="20"
-                               Margin="0,0,10,0"
-                               VerticalAlignment="Center" />
-                <TextBlock Text="Controller Information"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           VerticalAlignment="Center"
-                           Grid.Column="1" />
-            </Grid>
-
-            <!-- Separator -->
-            <Border Height="1"
-                    Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
-
             <!-- DualSense Image with Battery -->
             <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
                     CornerRadius="12"
