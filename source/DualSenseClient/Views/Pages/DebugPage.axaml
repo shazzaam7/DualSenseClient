@@ -4,11 +4,32 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
              xmlns:vm="clr-namespace:DualSenseClient.ViewModels.Pages"
+             xmlns:controls="clr-namespace:DualSenseClient.Views.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DualSenseClient.Views.Pages.DebugPage"
              x:DataType="vm:DebugPageViewModel">
     <Design.DataContext>
         <vm:DebugPageViewModel />
     </Design.DataContext>
-    Debug Page
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="20" MaxWidth="800">
+            <!-- Controller Selection -->
+            <controls:ControllerSelector DataContext="{Binding ControllerSelector}" />
+
+            <!-- Controller Information -->
+            <Border IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <controls:ControllerInformation DataContext="{Binding SelectedController}" />
+            </Border>
+
+            <!-- Controller Monitor -->
+            <Border IsVisible="{Binding MonitorViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <controls:ControllerMonitor DataContext="{Binding MonitorViewModel}" />
+            </Border>
+
+            <!-- Controller Profiles -->
+            <Border IsVisible="{Binding ProfileViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <controls:ControllerProfile DataContext="{Binding ProfileViewModel}" />
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

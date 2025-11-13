@@ -13,24 +13,6 @@
         <vm:HomePageViewModel />
     </Design.DataContext>
     <ScrollViewer>
-        <StackPanel Margin="20" Spacing="20" MaxWidth="800">
-            <!-- Controller Selection -->
-            <controls:ControllerSelector DataContext="{Binding ControllerSelector}" />
 
-            <!-- Controller Information -->
-            <Border IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
-                <controls:ControllerInformation DataContext="{Binding SelectedController}" />
-            </Border>
-
-            <!-- Controller Monitor -->
-            <Border IsVisible="{Binding MonitorViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
-                <controls:ControllerMonitor DataContext="{Binding MonitorViewModel}" />
-            </Border>
-            
-            <!-- Controller Profiles -->
-            <Border IsVisible="{Binding ProfileViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
-                <controls:ControllerProfile DataContext="{Binding ProfileViewModel}" />
-            </Border>
-        </StackPanel>
     </ScrollViewer>
 </UserControl>
