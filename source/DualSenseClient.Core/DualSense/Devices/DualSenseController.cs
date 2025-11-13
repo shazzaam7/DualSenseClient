@@ -839,16 +839,23 @@ public class DualSenseController : IDisposable
         report[2] = 0xFF;
         report[3] = 0xF7;
 
-        // Lightbar
-        report[41] = 0x02; // Enable lightbar modifications
+        // Lightbar enable flags
+        // AllowLightBrightnessChange (0), AllowColorLightFadeAnimation (1)
+        report[40] = 0x03; 
+
+        // Lightbar behavior
         report[43] = (byte)CurrentLightbarBehavior;
+
+        // Player LED brightness
+        report[44] = (byte)CurrentPlayerLedBrightness;
+
+        // Player LEDs
+        report[45] = (byte)(0x20 | (byte)CurrentPlayerLeds);
+
+        // RGB colors
         report[46] = CurrentLightbarColor.Red;
         report[47] = CurrentLightbarColor.Green;
         report[48] = CurrentLightbarColor.Blue;
-
-        // Player LEDs
-        report[44] = (byte)CurrentPlayerLedBrightness;
-        report[45] = (byte)(0x20 | (byte)CurrentPlayerLeds);
 
         // Mic LED
         report[10] = (byte)CurrentMicLed;
@@ -874,16 +881,23 @@ public class DualSenseController : IDisposable
         report[1] = 0xFF;
         report[2] = 0xF7;
 
-        // Lightbar
-        report[40] = 0x02; // Enable lightbar modifications
+        // Lightbar enable flags
+        // AllowLightBrightnessChange (0), AllowColorLightFadeAnimation (1)
+        report[39] = 0x03;
+
+        // Lightbar behavior
         report[42] = (byte)CurrentLightbarBehavior;
+
+        // Player LED brightness
+        report[43] = (byte)CurrentPlayerLedBrightness;
+
+        // Player LEDs
+        report[44] = (byte)(0x20 | (byte)CurrentPlayerLeds);
+
+        // RGB colors
         report[45] = CurrentLightbarColor.Red;
         report[46] = CurrentLightbarColor.Green;
         report[47] = CurrentLightbarColor.Blue;
-
-        // Player LEDs
-        report[43] = (byte)CurrentPlayerLedBrightness;
-        report[44] = (byte)(0x20 | (byte)CurrentPlayerLeds);
 
         // Mic LED
         report[9] = (byte)CurrentMicLed;
