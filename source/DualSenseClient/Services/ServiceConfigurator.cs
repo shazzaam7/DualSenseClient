@@ -29,6 +29,7 @@ public static class ServiceConfigurator
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<HomePageViewModel>();
         services.AddSingleton<SettingsPageViewModel>();
+        services.AddSingleton<DevicesPageViewModel>();
         services.AddSingleton<DebugPageViewModel>();
 
         // Windows

@@ -20,6 +20,10 @@ public class NavigationService
                 Logger.Info("Navigating to home page");
                 contentFrame.Navigate(typeof(HomePage));
                 break;
+            case "Devices":
+                Logger.Info("Navigating to devices page");
+                contentFrame.Navigate(typeof(DevicesPage));
+                break;
             case "Settings":
                 Logger.Info("Navigating to settings page");
                 contentFrame.Navigate(typeof(SettingsPage));

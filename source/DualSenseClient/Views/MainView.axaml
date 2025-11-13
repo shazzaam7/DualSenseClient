@@ -36,6 +36,12 @@
                 </ui:NavigationViewItem.Content>
             </ui:NavigationViewItem>
 
+            <ui:NavigationViewItem Tag="Devices">
+                <ui:NavigationViewItem.Content>
+                    <ic:SymbolIcon Symbol="Bluetooth" FontSize="24" />
+                </ui:NavigationViewItem.Content>
+            </ui:NavigationViewItem>
+
             <ui:NavigationViewItem Tag="Settings">
                 <ui:NavigationViewItem.Content>
                     <ic:SymbolIcon Symbol="Settings" FontSize="24" />
