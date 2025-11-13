@@ -21,7 +21,7 @@
                                FontSize="20"
                                Margin="0,0,10,0"
                                VerticalAlignment="Center" />
-                <TextBlock Text="Controller Selection"
+                <TextBlock Text="Available Controllers"
                            FontSize="16"
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"
@@ -40,67 +40,107 @@
             <Border Height="1"
                     Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
 
-            <!-- No Controllers Message -->
-            <Border IsVisible="{Binding !HasControllers}"
-                    Background="{DynamicResource SubtleFillColorSecondaryBrush}"
-                    CornerRadius="8"
-                    Padding="30,40">
-                <StackPanel Spacing="12" HorizontalAlignment="Center">
-                    <ic:SymbolIcon Symbol="XboxControllerError"
-                                   FontSize="64"
-                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Text="No DualSense controllers connected"
-                               HorizontalAlignment="Center"
-                               FontSize="16"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                    <TextBlock Text="Please connect a controller via USB or Bluetooth"
-                               FontSize="13"
-                               HorizontalAlignment="Center"
-                               Foreground="{DynamicResource TextFillColorTertiaryBrush}" />
-                </StackPanel>
-            </Border>
+            <!-- Controllers List -->
+            <ItemsControl ItemsSource="{Binding Controllers}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="10" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
 
-            <!-- Controller ComboBox -->
-            <ComboBox x:Name="ControllerComboBox"
-                      ItemsSource="{Binding Controllers}"
-                      SelectedItem="{Binding SelectedController, Mode=TwoWay}"
-                      IsVisible="{Binding HasControllers}"
-                      HorizontalAlignment="Stretch"
-                      PlaceholderText="Select a controller">
-                <ComboBox.ItemTemplate>
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Spacing="10">
-                            <TextBlock Text="{Binding Name}" />
+                        <Border Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                BorderBrush="{Binding IsSelected, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                BorderThickness="2"
+                                CornerRadius="8"
+                                Padding="15"
+                                Cursor="Hand">
+                            <Border.Styles>
+                                <Style Selector="Border:pointerover">
+                                    <Setter Property="Background"
+                                            Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
+                                </Style>
+                                <Style Selector="Border[BorderBrush=#00000000]:pointerover">
+                                    <Setter Property="BorderBrush"
+                                            Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
+                                </Style>
+                            </Border.Styles>
 
-                            <!-- Connection type badge with icon -->
-                            <Border Background="{DynamicResource SubtleFillColorSecondaryBrush}"
-                                    CornerRadius="4"
-                                    Padding="6,2">
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <ic:FluentIcon Icon="{Binding ConnectionIcon}"
-                                                   FontSize="12"
-                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                                    <TextBlock Text="{Binding ConnectionType}"
-                                               FontSize="11"
-                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
+                                <!-- Controller Icon -->
+                                <Border Grid.Row="0"
+                                        Grid.Column="0"
+                                        Grid.RowSpan="2"
+                                        Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                                        CornerRadius="8"
+                                        Width="56"
+                                        Height="56"
+                                        Margin="0,0,15,0"
+                                        VerticalAlignment="Center">
+                                    <ic:SymbolIcon Symbol="XboxController"
+                                                   FontSize="28"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                </Border>
+
+                                <!-- Controller Info -->
+                                <StackPanel Grid.Row="0"
+                                            Grid.Column="1"
+                                            Spacing="4"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="15"
+                                               FontWeight="SemiBold" />
+
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <!-- Connection Type Badge -->
+                                        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                                CornerRadius="4"
+                                                Padding="6,2">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <ic:FluentIcon Icon="{Binding ConnectionIcon}"
+                                                               FontSize="12"
+                                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock Text="{Binding ConnectionType}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- MAC Address -->
+                                        <TextBlock Text="{Binding MacAddress}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource TextFillColorTertiaryBrush}"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
                                 </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
 
-                <!-- This forces refresh on collection changes -->
-                <ComboBox.Styles>
-                    <Style Selector="ComboBox">
-                        <Setter Property="ItemsPanel">
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel />
-                            </ItemsPanelTemplate>
-                        </Setter>
-                    </Style>
-                </ComboBox.Styles>
-            </ComboBox>
+                                <!-- Selected Indicator -->
+                                <Border Grid.Row="0"
+                                        Grid.Column="2"
+                                        Grid.RowSpan="2"
+                                        IsVisible="{Binding IsSelected}"
+                                        Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                        CornerRadius="12"
+                                        Padding="8,4"
+                                        Margin="10,0,0,0"
+                                        VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="4">
+                                        <ic:SymbolIcon Symbol="Checkmark"
+                                                       FontSize="14"
+                                                       Foreground="White" />
+                                        <TextBlock Text="Selected"
+                                                   FontSize="12"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White" />
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
     </Border>
 </UserControl>

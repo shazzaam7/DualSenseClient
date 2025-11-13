@@ -10,9 +10,6 @@ namespace DualSenseClient.ViewModels.Pages;
 
 public partial class DebugPageViewModel : ViewModelBase
 {
-    private readonly ControllerSelectorViewModel _controllerSelector;
-    public ControllerSelectorViewModel ControllerSelector => _controllerSelector;
-
     private readonly SelectedControllerService _selectedControllerService;
     private readonly DualSenseProfileManager _profileManager;
 
@@ -21,11 +18,10 @@ public partial class DebugPageViewModel : ViewModelBase
     [ObservableProperty] private ControllerMonitorViewModel? _monitorViewModel;
     [ObservableProperty] private ControllerProfileViewModel? _profileViewModel;
 
-    public DebugPageViewModel(ControllerSelectorViewModel controllerSelector, SelectedControllerService selectedControllerService, DualSenseProfileManager profileManager)
+    public DebugPageViewModel(SelectedControllerService selectedControllerService, DualSenseProfileManager profileManager)
     {
         Logger.Debug("Creating DebugPageViewModel");
 
-        _controllerSelector = controllerSelector;
         _selectedControllerService = selectedControllerService;
         _profileManager = profileManager;
 

@@ -14,7 +14,7 @@
     <ScrollViewer>
         <StackPanel Margin="20" Spacing="20" MaxWidth="800">
             <!-- Controller Selection -->
-            <controls:ControllerSelector DataContext="{Binding ControllerSelector}" />
+            <controls:ControllerSelector />
 
             <!-- Controller Information -->
             <Border IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
