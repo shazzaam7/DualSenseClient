@@ -24,6 +24,12 @@
                     <ic:SymbolIcon Symbol="Home" FontSize="24" />
                 </ui:NavigationViewItem.Content>
             </ui:NavigationViewItem>
+
+            <ui:NavigationViewItem Tag="Monitor">
+                <ui:NavigationViewItem.Content>
+                    <ic:SymbolIcon Symbol="EyeCircle" FontSize="24" />
+                </ui:NavigationViewItem.Content>
+            </ui:NavigationViewItem>
         </ui:NavigationView.MenuItems>
 
         <!-- Footer (always at bottom) -->

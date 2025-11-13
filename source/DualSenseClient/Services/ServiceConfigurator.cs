@@ -28,6 +28,7 @@ public static class ServiceConfigurator
         services.AddSingleton<MainWindowViewModel>();
         services.AddSingleton<MainViewModel>();
         services.AddSingleton<HomePageViewModel>();
+        services.AddSingleton<MonitorPageViewModel>();
         services.AddSingleton<SettingsPageViewModel>();
         services.AddSingleton<DevicesPageViewModel>();
         services.AddSingleton<DebugPageViewModel>();
