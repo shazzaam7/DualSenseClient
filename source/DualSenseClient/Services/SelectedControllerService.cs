@@ -143,6 +143,15 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
 
         if (wasSelected)
         {
+            // Clear the current selection on UI thread immediately
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                lock (_lock)
+                {
+                    SelectControllerInternal(null);
+                }
+            });
+
             // Start transition
             _transitionCts?.Cancel();
             _transitionCts = new CancellationTokenSource();
