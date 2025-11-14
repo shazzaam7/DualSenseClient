@@ -24,7 +24,7 @@ public class ControllerMonitorViewModel : ControllerViewModelBase
     public MicLed CurrentMicLed => _controller.CurrentMicLed;
 
     // Constructor
-    public ControllerMonitorViewModel(DualSenseController controller, ControllerInfo? controllerInfo) : base(controller, controllerInfo)
+    public ControllerMonitorViewModel(DualSenseController controller, ControllerInfo controllerInfo) : base(controller, controllerInfo)
     {
         // Subscribe to all relevant events for real-time monitoring
         _controller.InputChanged += OnInputChanged;

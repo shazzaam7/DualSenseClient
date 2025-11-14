@@ -4,539 +4,672 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent"
              xmlns:vm="clr-namespace:DualSenseClient.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="700"
              x:Class="DualSenseClient.Views.Controls.ControllerMonitor"
              x:DataType="vm:ControllerMonitorViewModel">
     <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
             CornerRadius="8"
             Padding="20">
-        <StackPanel Spacing="20">
+        <Grid RowDefinitions="Auto,*" RowSpacing="20">
             <!-- Header -->
-            <Grid ColumnDefinitions="Auto,*">
-                <ic:SymbolIcon Symbol="DeveloperBoard"
-                               FontSize="20"
-                               Margin="0,0,10,0"
-                               VerticalAlignment="Center" />
-                <TextBlock Text="Controller Monitor"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           VerticalAlignment="Center"
-                           Grid.Column="1" />
-            </Grid>
+            <TextBlock FontSize="20"
+                       FontWeight="SemiBold"
+                       Grid.Row="0">
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="{}{0} ({1})">
+                        <Binding Path="ControllerInfo.Name" />
+                        <Binding Path="ControllerInfo.MacAddress" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
 
-            <Border Height="1"
-                    Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+            <!-- Main Content -->
+            <Grid ColumnDefinitions="1*,1.6*,1*"
+                  RowDefinitions="Auto,Auto,Auto,Auto"
+                  ColumnSpacing="20"
+                  RowSpacing="16"
+                  Grid.Row="1">
 
-            <!-- Main Content Grid -->
-            <Grid RowDefinitions="Auto,Auto,Auto,Auto" ColumnDefinitions="*,*">
-
-                <!-- Analog Sticks -->
+                <!-- Left Column -->
+                <!-- L1/L2 Triggers -->
                 <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
                         CornerRadius="8"
-                        Padding="16"
+                        Padding="12"
+                        Grid.Column="0"
                         Grid.Row="0"
-                        Grid.Column="0">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Analog Sticks"
-                                   FontSize="14"
-                                   FontWeight="SemiBold" />
+                        MinWidth="150"
+                        MaxWidth="220">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Left Triggers"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   HorizontalAlignment="Center" />
+                        <Border Background="{Binding InputState.L1, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                CornerRadius="6"
+                                Padding="12,10">
+                            <TextBlock Text="L1"
+                                       HorizontalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="SemiBold" />
+                        </Border>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                            <!-- Left Stick -->
-                            <StackPanel Grid.Column="0" Spacing="8">
-                                <TextBlock Text="Left Stick"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                           HorizontalAlignment="Center" />
-                                <Border Width="80"
-                                        Height="80"
-                                        Background="{DynamicResource SubtleFillColorSecondaryBrush}"
-                                        CornerRadius="40"
-                                        ClipToBounds="True">
-                                    <Canvas>
-                                        <!-- Crosshair -->
-                                        <Line StartPoint="40,0" EndPoint="40,80"
-                                              Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
-                                              StrokeThickness="1" />
-                                        <Line StartPoint="0,40" EndPoint="80,40"
-                                              Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
-                                              StrokeThickness="1" />
-                                        <!-- Stick Position Indicator -->
-                                        <Ellipse Width="12"
-                                                 Height="12"
-                                                 Fill="{DynamicResource AccentFillColorDefaultBrush}"
-                                                 Canvas.Left="{Binding InputState.LeftStickX, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=80}"
-                                                 Canvas.Top="{Binding InputState.LeftStickY, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=80}" />
-                                    </Canvas>
-                                </Border>
-                                <TextBlock HorizontalAlignment="Center"
-                                           FontSize="10"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                    <Run Text="X:" />
-                                    <Run Text="{Binding InputState.LeftStickX, StringFormat={}{0:F2}}" />
-                                    <Run Text=" Y:" />
-                                    <Run Text="{Binding InputState.LeftStickY, StringFormat={}{0:F2}}" />
-                                </TextBlock>
-                            </StackPanel>
-
-                            <!-- Right Stick -->
-                            <StackPanel Grid.Column="1" Spacing="8">
-                                <TextBlock Text="Right Stick"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                           HorizontalAlignment="Center" />
-                                <Border Width="80"
-                                        Height="80"
-                                        Background="{DynamicResource SubtleFillColorSecondaryBrush}"
-                                        CornerRadius="40"
-                                        ClipToBounds="True">
-                                    <Canvas>
-                                        <Line StartPoint="40,0" EndPoint="40,80"
-                                              Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
-                                              StrokeThickness="1" />
-                                        <Line StartPoint="0,40" EndPoint="80,40"
-                                              Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
-                                              StrokeThickness="1" />
-                                        <Ellipse Width="12"
-                                                 Height="12"
-                                                 Fill="{DynamicResource AccentFillColorDefaultBrush}"
-                                                 Canvas.Left="{Binding InputState.RightStickX, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=80}"
-                                                 Canvas.Top="{Binding InputState.RightStickY, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=80}" />
-                                    </Canvas>
-                                </Border>
-                                <TextBlock HorizontalAlignment="Center"
-                                           FontSize="10"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                    <Run Text="X:" />
-                                    <Run Text="{Binding InputState.RightStickX, StringFormat={}{0:F2}}" />
-                                    <Run Text=" Y:" />
-                                    <Run Text="{Binding InputState.RightStickY, StringFormat={}{0:F2}}" />
-                                </TextBlock>
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <!-- Triggers -->
-                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="16"
-                        Grid.Row="0"
-                        Grid.Column="1">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Triggers"
-                                   FontSize="14"
-                                   FontWeight="SemiBold" />
-
-                        <StackPanel Spacing="10">
-                            <!-- L2 Trigger -->
-                            <StackPanel Spacing="4">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock Text="L2"
-                                               FontSize="12"
-                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                                    <TextBlock Grid.Column="1"
-                                               Text="{Binding InputState.L2, Converter={StaticResource ByteToPercentageConverter}, StringFormat={}{0:F0}%}"
-                                               FontSize="12"
-                                               FontWeight="SemiBold" />
-                                </Grid>
-                                <ProgressBar Value="{Binding InputState.L2, Converter={StaticResource ByteToPercentageConverter}}"
-                                             Maximum="100"
-                                             Height="8" />
-                            </StackPanel>
-
-                            <!-- R2 Trigger -->
-                            <StackPanel Spacing="4">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock Text="R2"
-                                               FontSize="12"
-                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                                    <TextBlock Grid.Column="1"
-                                               Text="{Binding InputState.R2, Converter={StaticResource ByteToPercentageConverter}, StringFormat={}{0:F0}%}"
-                                               FontSize="12"
-                                               FontWeight="SemiBold" />
-                                </Grid>
-                                <ProgressBar Value="{Binding InputState.R2, Converter={StaticResource ByteToPercentageConverter}}"
-                                             Maximum="100"
-                                             Height="8" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <!-- Trigger Buttons -->
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8" Margin="0,8,0,0">
+                        <StackPanel Spacing="6">
                             <Border Background="{Binding InputState.L2Button, Converter={StaticResource BoolToButtonBackgroundConverter}}"
                                     CornerRadius="6"
-                                    Padding="8,6"
-                                    Grid.Column="0">
-                                <TextBlock Text="L2"
-                                           HorizontalAlignment="Center"
-                                           FontSize="12"
-                                           FontWeight="SemiBold" />
+                                    Padding="12,10">
+                                <Grid>
+                                    <TextBlock Text="L2"
+                                               HorizontalAlignment="Center"
+                                               FontSize="14"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding InputState.L2, Converter={StaticResource ByteToPercentageConverter}, StringFormat='{}{0:F0}%'}"
+                                               FontSize="11"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,4,0"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                </Grid>
                             </Border>
-                            <Border Background="{Binding InputState.R2Button, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="8,6"
-                                    Grid.Column="1">
-                                <TextBlock Text="R2"
-                                           HorizontalAlignment="Center"
-                                           FontSize="12"
-                                           FontWeight="SemiBold" />
-                            </Border>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <!-- Buttons -->
-                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="16"
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Buttons"
-                                   FontSize="14"
-                                   FontWeight="SemiBold" />
-
-                        <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto">
-                            <!-- Face Buttons -->
-                            <Border Background="{Binding InputState.Triangle, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="0"
-                                    Grid.Column="0">
-                                <TextBlock Text="△"
-                                           HorizontalAlignment="Center"
-                                           FontSize="14" />
-                            </Border>
-                            <Border Background="{Binding InputState.Circle, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="0"
-                                    Grid.Column="1">
-                                <TextBlock Text="○"
-                                           HorizontalAlignment="Center"
-                                           FontSize="14" />
-                            </Border>
-                            <Border Background="{Binding InputState.Cross, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="0"
-                                    Grid.Column="2">
-                                <TextBlock Text="✕"
-                                           HorizontalAlignment="Center"
-                                           FontSize="14" />
-                            </Border>
-                            <Border Background="{Binding InputState.Square, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="0"
-                                    Grid.Column="3">
-                                <TextBlock Text="□"
-                                           HorizontalAlignment="Center"
-                                           FontSize="14" />
-                            </Border>
-
-                            <!-- Shoulder Buttons -->
-                            <Border Background="{Binding InputState.L1, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="1"
-                                    Grid.Column="0">
-                                <TextBlock Text="L1"
-                                           HorizontalAlignment="Center"
-                                           FontSize="12" />
-                            </Border>
-                            <Border Background="{Binding InputState.R1, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="1"
-                                    Grid.Column="1">
-                                <TextBlock Text="R1"
-                                           HorizontalAlignment="Center"
-                                           FontSize="12" />
-                            </Border>
-                            <Border Background="{Binding InputState.L3, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="1"
-                                    Grid.Column="2">
-                                <TextBlock Text="L3"
-                                           HorizontalAlignment="Center"
-                                           FontSize="12" />
-                            </Border>
-                            <Border Background="{Binding InputState.R3, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="1"
-                                    Grid.Column="3">
-                                <TextBlock Text="R3"
-                                           HorizontalAlignment="Center"
-                                           FontSize="12" />
-                            </Border>
-
-                            <!-- D-Pad -->
-                            <Border Background="{Binding InputState.DPadUp, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="2"
-                                    Grid.Column="0">
-                                <TextBlock Text="↑"
-                                           HorizontalAlignment="Center"
-                                           FontSize="14" />
-                            </Border>
-                            <Border Background="{Binding InputState.DPadDown, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="2"
-                                    Grid.Column="1">
-                                <TextBlock Text="↓"
-                                           HorizontalAlignment="Center"
-                                           FontSize="14" />
-                            </Border>
-                            <Border Background="{Binding InputState.DPadLeft, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="2"
-                                    Grid.Column="2">
-                                <TextBlock Text="←"
-                                           HorizontalAlignment="Center"
-                                           FontSize="14" />
-                            </Border>
-                            <Border Background="{Binding InputState.DPadRight, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="2"
-                                    Grid.Column="3">
-                                <TextBlock Text="→"
-                                           HorizontalAlignment="Center"
-                                           FontSize="14" />
-                            </Border>
-
-                            <!-- System Buttons -->
-                            <Border Background="{Binding InputState.Create, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="3"
-                                    Grid.Column="0">
-                                <TextBlock Text="CREATE"
-                                           HorizontalAlignment="Center"
-                                           FontSize="10" />
-                            </Border>
-                            <Border Background="{Binding InputState.Options, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="3"
-                                    Grid.Column="1">
-                                <TextBlock Text="OPTIONS"
-                                           HorizontalAlignment="Center"
-                                           FontSize="10" />
-                            </Border>
-                            <Border Background="{Binding InputState.PS, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="3"
-                                    Grid.Column="2">
-                                <TextBlock Text="PS"
-                                           HorizontalAlignment="Center"
-                                           FontSize="12" />
-                            </Border>
-                            <Border Background="{Binding InputState.Mute, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                    CornerRadius="6"
-                                    Padding="10,6"
-                                    Grid.Row="3"
-                                    Grid.Column="3">
-                                <TextBlock Text="MUTE"
-                                           HorizontalAlignment="Center"
-                                           FontSize="10" />
-                            </Border>
-                        </Grid>
-                    </StackPanel>
-                </Border>
-
-                <!-- Touchpad -->
-                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="16"
-                        Grid.Row="2"
-                        Grid.Column="0">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Touchpad"
-                                   FontSize="14"
-                                   FontWeight="SemiBold" />
-
-                        <Border Width="200"
-                                Height="110"
-                                Background="{DynamicResource SubtleFillColorSecondaryBrush}"
-                                CornerRadius="6"
-                                ClipToBounds="True">
-                            <Canvas>
-                                <!-- Touch Point 1 -->
-                                <Ellipse Width="16"
-                                         Height="16"
-                                         Fill="{DynamicResource AccentFillColorDefaultBrush}"
-                                         Opacity="0.8"
-                                         IsVisible="{Binding TouchpadState.Touch1.IsActive}"
-                                         Canvas.Left="{Binding TouchpadState.Touch1.X, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='200;1920'}"
-                                         Canvas.Top="{Binding TouchpadState.Touch1.Y, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='110;1080'}" />
-
-                                <!-- Touch Point 2 -->
-                                <Ellipse Width="16"
-                                         Height="16"
-                                         Fill="{DynamicResource SystemFillColorCautionBrush}"
-                                         Opacity="0.8"
-                                         IsVisible="{Binding TouchpadState.Touch2.IsActive}"
-                                         Canvas.Left="{Binding TouchpadState.Touch2.X, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='200;1920'}"
-                                         Canvas.Top="{Binding TouchpadState.Touch2.Y, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='110;1080'}" />
-                            </Canvas>
-                        </Border>
-
-                        <!-- Touch Info (Debugging) -->
-                        <StackPanel Spacing="4">
-                            <TextBlock FontSize="10"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                <Run Text="Touch 1: " />
-                                <Run Text="{Binding TouchpadState.Touch1.IsActive, StringFormat='Active={0}'}" />
-                                <Run Text=" | X=" />
-                                <Run Text="{Binding TouchpadState.Touch1.X}" />
-                                <Run Text=" Y=" />
-                                <Run Text="{Binding TouchpadState.Touch1.Y}" />
-                            </TextBlock>
-                            <TextBlock FontSize="10"
-                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}">
-                                <Run Text="Touch 2: " />
-                                <Run Text="{Binding TouchpadState.Touch2.IsActive, StringFormat='Active={0}'}" />
-                                <Run Text=" | X=" />
-                                <Run Text="{Binding TouchpadState.Touch2.X}" />
-                                <Run Text=" Y=" />
-                                <Run Text="{Binding TouchpadState.Touch2.Y}" />
-                            </TextBlock>
+                            <ProgressBar Value="{Binding InputState.L2, Converter={StaticResource ByteToPercentageConverter}}"
+                                         Maximum="100"
+                                         Height="6"
+                                         MinWidth="100" />
                         </StackPanel>
-
-                        <!-- Click Button -->
-                        <Border Background="{Binding InputState.TouchPadClick, Converter={StaticResource BoolToButtonBackgroundConverter}}"
-                                CornerRadius="6"
-                                Padding="8,6">
-                            <TextBlock Text="TOUCHPAD CLICK"
-                                       HorizontalAlignment="Center"
-                                       FontSize="10" />
-                        </Border>
                     </StackPanel>
                 </Border>
 
-                <!-- Lights Status -->
+                <!-- D-Pad -->
                 <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
                         CornerRadius="8"
-                        Padding="16"
-                        Grid.Row="2"
-                        Grid.Column="1">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Lights"
+                        Padding="12"
+                        Grid.Column="0"
+                        Grid.Row="1"
+                        MaxWidth="220">
+                    <StackPanel Spacing="10" HorizontalAlignment="Center">
+                        <TextBlock Text="D-Pad"
                                    FontSize="14"
-                                   FontWeight="SemiBold" />
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                        <Grid RowDefinitions="36,36,36"
+                              ColumnDefinitions="36,36,36"
+                              RowSpacing="2"
+                              ColumnSpacing="2"
+                              HorizontalAlignment="Center">
+                            <!-- Up -->
+                            <Border Background="{Binding InputState.DPadUp, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    CornerRadius="4"
+                                    Grid.Row="0"
+                                    Grid.Column="1">
+                                <Viewbox Width="14" Height="14">
+                                    <Path Data="M 12,18 L 6,12 L 0,18 Z"
+                                          Fill="{DynamicResource TextFillColorPrimaryBrush}"
+                                          Stretch="Uniform" />
+                                </Viewbox>
+                            </Border>
+                            <!-- Left -->
+                            <Border Background="{Binding InputState.DPadLeft, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    CornerRadius="4"
+                                    Grid.Row="1"
+                                    Grid.Column="0">
+                                <Viewbox Width="14" Height="14">
+                                    <Path Data="M 18,0 L 12,6 L 18,12 Z"
+                                          Fill="{DynamicResource TextFillColorPrimaryBrush}"
+                                          Stretch="Uniform" />
+                                </Viewbox>
+                            </Border>
+                            <!-- Right -->
+                            <Border Background="{Binding InputState.DPadRight, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    CornerRadius="4"
+                                    Grid.Row="1"
+                                    Grid.Column="2">
+                                <Viewbox Width="14" Height="14">
+                                    <Path Data="M 0,0 L 6,6 L 0,12 Z"
+                                          Fill="{DynamicResource TextFillColorPrimaryBrush}"
+                                          Stretch="Uniform" />
+                                </Viewbox>
+                            </Border>
+                            <!-- Down -->
+                            <Border Background="{Binding InputState.DPadDown, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    CornerRadius="4"
+                                    Grid.Row="2"
+                                    Grid.Column="1">
+                                <Viewbox Width="14" Height="14">
+                                    <Path Data="M 0,0 L 6,6 L 12,0 Z"
+                                          Fill="{DynamicResource TextFillColorPrimaryBrush}"
+                                          Stretch="Uniform" />
+                                </Viewbox>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
-                        <StackPanel Spacing="8">
-                            <!-- Lightbar Color -->
-                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                                <TextBlock Text="Lightbar:"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                           VerticalAlignment="Center" />
-                                <Border Background="{Binding CurrentLightbarColor, Converter={StaticResource ColorToBrushConverter}}"
-                                        CornerRadius="4"
-                                        Height="24"
-                                        Grid.Column="1">
-                                    <TextBlock Text="{Binding CurrentLightbarBehavior}"
+                <!-- Left Stick (Bottom Position like PS) -->
+                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                        CornerRadius="8"
+                        Padding="12"
+                        Grid.Column="0"
+                        Grid.Row="2"
+                        MaxWidth="220">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Left Stick"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                        <Border Width="100"
+                                Height="100"
+                                Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                CornerRadius="50"
+                                ClipToBounds="True"
+                                HorizontalAlignment="Center">
+                            <Grid>
+                                <Canvas>
+                                    <!-- Crosshair -->
+                                    <Line StartPoint="50,0" EndPoint="50,100"
+                                          Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
+                                          StrokeThickness="1"
+                                          Opacity="0.5" />
+                                    <Line StartPoint="0,50" EndPoint="100,50"
+                                          Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
+                                          StrokeThickness="1"
+                                          Opacity="0.5" />
+                                    <!-- Stick Position -->
+                                    <Ellipse Width="16"
+                                             Height="16"
+                                             Fill="{DynamicResource AccentFillColorDefaultBrush}"
+                                             Canvas.Left="{Binding InputState.LeftStickX, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=100}"
+                                             Canvas.Top="{Binding InputState.LeftStickY, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=100}" />
+                                </Canvas>
+                                <!-- L3 Overlay -->
+                                <Border Background="{Binding InputState.L3, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                        CornerRadius="12"
+                                        Width="28"
+                                        Height="28"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Opacity="0.9">
+                                    <TextBlock Text="L3"
                                                HorizontalAlignment="Center"
                                                VerticalAlignment="Center"
                                                FontSize="10"
-                                               Foreground="White" />
+                                               FontWeight="Bold" />
                                 </Border>
                             </Grid>
+                        </Border>
+                        <!-- Stick Values -->
+                        <TextBlock HorizontalAlignment="Center"
+                                   FontSize="11"
+                                   FontFamily="Consolas"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                            <Run Text="X:" />
+                            <Run Text="{Binding InputState.LeftStickX, StringFormat={}{0:F2}}" />
+                            <Run Text=" Y:" />
+                            <Run Text="{Binding InputState.LeftStickY, StringFormat={}{0:F2}}" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
 
-                            <!-- Player LEDs -->
-                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                                <TextBlock Text="Player LEDs:"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                <!-- Center Column -->
+                <!-- System Buttons & Touchpad -->
+                <StackPanel Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" Spacing="16" VerticalAlignment="Center" MinWidth="260">
+                    <!-- Create/Options -->
+                    <Grid ColumnDefinitions="Auto,30,Auto" HorizontalAlignment="Center">
+                        <Border Background="{Binding InputState.Create, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                CornerRadius="6"
+                                Padding="12,6"
+                                Grid.Column="0">
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <TextBlock Text="≡"
+                                           FontSize="14"
+                                           FontWeight="Bold"
                                            VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding CurrentPlayerLeds}"
-                                           FontSize="12"
-                                           FontWeight="SemiBold"
-                                           Grid.Column="1"
-                                           VerticalAlignment="Center" />
-                            </Grid>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="{Binding InputState.Options, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                CornerRadius="6"
+                                Padding="12,6"
+                                Grid.Column="2">
+                            <TextBlock Text="⋮"
+                                       FontSize="16"
+                                       FontWeight="Bold"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                    </Grid>
 
-                            <!-- Mic LED -->
-                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
-                                <TextBlock Text="Mic LED:"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Text="{Binding CurrentMicLed}"
-                                           FontSize="12"
-                                           FontWeight="SemiBold"
-                                           Grid.Column="1"
-                                           VerticalAlignment="Center" />
+                    <!-- Touchpad -->
+                    <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                            CornerRadius="8"
+                            Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Touchpad"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
+                            <Border Width="240"
+                                    Height="130"
+                                    Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                    BorderBrush="{Binding InputState.TouchPadClick, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    BorderThickness="2"
+                                    CornerRadius="6"
+                                    ClipToBounds="True">
+                                <Canvas>
+                                    <!-- Grid lines -->
+                                    <Line StartPoint="120,0" EndPoint="120,130"
+                                          Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
+                                          StrokeThickness="1"
+                                          Opacity="0.3" />
+                                    <Line StartPoint="0,65" EndPoint="240,65"
+                                          Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
+                                          StrokeThickness="1"
+                                          Opacity="0.3" />
+
+                                    <!-- Touch Point 1 -->
+                                    <Ellipse Width="24"
+                                             Height="24"
+                                             Fill="{DynamicResource AccentFillColorDefaultBrush}"
+                                             Opacity="0.8"
+                                             IsVisible="{Binding TouchpadState.Touch1.IsActive}"
+                                             Canvas.Left="{Binding TouchpadState.Touch1.X, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='240;1920'}"
+                                             Canvas.Top="{Binding TouchpadState.Touch1.Y, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='130;1080'}" />
+
+                                    <!-- Touch Point 2 -->
+                                    <Ellipse Width="24"
+                                             Height="24"
+                                             Fill="{DynamicResource SystemFillColorCautionBrush}"
+                                             Opacity="0.8"
+                                             IsVisible="{Binding TouchpadState.Touch2.IsActive}"
+                                             Canvas.Left="{Binding TouchpadState.Touch2.X, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='240;1920'}"
+                                             Canvas.Top="{Binding TouchpadState.Touch2.Y, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='130;1080'}" />
+                                </Canvas>
+                            </Border>
+
+                            <!-- Touchpad Info -->
+                            <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                <TextBlock FontSize="11"
+                                           FontFamily="Consolas"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                    <Run Text="T1:" />
+                                    <Run Text="{Binding TouchpadState.Touch1.IsActive}"
+                                         Foreground="{Binding TouchpadState.Touch1.IsActive, Converter={StaticResource BoolToColorConverter}}" />
+                                    <Run Text=" | X:" />
+                                    <Run Text="{Binding TouchpadState.Touch1.X}" />
+                                    <Run Text=" Y:" />
+                                    <Run Text="{Binding TouchpadState.Touch1.Y}" />
+                                </TextBlock>
+                                <TextBlock FontSize="11"
+                                           FontFamily="Consolas"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                    <Run Text="T2:" />
+                                    <Run Text="{Binding TouchpadState.Touch2.IsActive}"
+                                         Foreground="{Binding TouchpadState.Touch2.IsActive, Converter={StaticResource BoolToColorConverter}}" />
+                                    <Run Text=" | X:" />
+                                    <Run Text="{Binding TouchpadState.Touch2.X}" />
+                                    <Run Text=" Y:" />
+                                    <Run Text="{Binding TouchpadState.Touch2.Y}" />
+                                </TextBlock>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Motion Sensors -->
+                    <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                            CornerRadius="8"
+                            Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Motion Sensors"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center" />
+
+                            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                                <!-- Gyroscope -->
+                                <StackPanel Grid.Column="0" Spacing="4" HorizontalAlignment="Center">
+                                    <TextBlock Text="Gyroscope"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                               HorizontalAlignment="Center" />
+                                    <TextBlock FontSize="11"
+                                               FontFamily="Consolas"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                        <Run Text="X:" />
+                                        <Run Text="{Binding MotionState.GyroX, StringFormat={}{0:F0}}" />
+                                    </TextBlock>
+                                    <TextBlock FontSize="11"
+                                               FontFamily="Consolas"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                        <Run Text="Y:" />
+                                        <Run Text="{Binding MotionState.GyroY, StringFormat={}{0:F0}}" />
+                                    </TextBlock>
+                                    <TextBlock FontSize="11"
+                                               FontFamily="Consolas"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                        <Run Text="Z:" />
+                                        <Run Text="{Binding MotionState.GyroZ, StringFormat={}{0:F0}}" />
+                                    </TextBlock>
+                                </StackPanel>
+
+                                <!-- Accelerometer -->
+                                <StackPanel Grid.Column="1" Spacing="4" HorizontalAlignment="Center">
+                                    <TextBlock Text="Accelerometer"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                               HorizontalAlignment="Center" />
+                                    <TextBlock FontSize="11"
+                                               FontFamily="Consolas"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                        <Run Text="X:" />
+                                        <Run Text="{Binding MotionState.AccelX, StringFormat={}{0:F0}}" />
+                                    </TextBlock>
+                                    <TextBlock FontSize="11"
+                                               FontFamily="Consolas"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                        <Run Text="Y:" />
+                                        <Run Text="{Binding MotionState.AccelY, StringFormat={}{0:F0}}" />
+                                    </TextBlock>
+                                    <TextBlock FontSize="11"
+                                               FontFamily="Consolas"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                                        <Run Text="Z:" />
+                                        <Run Text="{Binding MotionState.AccelZ, StringFormat={}{0:F0}}" />
+                                    </TextBlock>
+                                </StackPanel>
                             </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- PS Button -->
+                    <Border Background="{Binding InputState.PS, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                            CornerRadius="22"
+                            Width="48"
+                            Height="48"
+                            HorizontalAlignment="Center">
+                        <Grid>
+                            <Ellipse Width="44" Height="44"
+                                     Fill="Transparent"
+                                     Stroke="{DynamicResource TextFillColorPrimaryBrush}"
+                                     StrokeThickness="1"
+                                     Opacity="0.3" />
+                            <TextBlock Text="PS"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="Bold" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Mute Button -->
+                    <Border Background="{Binding InputState.Mute, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                            CornerRadius="6"
+                            Padding="12,6"
+                            HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <ic:SymbolIcon Symbol="MicOff" FontSize="14" />
+                            <TextBlock Text="MUTE"
+                                       FontSize="11" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Right Column -->
+                <!-- R1/R2 Triggers -->
+                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                        CornerRadius="8"
+                        Padding="12"
+                        Grid.Column="2"
+                        Grid.Row="0"
+                        MinWidth="150"
+                        MaxWidth="220">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Right Triggers"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                   HorizontalAlignment="Center" />
+                        <Border Background="{Binding InputState.R1, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                CornerRadius="6"
+                                Padding="12,10">
+                            <TextBlock Text="R1"
+                                       HorizontalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="SemiBold" />
+                        </Border>
+
+                        <StackPanel Spacing="6">
+                            <Border Background="{Binding InputState.R2Button, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    CornerRadius="6"
+                                    Padding="12,10">
+                                <Grid>
+                                    <TextBlock Text="R2"
+                                               HorizontalAlignment="Center"
+                                               FontSize="14"
+                                               FontWeight="SemiBold" />
+                                    <TextBlock Text="{Binding InputState.R2, Converter={StaticResource ByteToPercentageConverter}, StringFormat='{}{0:F0}%'}"
+                                               FontSize="11"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,4,0"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                </Grid>
+                            </Border>
+                            <ProgressBar Value="{Binding InputState.R2, Converter={StaticResource ByteToPercentageConverter}}"
+                                         Maximum="100"
+                                         Height="6"
+                                         MinWidth="100" />
                         </StackPanel>
                     </StackPanel>
                 </Border>
 
-                <!-- Sensors (Gyro/Accel) -->
+                <!-- Face Buttons (PlayStation Style) -->
+                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                        CornerRadius="8"
+                        Padding="12"
+                        Grid.Column="2"
+                        Grid.Row="1"
+                        MaxWidth="220">
+                    <StackPanel Spacing="10" HorizontalAlignment="Center">
+                        <TextBlock Text="Action Buttons"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                        <Grid RowDefinitions="36,36,36"
+                              ColumnDefinitions="36,36,36"
+                              RowSpacing="2"
+                              ColumnSpacing="2"
+                              HorizontalAlignment="Center">
+                            <!-- Triangle (Top) -->
+                            <Border Background="{Binding InputState.Triangle, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    CornerRadius="18"
+                                    Grid.Row="0"
+                                    Grid.Column="1">
+                                <TextBlock Text="△"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="#00D9A3" />
+                            </Border>
+                            <!-- Square (Left) - Using Path for better rendering -->
+                            <Border Background="{Binding InputState.Square, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    CornerRadius="18"
+                                    Grid.Row="1"
+                                    Grid.Column="0">
+                                <Viewbox Width="18" Height="18">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M 6,6 L 18,6 L 18,18 L 6,18 Z"
+                                              Stroke="#FF6B9D"
+                                              StrokeThickness="2.5"
+                                              Fill="Transparent" />
+                                    </Canvas>
+                                </Viewbox>
+                            </Border>
+                            <!-- Circle (Right) -->
+                            <Border Background="{Binding InputState.Circle, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    CornerRadius="18"
+                                    Grid.Row="1"
+                                    Grid.Column="2">
+                                <TextBlock Text="○"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="#FF4757" />
+                            </Border>
+                            <!-- Cross (Bottom) -->
+                            <Border Background="{Binding InputState.Cross, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                    CornerRadius="18"
+                                    Grid.Row="2"
+                                    Grid.Column="1">
+                                <TextBlock Text="✕"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           FontSize="16"
+                                           FontWeight="Bold"
+                                           Foreground="#5C7CFA" />
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Right Stick (Bottom Position like PS) -->
+                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                        CornerRadius="8"
+                        Padding="12"
+                        Grid.Column="2"
+                        Grid.Row="2"
+                        MaxWidth="220">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Right Stick"
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" />
+                        <Border Width="100"
+                                Height="100"
+                                Background="{DynamicResource SubtleFillColorSecondaryBrush}"
+                                CornerRadius="50"
+                                ClipToBounds="True"
+                                HorizontalAlignment="Center">
+                            <Grid>
+                                <Canvas>
+                                    <!-- Crosshair -->
+                                    <Line StartPoint="50,0" EndPoint="50,100"
+                                          Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
+                                          StrokeThickness="1"
+                                          Opacity="0.5" />
+                                    <Line StartPoint="0,50" EndPoint="100,50"
+                                          Stroke="{DynamicResource DividerStrokeColorDefaultBrush}"
+                                          StrokeThickness="1"
+                                          Opacity="0.5" />
+                                    <!-- Stick Position -->
+                                    <Ellipse Width="16"
+                                             Height="16"
+                                             Fill="{DynamicResource AccentFillColorDefaultBrush}"
+                                             Canvas.Left="{Binding InputState.RightStickX, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=100}"
+                                             Canvas.Top="{Binding InputState.RightStickY, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=100}" />
+                                </Canvas>
+                                <!-- R3 Overlay -->
+                                <Border Background="{Binding InputState.R3, Converter={StaticResource BoolToButtonBackgroundConverter}}"
+                                        CornerRadius="12"
+                                        Width="28"
+                                        Height="28"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Opacity="0.9">
+                                    <TextBlock Text="R3"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center"
+                                               FontSize="10"
+                                               FontWeight="Bold" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                        <!-- Stick Values -->
+                        <TextBlock HorizontalAlignment="Center"
+                                   FontSize="11"
+                                   FontFamily="Consolas"
+                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}">
+                            <Run Text="X:" />
+                            <Run Text="{Binding InputState.RightStickX, StringFormat={}{0:F2}}" />
+                            <Run Text=" Y:" />
+                            <Run Text="{Binding InputState.RightStickY, StringFormat={}{0:F2}}" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <!-- Status Bar (Bottom) -->
                 <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
                         CornerRadius="8"
                         Padding="16"
                         Grid.Row="3"
                         Grid.Column="0"
-                        Grid.ColumnSpan="2">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Sensors"
-                                   FontSize="14"
-                                   FontWeight="SemiBold" />
+                        Grid.ColumnSpan="3">
+                    <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto" ColumnSpacing="20">
+                        <!-- Battery -->
+                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8">
+                            <ic:SymbolIcon Symbol="Battery10" FontSize="18" />
+                            <TextBlock Text="{Binding BatteryLevel, StringFormat='{}{0:F0}%'}"
+                                       VerticalAlignment="Center"
+                                       FontSize="13"
+                                       FontWeight="SemiBold" />
+                        </StackPanel>
 
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-                            <!-- Gyroscope -->
-                            <StackPanel Grid.Column="0" Spacing="4">
-                                <TextBlock Text="Gyroscope"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                                <TextBlock FontSize="11" FontFamily="Consolas">
-                                    <Run Text="X: " />
-                                    <Run Text="{Binding MotionState.GyroX}" />
-                                </TextBlock>
-                                <TextBlock FontSize="11" FontFamily="Consolas">
-                                    <Run Text="Y: " />
-                                    <Run Text="{Binding MotionState.GyroY}" />
-                                </TextBlock>
-                                <TextBlock FontSize="11" FontFamily="Consolas">
-                                    <Run Text="Z: " />
-                                    <Run Text="{Binding MotionState.GyroZ}" />
-                                </TextBlock>
-                            </StackPanel>
+                        <Rectangle Grid.Column="1" Width="1" Fill="{DynamicResource DividerStrokeColorDefaultBrush}" Opacity="0.3" />
 
-                            <!-- Accelerometer -->
-                            <StackPanel Grid.Column="1" Spacing="4">
-                                <TextBlock Text="Accelerometer"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                                <TextBlock FontSize="11" FontFamily="Consolas">
-                                    <Run Text="X: " />
-                                    <Run Text="{Binding MotionState.AccelX}" />
-                                </TextBlock>
-                                <TextBlock FontSize="11" FontFamily="Consolas">
-                                    <Run Text="Y: " />
-                                    <Run Text="{Binding MotionState.AccelY}" />
-                                </TextBlock>
-                                <TextBlock FontSize="11" FontFamily="Consolas">
-                                    <Run Text="Z: " />
-                                    <Run Text="{Binding MotionState.AccelZ}" />
-                                </TextBlock>
-                            </StackPanel>
-                        </Grid>
-                    </StackPanel>
+                        <!-- Lightbar -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                            <Border Width="44"
+                                    Height="10"
+                                    CornerRadius="5"
+                                    Background="{Binding CurrentLightbarColor, Converter={StaticResource LightbarColorToBrushConverter}}" />
+                            <TextBlock Text="{Binding CurrentLightbarBehavior}"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+
+                        <Rectangle Grid.Column="3" Width="1" Fill="{DynamicResource DividerStrokeColorDefaultBrush}" Opacity="0.3" />
+
+                        <!-- Player LEDs -->
+                        <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="8">
+                            <Grid ColumnDefinitions="5,5,5,5,5" ColumnSpacing="3"
+                                  Opacity="{Binding CurrentPlayerLedBrightness, Converter={StaticResource PlayerLedBrightnessToOpacityConverter}}">
+                                <Rectangle Width="5" Height="14"
+                                           Fill="{Binding CurrentPlayerLeds, Converter={StaticResource PlayerLedFlagToBrushConverter}, ConverterParameter=1}"
+                                           RadiusX="1" RadiusY="1" Grid.Column="0" />
+                                <Rectangle Width="5" Height="14"
+                                           Fill="{Binding CurrentPlayerLeds, Converter={StaticResource PlayerLedFlagToBrushConverter}, ConverterParameter=2}"
+                                           RadiusX="1" RadiusY="1" Grid.Column="1" />
+                                <Rectangle Width="5" Height="14"
+                                           Fill="{Binding CurrentPlayerLeds, Converter={StaticResource PlayerLedFlagToBrushConverter}, ConverterParameter=3}"
+                                           RadiusX="1" RadiusY="1" Grid.Column="2" />
+                                <Rectangle Width="5" Height="14"
+                                           Fill="{Binding CurrentPlayerLeds, Converter={StaticResource PlayerLedFlagToBrushConverter}, ConverterParameter=4}"
+                                           RadiusX="1" RadiusY="1" Grid.Column="3" />
+                                <Rectangle Width="5" Height="14"
+                                           Fill="{Binding CurrentPlayerLeds, Converter={StaticResource PlayerLedFlagToBrushConverter}, ConverterParameter=5}"
+                                           RadiusX="1" RadiusY="1" Grid.Column="4" />
+                            </Grid>
+                            <TextBlock Text="{Binding CurrentPlayerLeds, Converter={StaticResource PlayerLedToStringConverter}}"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+
+
+                        <Rectangle Grid.Column="5" Width="1" Fill="{DynamicResource DividerStrokeColorDefaultBrush}" Opacity="0.3" />
+
+                        <!-- Mic LED -->
+                        <StackPanel Grid.Column="6" Orientation="Horizontal" Spacing="8">
+                            <Ellipse Width="10" Height="10"
+                                     Fill="{Binding CurrentMicLed, Converter={StaticResource MicLedToBrushConverter}}"
+                                     VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding CurrentMicLed}"
+                                       VerticalAlignment="Center"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                        </StackPanel>
+                    </Grid>
                 </Border>
             </Grid>
-        </StackPanel>
+        </Grid>
     </Border>
 </UserControl>

@@ -215,3 +215,180 @@ public class ColorToBrushConverter : IValueConverter
         throw new NotImplementedException();
     }
 }
+
+/// <summary>
+/// Converter for individual Player LED indicators
+/// Checks if a specific LED flag is set in the PlayerLed enum
+/// </summary>
+public class PlayerLedFlagToBrushConverter : IValueConverter
+{
+    private static readonly IBrush ActiveLedBrush = new SolidColorBrush(Colors.White);
+    private static readonly IBrush InactiveLedBrush = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255));
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not PlayerLed playerLeds || parameter is not string ledFlag)
+        {
+            return InactiveLedBrush;
+        }
+
+        PlayerLed flag = ledFlag switch
+        {
+            "1" or "LED_1" => PlayerLed.LED_1,
+            "2" or "LED_2" => PlayerLed.LED_2,
+            "3" or "LED_3" => PlayerLed.LED_3,
+            "4" or "LED_4" => PlayerLed.LED_4,
+            "5" or "LED_5" => PlayerLed.LED_5,
+            _ => PlayerLed.None
+        };
+
+        return playerLeds.HasFlag(flag) ? ActiveLedBrush : InactiveLedBrush;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converter for Mic LED state to color
+/// </summary>
+public class MicLedToBrushConverter : IValueConverter
+{
+    private static readonly IBrush MicOnBrush = new SolidColorBrush(Color.FromRgb(255, 140, 0)); // Orange
+    private static readonly IBrush MicPulseBrush = new SolidColorBrush(Color.FromRgb(255, 69, 0)); // Red-Orange
+    private static readonly IBrush MicOffBrush = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)); // Dim white
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not MicLed micLed)
+        {
+            return MicOffBrush;
+        }
+
+        return micLed switch
+        {
+            MicLed.On => MicOnBrush,
+            MicLed.Pulse => MicPulseBrush,
+            MicLed.Off => MicOffBrush,
+            _ => MicOffBrush
+        };
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converter for PlayerLed enum to readable string
+/// </summary>
+public class PlayerLedToStringConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not PlayerLed playerLeds)
+        {
+            return "None";
+        }
+
+        if (playerLeds == PlayerLed.None)
+        {
+            return "None";
+        }
+
+        if (playerLeds == PlayerLed.All)
+        {
+            return "All (5)";
+        }
+
+        List<string> activeLeds = new List<string>();
+
+        if (playerLeds.HasFlag(PlayerLed.LED_1)) activeLeds.Add("1");
+        if (playerLeds.HasFlag(PlayerLed.LED_2)) activeLeds.Add("2");
+        if (playerLeds.HasFlag(PlayerLed.LED_3)) activeLeds.Add("3");
+        if (playerLeds.HasFlag(PlayerLed.LED_4)) activeLeds.Add("4");
+        if (playerLeds.HasFlag(PlayerLed.LED_5)) activeLeds.Add("5");
+
+        return activeLeds.Count > 0 ? string.Join(", ", activeLeds) : "None";
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converter for LightbarColor struct to Brush
+/// </summary>
+public class LightbarColorToBrushConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not LightbarColor lightbarColor)
+        {
+            return new SolidColorBrush(Colors.Black);
+        }
+
+        Color color = Color.FromRgb(lightbarColor.Red, lightbarColor.Green, lightbarColor.Blue);
+        return new SolidColorBrush(color);
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converter for PlayerLedBrightness enum to opacity value
+/// </summary>
+public class PlayerLedBrightnessToOpacityConverter : IValueConverter
+{
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is not PlayerLedBrightness brightness)
+        {
+            return 1.0;
+        }
+
+        return brightness switch
+        {
+            PlayerLedBrightness.High => 1.0,
+            PlayerLedBrightness.Medium => 0.66,
+            PlayerLedBrightness.Low => 0.33,
+            _ => 1.0
+        };
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+/// <summary>
+/// Converter for boolean to color (for touch active state)
+/// </summary>
+public class BoolToColorConverter : IValueConverter
+{
+    private static readonly IBrush ActiveBrush = new SolidColorBrush(Color.FromRgb(0, 217, 163)); // Green
+    private static readonly IBrush InactiveBrush = new SolidColorBrush(Color.FromRgb(150, 150, 150)); // Gray
+
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        if (value is bool isActive)
+        {
+            return isActive ? ActiveBrush : InactiveBrush;
+        }
+        return InactiveBrush;
+    }
+
+    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    {
+        throw new NotImplementedException();
+    }
+}

@@ -32,6 +32,7 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
     [ObservableProperty] private string _batteryText = string.Empty;
 
     public DualSenseController Controller => _controller;
+    public ControllerInfo? ControllerInfo => _controllerInfo;
 
     // Constructor
     public ControllerViewModelBase(DualSenseController controller, ControllerInfo? controllerInfo)
