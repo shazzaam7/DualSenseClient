@@ -20,6 +20,8 @@ public partial class ControllerSelectorViewModel : ViewModelBase
 
     public ControllerSelectorViewModel(SelectedControllerService selectedControllerService)
     {
+        Logger.Debug<ControllerSelectorViewModel>("Creating ControllerSelectorViewModel");
+
         _selectedControllerService = selectedControllerService;
 
         // Subscribe to changes
@@ -28,23 +30,28 @@ public partial class ControllerSelectorViewModel : ViewModelBase
 
         // Initialize
         UpdateControllersList();
+
+        Logger.Debug<ControllerSelectorViewModel>("ControllerSelectorViewModel created successfully");
     }
 
     private void OnServicePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SelectedControllerService.SelectedController))
         {
+            Logger.Trace<ControllerSelectorViewModel>("Selected controller changed in service");
             UpdateSelectedStates();
         }
     }
 
     private void OnControllersCollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        Logger.Debug<ControllerSelectorViewModel>("Controllers collection changed");
         UpdateControllersList();
     }
 
     private void UpdateControllersList()
     {
+        Logger.Trace<ControllerSelectorViewModel>("Updating controllers list");
         _isUpdating = true;
 
         // Dispose old items
@@ -58,20 +65,30 @@ public partial class ControllerSelectorViewModel : ViewModelBase
 
         foreach (var controller in _selectedControllerService.AvailableControllers)
         {
-            ControllerListItemViewModel item = new ControllerListItemViewModel(controller, controller == _selectedControllerService.SelectedController,
+            ControllerListItemViewModel item = new ControllerListItemViewModel(
+                controller,
+                controller == _selectedControllerService.SelectedController,
                 _selectedControllerService);
             Controllers.Add(item);
         }
 
         HasControllers = Controllers.Count > 0;
+        Logger.Debug<ControllerSelectorViewModel>($"Controllers list updated: {Controllers.Count} controller(s)");
+
         _isUpdating = false;
     }
 
     private void UpdateSelectedStates()
     {
-        if (_isUpdating) return;
+        if (_isUpdating)
+        {
+            Logger.Trace<ControllerSelectorViewModel>("Skipping selection update (currently updating list)");
+            return;
+        }
 
-        foreach (var item in Controllers)
+        Logger.Trace<ControllerSelectorViewModel>("Updating selected states");
+
+        foreach (ControllerListItemViewModel item in Controllers)
         {
             item.IsSelected = item.Controller == _selectedControllerService.SelectedController;
         }
@@ -82,7 +99,12 @@ public partial class ControllerSelectorViewModel : ViewModelBase
     {
         if (item != null)
         {
+            Logger.Info<ControllerSelectorViewModel>($"Selecting controller: {item.Name}");
             _selectedControllerService.SelectController(item.Controller);
+        }
+        else
+        {
+            Logger.Warning<ControllerSelectorViewModel>("SelectController called with null item");
         }
     }
 }
@@ -113,6 +135,8 @@ public partial class ControllerListItemViewModel : ObservableObject
 
     public ControllerListItemViewModel(ControllerViewModelBase controller, bool isSelected, SelectedControllerService selectedControllerService)
     {
+        Logger.Trace<ControllerListItemViewModel>($"Creating ControllerListItemViewModel for: {controller.Name}");
+
         Controller = controller;
         IsSelected = isSelected;
         _selectedControllerService = selectedControllerService;
@@ -128,6 +152,7 @@ public partial class ControllerListItemViewModel : ObservableObject
         switch (e.PropertyName)
         {
             case nameof(ControllerViewModelBase.Name):
+                Logger.Trace<ControllerListItemViewModel>($"Controller name changed: {Controller.Name}");
                 OnPropertyChanged(nameof(Name));
                 EditingName = Controller.Name; // Keep editing name in sync
                 break;
@@ -152,7 +177,7 @@ public partial class ControllerListItemViewModel : ObservableObject
     [RelayCommand]
     private void StartRenaming()
     {
-        Logger.Debug($"Starting rename for controller: {Name}");
+        Logger.Debug<ControllerListItemViewModel>($"Starting rename for controller: {Name}");
         EditingName = Controller.Name;
         IsRenaming = true;
     }
@@ -162,15 +187,19 @@ public partial class ControllerListItemViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(EditingName))
         {
-            Logger.Warning("Cannot save empty controller name");
+            Logger.Warning<ControllerListItemViewModel>("Cannot save empty controller name");
             CancelRenaming();
             return;
         }
 
         if (EditingName != Controller.Name)
         {
-            Logger.Info($"Renaming controller from '{Controller.Name}' to '{EditingName}'");
+            Logger.Info<ControllerListItemViewModel>($"Renaming controller from '{Controller.Name}' to '{EditingName}'");
             _selectedControllerService.UpdateControllerName(Controller.ControllerId, EditingName);
+        }
+        else
+        {
+            Logger.Debug<ControllerListItemViewModel>("Name unchanged, cancelling rename");
         }
 
         IsRenaming = false;
@@ -179,7 +208,7 @@ public partial class ControllerListItemViewModel : ObservableObject
     [RelayCommand]
     private void CancelRenaming()
     {
-        Logger.Debug("Cancelled renaming");
+        Logger.Debug<ControllerListItemViewModel>("Cancelled renaming");
         EditingName = Controller.Name;
         IsRenaming = false;
     }
@@ -192,17 +221,23 @@ public partial class ControllerListItemViewModel : ObservableObject
             if (App.MainWindow?.Clipboard != null)
             {
                 await App.MainWindow.Clipboard.SetTextAsync(MacAddress);
-                Logger.Info($"MAC address copied to clipboard: {MacAddress}");
+                Logger.Info<ControllerListItemViewModel>($"MAC address copied to clipboard: {MacAddress}");
+            }
+            else
+            {
+                Logger.Warning<ControllerListItemViewModel>("Cannot copy MAC address: Clipboard not available");
             }
         }
         catch (Exception ex)
         {
-            Logger.Error($"Failed to copy MAC address: {ex.Message}");
+            Logger.Error<ControllerListItemViewModel>("Failed to copy MAC address");
+            Logger.LogExceptionDetails<ControllerListItemViewModel>(ex, includeEnvironmentInfo: false);
         }
     }
 
     public void Dispose()
     {
+        Logger.Trace<ControllerListItemViewModel>($"Disposing ControllerListItemViewModel for: {Name}");
         Controller.PropertyChanged -= OnControllerPropertyChanged;
     }
 }

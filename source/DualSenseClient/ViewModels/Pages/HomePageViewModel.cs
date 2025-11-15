@@ -1,11 +1,6 @@
-﻿using System;
-using Avalonia.Threading;
+﻿using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
-using DualSenseClient.Core.DualSense;
-using DualSenseClient.Core.Settings;
-using DualSenseClient.Core.Settings.Models;
 using DualSenseClient.Services;
-using DualSenseClient.ViewModels.Controls;
 using DualSenseClient.Core.Logging;
 
 namespace DualSenseClient.ViewModels.Pages;
@@ -18,7 +13,8 @@ public partial class HomePageViewModel : ViewModelBase
 
     public HomePageViewModel(SelectedControllerService selectedControllerService)
     {
-        Logger.Debug("Creating HomePageViewModel");
+        Logger.Debug<HomePageViewModel>("Creating HomePageViewModel");
+
         _selectedControllerService = selectedControllerService;
         _selectedControllerService.PropertyChanged += (_, e) =>
         {
@@ -26,14 +22,25 @@ public partial class HomePageViewModel : ViewModelBase
             {
                 Dispatcher.UIThread.Post(() =>
                 {
-                    Logger.Debug($"Selected controller changed in service");
+                    Logger.Debug<HomePageViewModel>("Selected controller changed in service");
                     SelectedController = _selectedControllerService.SelectedController;
+
+                    if (SelectedController != null)
+                    {
+                        Logger.Info<HomePageViewModel>($"Controller selected: {SelectedController.Name}");
+                    }
+                    else
+                    {
+                        Logger.Info<HomePageViewModel>("Controller deselected");
+                    }
                 });
             }
         };
 
         // Initialize with current selection
         SelectedController = _selectedControllerService.SelectedController;
-        Logger.Debug("HomePageViewModel created successfully");
+
+        Logger.Debug<HomePageViewModel>(SelectedController != null ? $"Initialized with controller: {SelectedController.Name}" : "Initialized with no controller selected");
+        Logger.Debug<HomePageViewModel>("HomePageViewModel created successfully");
     }
 }

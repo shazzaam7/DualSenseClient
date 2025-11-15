@@ -67,39 +67,39 @@ public class DualSenseController : IDisposable
     // Constructor
     public DualSenseController(HidDevice device, HidStream stream)
     {
-        Logger.Debug($"Initializing DualSense controller: {device.GetProductName()}");
+        Logger.Debug<DualSenseController>($"Initializing DualSense controller: {device.GetProductName()}");
 
         Device = device;
         _stream = stream;
         ConnectionType = device.GetMaxOutputReportLength() > 64 ? ConnectionType.Bluetooth : ConnectionType.USB;
 
-        Logger.Info($"Controller mode detected: {ConnectionType}");
-        Logger.Debug($"Max output report length: {device.GetMaxOutputReportLength()}");
+        Logger.Info<DualSenseController>($"Controller mode detected: {ConnectionType}");
+        Logger.Debug<DualSenseController>($"Max output report length: {device.GetMaxOutputReportLength()}");
 
         // Try to extract MAC address for both USB and Bluetooth
         MacAddress = BluetoothHelper.ExtractMacAddress(device);
 
         if (MacAddress != null)
         {
-            Logger.Info($"Hardware MAC address: {MacAddress}");
+            Logger.Info<DualSenseController>($"Hardware MAC address: {MacAddress}");
         }
         else
         {
-            Logger.Warning("Failed to extract MAC address from device");
+            Logger.Warning<DualSenseController>("Failed to extract MAC address from device");
 
             // For USB, try to get it from the controller itself via feature report
             MacAddress = TryGetMacAddressFromController();
 
             if (MacAddress != null)
             {
-                Logger.Info($"MAC address from controller: {MacAddress}");
+                Logger.Info<DualSenseController>($"MAC address from controller: {MacAddress}");
             }
         }
 
         _cts = new CancellationTokenSource();
         _readTask = Task.Run(() => ReadLoop(_cts.Token));
 
-        Logger.Info("DualSense controller initialized successfully");
+        Logger.Info<DualSenseController>("DualSense controller initialized successfully");
     }
 
     // Functions
@@ -120,13 +120,13 @@ public class DualSenseController : IDisposable
             if (report.Length >= 7)
             {
                 string mac = $"{report[6]:X2}:{report[5]:X2}:{report[4]:X2}:{report[3]:X2}:{report[2]:X2}:{report[1]:X2}";
-                Logger.Debug($"Extracted MAC from feature report: {mac}");
+                Logger.Debug<DualSenseController>($"Extracted MAC from feature report: {mac}");
                 return mac;
             }
         }
         catch (Exception ex)
         {
-            Logger.Debug($"Could not retrieve MAC from feature report: {ex.Message}");
+            Logger.Debug<DualSenseController>($"Could not retrieve MAC from feature report: {ex.Message}");
         }
 
         return null;
@@ -134,7 +134,7 @@ public class DualSenseController : IDisposable
 
     private async Task ReadLoop(CancellationToken ct)
     {
-        Logger.Debug("Read loop started");
+        Logger.Debug<DualSenseController>("Read loop started");
         byte[] buffer = new byte[128];
         int reportCount = 0;
 
@@ -146,39 +146,39 @@ public class DualSenseController : IDisposable
 
                 if (read <= 0)
                 {
-                    Logger.Warning($"Read returned {read} bytes, disconnecting");
+                    Logger.Warning<DualSenseController>($"Read returned {read} bytes, disconnecting");
                     HandleDisconnection();
                     break;
                 }
 
                 reportCount++;
-                Logger.Trace($"Report #{reportCount}: Read {read} bytes, ID: 0x{buffer[0]:X2}");
+                Logger.Trace<DualSenseController>($"Report #{reportCount}: Read {read} bytes, ID: 0x{buffer[0]:X2}");
 
                 ProcessInputReport(buffer, read);
             }
             catch (OperationCanceledException)
             {
-                Logger.Debug("Read loop cancelled");
+                Logger.Debug<DualSenseController>("Read loop cancelled");
                 break;
             }
             catch (IOException ioEx) when (IsDisconnectionException(ioEx))
             {
                 // Expected disconnection - log at Info level without full details
-                Logger.Info($"Controller disconnected: {ioEx.Message}");
+                Logger.Info<DualSenseController>($"Controller disconnected: {ioEx.Message}");
                 HandleDisconnection();
                 break;
             }
             catch (Exception ex)
             {
                 // Unexpected exception - log full details
-                Logger.Error("Unexpected error in read loop");
-                Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+                Logger.Error<DualSenseController>("Unexpected error in read loop");
+                Logger.LogExceptionDetails<DualSenseController>(ex, includeEnvironmentInfo: false);
                 HandleDisconnection();
                 break;
             }
         }
 
-        Logger.Debug("Read loop ended");
+        Logger.Debug<DualSenseController>("Read loop ended");
     }
 
     /// <summary>
@@ -218,22 +218,22 @@ public class DualSenseController : IDisposable
                 case 0x31:
                     if (length < 10)
                     {
-                        Logger.Warning($"Bluetooth report too short: {length} bytes (minimum 10)");
+                        Logger.Warning<DualSenseController>($"Bluetooth report too short: {length} bytes (minimum 10)");
                         return;
                     }
                     byte[] stripped31 = new byte[length - 2];
                     Array.Copy(data, 2, stripped31, 0, length - 2);
-                    Logger.Trace($"Stripped BT 0x31 headers: {length} -> {stripped31.Length} bytes");
+                    Logger.Trace<DualSenseController>($"Stripped BT 0x31 headers: {length} -> {stripped31.Length} bytes");
                     ParseInputData(stripped31);
                     break;
                 case 0x01:
                     // DualSense is in "simple" Bluetooth state (0x01)
                     // Sending out an "Output Report" resets it to the "normal" Bluetooth state (0x31)
-                    Logger.Warning($"Controller is in simple Bluetooth state");
+                    Logger.Warning<DualSenseController>("Controller is in simple Bluetooth state");
                     SendOutputReport();
                     break;
                 default:
-                    Logger.Warning($"Unknown Bluetooth report ID: 0x{reportId:X2}");
+                    Logger.Warning<DualSenseController>($"Unknown Bluetooth report ID: 0x{reportId:X2}");
                     break;
             }
         }
@@ -242,7 +242,7 @@ public class DualSenseController : IDisposable
             // USB mode (only 0x01 expected)
             if (reportId != 0x01)
             {
-                Logger.Warning($"Invalid USB report ID: 0x{reportId:X2} (expected 0x01)");
+                Logger.Warning<DualSenseController>($"Invalid USB report ID: 0x{reportId:X2} (expected 0x01)");
                 return;
             }
 
@@ -256,11 +256,11 @@ public class DualSenseController : IDisposable
     {
         if (data.Length < 63)
         {
-            Logger.Warning($"Data too short for parsing: {data.Length} bytes (expected 63)");
+            Logger.Warning<DualSenseController>($"Data too short for parsing: {data.Length} bytes (expected 63)");
             return;
         }
 
-        Logger.Trace("Parsing input data");
+        Logger.Trace<DualSenseController>("Parsing input data");
 
         // Store current state for comparison
         InputState oldInput = CopyInputState(Input);
@@ -386,7 +386,7 @@ public class DualSenseController : IDisposable
         CheckButtonEvent(ButtonType.Circle, oldCircle, Input.Circle);
         CheckButtonEvent(ButtonType.Triangle, oldTriangle, Input.Triangle);
 
-        Logger.Trace($"DPad: {dpadValue:X}, Face: Square={Input.Square}, Cross={Input.Cross}, Circle={Input.Circle}, Triangle={Input.Triangle}");
+        Logger.Trace<DualSenseController>($"DPad: {dpadValue:X}, Face: Square={Input.Square}, Cross={Input.Cross}, Circle={Input.Circle}, Triangle={Input.Triangle}");
     }
 
     private void ParseShoulderButtons(byte btnBlock2, InputState oldInput)
@@ -413,7 +413,7 @@ public class DualSenseController : IDisposable
         CheckButtonEvent(ButtonType.L3, oldL3, Input.L3);
         CheckButtonEvent(ButtonType.R3, oldR3, Input.R3);
 
-        Logger.Trace($"Shoulders: L1={Input.L1}, R1={Input.R1}, L2={Input.L2Button}, R2={Input.R2Button}, L3={Input.L3}, R3={Input.R3}");
+        Logger.Trace<DualSenseController>($"Shoulders: L1={Input.L1}, R1={Input.R1}, L2={Input.L2Button}, R2={Input.R2Button}, L3={Input.L3}, R3={Input.R3}");
     }
 
     private void ParseSystemButtons(byte btnBlock3, InputState oldInput)
@@ -429,7 +429,7 @@ public class DualSenseController : IDisposable
         CheckButtonEvent(ButtonType.TouchPad, oldTouchPadClick, Input.TouchPadClick);
         CheckButtonEvent(ButtonType.Mute, oldMute, Input.Mute);
 
-        Logger.Trace($"System: PS={Input.PS}, TouchPad={Input.TouchPadClick}, Mute={Input.Mute}");
+        Logger.Trace<DualSenseController>($"System: PS={Input.PS}, TouchPad={Input.TouchPadClick}, Mute={Input.Mute}");
     }
 
     private void ParseBatteryInfo(byte batteryByte)
@@ -455,7 +455,7 @@ public class DualSenseController : IDisposable
             Battery.IsCharging = charging;
             Battery.IsFullyCharged = fullyCharged;
 
-            Logger.Debug($"Battery: {newLevel:F0}%, State=0x{powerState:X} (Charging={charging}, Full={fullyCharged})");
+            Logger.Debug<DualSenseController>($"Battery: {newLevel:F0}%, State=0x{powerState:X} (Charging={charging}, Full={fullyCharged})");
 
             BatteryChanged?.Invoke(this, new BatteryStateEventArgs(Battery, oldBattery));
         }
@@ -485,7 +485,7 @@ public class DualSenseController : IDisposable
             oldStatus.IsUsbDataConnected != ConnectionStatus.IsUsbDataConnected ||
             oldStatus.IsUsbPowerConnected != ConnectionStatus.IsUsbPowerConnected)
         {
-            Logger.Trace($"Status: Headphone={ConnectionStatus.IsHeadphoneConnected}, Mic={ConnectionStatus.IsMicConnected}, USB={ConnectionStatus.IsUsbDataConnected}");
+            Logger.Trace<DualSenseController>($"Status: Headphone={ConnectionStatus.IsHeadphoneConnected}, Mic={ConnectionStatus.IsMicConnected}, USB={ConnectionStatus.IsUsbDataConnected}");
 
             ConnectionStatusChanged?.Invoke(this, new ConnectionStatusEventArgs(ConnectionStatus, oldStatus));
         }
@@ -495,7 +495,7 @@ public class DualSenseController : IDisposable
     {
         if (data.Length < offset + 4)
         {
-            Logger.Trace($"Insufficient data for touchpad at offset {offset}");
+            Logger.Trace<DualSenseController>($"Insufficient data for touchpad at offset {offset}");
             return new TouchPoint();
         }
 
@@ -511,7 +511,7 @@ public class DualSenseController : IDisposable
 
         if (point.IsActive)
         {
-            Logger.Trace($"Touch at offset {offset}: ({point.X}, {point.Y}), Index={point.Index}");
+            Logger.Trace<DualSenseController>($"Touch at offset {offset}: ({point.X}, {point.Y}), Index={point.Index}");
         }
 
         return point;
@@ -688,7 +688,7 @@ public class DualSenseController : IDisposable
     /// </summary>
     public bool SetLightbarBehavior(LightbarBehavior behavior)
     {
-        Logger.Debug($"Setting lightbar behavior: {behavior}");
+        Logger.Debug<DualSenseController>($"Setting lightbar behavior: {behavior}");
 
         // Store previous state
         LightbarColor previousColor = CurrentLightbarColor;
@@ -718,7 +718,7 @@ public class DualSenseController : IDisposable
     /// </summary>
     public bool SetLightbar(byte red, byte green, byte blue)
     {
-        Logger.Debug($"Setting lightbar color: RGB({red}, {green}, {blue})");
+        Logger.Debug<DualSenseController>($"Setting lightbar color: RGB({red}, {green}, {blue})");
 
         // Store previous state
         LightbarColor previousColor = CurrentLightbarColor;
@@ -749,7 +749,7 @@ public class DualSenseController : IDisposable
     /// </summary>
     public bool SetPlayerLeds(PlayerLed leds, PlayerLedBrightness brightness = PlayerLedBrightness.High)
     {
-        Logger.Debug($"Setting player LEDs: {leds}, Brightness={brightness}");
+        Logger.Debug<DualSenseController>($"Setting player LEDs: {leds}, Brightness={brightness}");
 
         // Store previous state
         PlayerLed previousLeds = CurrentPlayerLeds;
@@ -780,7 +780,7 @@ public class DualSenseController : IDisposable
     /// </summary>
     public bool SetMicLed(MicLed led)
     {
-        Logger.Debug($"Setting mic LED: {led}");
+        Logger.Debug<DualSenseController>($"Setting mic LED: {led}");
 
         // Store previous state
         MicLed previousLed = CurrentMicLed;
@@ -804,7 +804,7 @@ public class DualSenseController : IDisposable
     {
         if (!IsConnected)
         {
-            Logger.Warning("Cannot send output report: Controller not connected");
+            Logger.Warning<DualSenseController>("Cannot send output report: Controller not connected");
             return false;
         }
 
@@ -813,16 +813,16 @@ public class DualSenseController : IDisposable
             try
             {
                 byte[] report = ConnectionType == ConnectionType.Bluetooth ? BuildBluetoothOutputReport() : BuildUsbOutputReport();
-                Logger.Trace($"Sending {ConnectionType} output report: {report.Length} bytes");
+                Logger.Trace<DualSenseController>($"Sending {ConnectionType} output report: {report.Length} bytes");
 
                 _stream.Write(report);
-                Logger.Trace("Output report sent successfully");
+                Logger.Trace<DualSenseController>("Output report sent successfully");
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.Error("Failed to send output report");
-                Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+                Logger.Error<DualSenseController>("Failed to send output report");
+                Logger.LogExceptionDetails<DualSenseController>(ex, includeEnvironmentInfo: false);
                 HandleDisconnection();
                 return false;
             }
@@ -841,7 +841,7 @@ public class DualSenseController : IDisposable
 
         // Lightbar enable flags
         // AllowLightBrightnessChange (0), AllowColorLightFadeAnimation (1)
-        report[40] = 0x03; 
+        report[40] = 0x03;
 
         // Lightbar behavior
         report[43] = (byte)CurrentLightbarBehavior;
@@ -867,7 +867,7 @@ public class DualSenseController : IDisposable
         report[76] = (byte)((crc >> 16) & 0xFF);
         report[77] = (byte)((crc >> 24) & 0xFF);
 
-        Logger.Trace($"BT Report - CRC: 0x{crc:X8}");
+        Logger.Trace<DualSenseController>($"BT Report - CRC: 0x{crc:X8}, Bytes: [{report[74]:X2} {report[75]:X2} {report[76]:X2} {report[77]:X2}]");
 
         return report;
     }
@@ -912,17 +912,17 @@ public class DualSenseController : IDisposable
     {
         if (ConnectionType != ConnectionType.Bluetooth)
         {
-            Logger.Warning("Cannot disconnect Bluetooth: Controller is connected via USB");
+            Logger.Warning<DualSenseController>("Cannot disconnect Bluetooth: Controller is connected via USB");
             return false;
         }
 
         if (MacAddress == null)
         {
-            Logger.Warning("Cannot disconnect Bluetooth: MAC address not available");
+            Logger.Warning<DualSenseController>("Cannot disconnect Bluetooth: MAC address not available");
             return false;
         }
 
-        Logger.Info($"Disconnecting Bluetooth device: {MacAddress}");
+        Logger.Info<DualSenseController>($"Disconnecting Bluetooth device: {MacAddress}");
         return BluetoothHelper.Disconnect(MacAddress);
     }
 
@@ -930,12 +930,12 @@ public class DualSenseController : IDisposable
     {
         if (!IsConnected)
         {
-            Logger.Trace("HandleDisconnection called but already disconnected");
+            Logger.Trace<DualSenseController>("HandleDisconnection called but already disconnected");
             return;
         }
 
         IsConnected = false;
-        Logger.Info($"Controller disconnected: {Device.GetProductName()} ({ConnectionType})");
+        Logger.Info<DualSenseController>($"Controller disconnected: {Device.GetProductName()} ({ConnectionType})");
 
         try
         {
@@ -943,30 +943,30 @@ public class DualSenseController : IDisposable
         }
         catch (Exception ex)
         {
-            Logger.Warning($"Exception in Disconnected event handler: {ex.Message}");
+            Logger.Warning<DualSenseController>($"Exception in Disconnected event handler: {ex.Message}");
         }
     }
 
     public void Dispose()
     {
-        Logger.Debug("Disposing DualSense controller");
+        Logger.Debug<DualSenseController>("Disposing DualSense controller");
         _cts.Cancel();
 
         try
         {
             if (!_readTask.Wait(1000))
             {
-                Logger.Warning("Read task did not complete within timeout");
+                Logger.Warning<DualSenseController>("Read task did not complete within timeout");
             }
         }
         catch (Exception ex)
         {
-            Logger.Warning($"Exception while waiting for read task: {ex.Message}");
+            Logger.Warning<DualSenseController>($"Exception while waiting for read task: {ex.Message}");
         }
 
         _cts.Dispose();
         _stream.Dispose();
 
-        Logger.Debug("DualSense controller disposed");
+        Logger.Debug<DualSenseController>("DualSense controller disposed");
     }
 }

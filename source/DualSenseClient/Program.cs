@@ -18,7 +18,7 @@ sealed class Program
         }
         catch (Exception ex)
         {
-            Logger.LogExceptionDetails(ex);
+            Logger.LogExceptionDetails<Program>(ex);
             Environment.Exit(1);
         }
     }

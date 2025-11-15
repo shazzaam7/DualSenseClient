@@ -16,28 +16,28 @@ public class DualSenseProfileManager
     // Constructor
     public DualSenseProfileManager(ISettingsManager settingsManager, DualSenseManager dualSenseManager)
     {
-        Logger.Info("Initializing DualSenseProfileManager");
+        Logger.Info<DualSenseProfileManager>("Initializing DualSenseProfileManager");
 
         _settingsManager = settingsManager;
         _dualSenseManager = dualSenseManager;
 
         // Subscribe to controller events
-        Logger.Debug("Subscribing to controller events");
+        Logger.Debug<DualSenseProfileManager>("Subscribing to controller events");
         _dualSenseManager.ControllerConnected += OnControllerConnected;
         _dualSenseManager.ControllerDisconnected += OnControllerDisconnected;
 
         // Apply profiles to already connected controllers
         InitializeExistingControllers();
 
-        Logger.Info("DualSenseProfileManager initialized successfully");
+        Logger.Info<DualSenseProfileManager>("DualSenseProfileManager initialized successfully");
     }
 
     // Functions
     private void OnControllerConnected(object? sender, DualSenseController controller)
     {
-        Logger.Info($"Controller connected event: {controller.Device.GetProductName()}");
-        Logger.Debug($"  Connection type: {controller.ConnectionType}");
-        Logger.Debug($"  MAC Address: {controller.MacAddress ?? "Unknown"}");
+        Logger.Info<DualSenseProfileManager>($"Controller connected event: {controller.Device.GetProductName()}");
+        Logger.Debug<DualSenseProfileManager>($"  Connection type: {controller.ConnectionType}");
+        Logger.Debug<DualSenseProfileManager>($"  MAC Address: {controller.MacAddress ?? "Unknown"}");
 
         try
         {
@@ -47,28 +47,28 @@ public class DualSenseProfileManager
             // Update last seen
             controllerInfo.LastSeen = DateTime.UtcNow;
             controllerInfo.LastConnectionType = controller.ConnectionType;
-            Logger.Debug($"  Updated last seen: {controllerInfo.LastSeen:O}");
+            Logger.Debug<DualSenseProfileManager>($"  Updated last seen: {controllerInfo.LastSeen:O}");
 
             // Apply profile
             ApplyProfile(controller, controllerInfo);
 
             // Save settings
-            Logger.Debug("Saving settings after controller connection");
+            Logger.Debug<DualSenseProfileManager>("Saving settings after controller connection");
             _settingsManager.SaveAll();
 
-            Logger.Info($"Controller '{controllerInfo.Name}' connected and configured successfully");
+            Logger.Info<DualSenseProfileManager>($"Controller '{controllerInfo.Name}' connected and configured successfully");
         }
         catch (Exception ex)
         {
-            Logger.Error($"Failed to handle controller connection");
-            Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+            Logger.Error<DualSenseProfileManager>($"Failed to handle controller connection");
+            Logger.LogExceptionDetails<DualSenseProfileManager>(ex, includeEnvironmentInfo: false);
         }
     }
 
     private void OnControllerDisconnected(object? sender, string devicePath)
     {
-        Logger.Info($"Controller disconnected: {devicePath}");
-        Logger.Debug("Settings are already saved, no action needed");
+        Logger.Info<DualSenseProfileManager>($"Controller disconnected: {devicePath}");
+        Logger.Debug<DualSenseProfileManager>("Settings are already saved, no action needed");
     }
 
     /// <summary>
@@ -76,17 +76,17 @@ public class DualSenseProfileManager
     /// </summary>
     private void InitializeExistingControllers()
     {
-        Logger.Info("Checking for already connected controllers at startup");
+        Logger.Info<DualSenseProfileManager>("Checking for already connected controllers at startup");
 
         List<DualSenseController> connectedControllers = _dualSenseManager.Controllers.Values.ToList();
 
         if (connectedControllers.Count == 0)
         {
-            Logger.Debug("No controllers currently connected");
+            Logger.Debug<DualSenseProfileManager>("No controllers currently connected");
             return;
         }
 
-        Logger.Info($"Found {connectedControllers.Count} connected controller(s), applying profiles");
+        Logger.Info<DualSenseProfileManager>($"Found {connectedControllers.Count} connected controller(s), applying profiles");
 
         bool settingsChanged = false;
         int successCount = 0;
@@ -97,9 +97,9 @@ public class DualSenseProfileManager
             try
             {
                 string productName = controller.Device.GetProductName();
-                Logger.Debug($"Processing existing controller: {productName}");
-                Logger.Trace($"  Device path: {controller.Device.DevicePath}");
-                Logger.Trace($"  Connection type: {controller.ConnectionType}");
+                Logger.Debug<DualSenseProfileManager>($"Processing existing controller: {productName}");
+                Logger.Trace<DualSenseProfileManager>($"  Device path: {controller.Device.DevicePath}");
+                Logger.Trace<DualSenseProfileManager>($"  Connection type: {controller.ConnectionType}");
 
                 // Get or create controller info
                 ControllerInfo controllerInfo = GetOrCreateControllerInfo(controller);
@@ -113,50 +113,50 @@ public class DualSenseProfileManager
 
                 settingsChanged = true;
                 successCount++;
-                Logger.Debug($"Successfully initialized controller '{controllerInfo.Name}'");
+                Logger.Debug<DualSenseProfileManager>($"Successfully initialized controller '{controllerInfo.Name}'");
             }
             catch (Exception ex)
             {
                 failureCount++;
-                Logger.Error($"Failed to initialize existing controller");
-                Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+                Logger.Error<DualSenseProfileManager>($"Failed to initialize existing controller");
+                Logger.LogExceptionDetails<DualSenseProfileManager>(ex, includeEnvironmentInfo: false);
             }
         }
 
         // Save settings if any controller was processed
         if (settingsChanged)
         {
-            Logger.Debug("Saving settings after initializing existing controllers");
+            Logger.Debug<DualSenseProfileManager>("Saving settings after initializing existing controllers");
             _settingsManager.SaveAll();
         }
 
-        Logger.Info($"Existing controllers initialization complete: {successCount} succeeded, {failureCount} failed");
+        Logger.Info<DualSenseProfileManager>($"Existing controllers initialization complete: {successCount} succeeded, {failureCount} failed");
     }
 
     public ControllerInfo GetOrCreateControllerInfo(DualSenseController controller)
     {
-        Logger.Debug($"Getting or creating controller info");
+        Logger.Debug<DualSenseProfileManager>($"Getting or creating controller info");
         ControllerSettings settings = _settingsManager.Application.Controllers;
 
         // Try to find by MAC address first (most reliable for Bluetooth)
         if (!string.IsNullOrEmpty(controller.MacAddress))
         {
-            Logger.Trace($"Searching by MAC address: {controller.MacAddress}");
+            Logger.Trace<DualSenseProfileManager>($"Searching by MAC address: {controller.MacAddress}");
             ControllerInfo? existing = settings.KnownControllers.Values.FirstOrDefault(c => c.MacAddress == controller.MacAddress);
 
             if (existing != null)
             {
-                Logger.Debug($"Found existing controller by MAC: {existing.Name} (ID: {existing.Id})");
+                Logger.Debug<DualSenseProfileManager>($"Found existing controller by MAC: {existing.Name} (ID: {existing.Id})");
                 return existing;
             }
         }
         else
         {
-            Logger.Warning("Controller has no MAC address, cannot search by MAC");
+            Logger.Warning<DualSenseProfileManager>("Controller has no MAC address, cannot search by MAC");
         }
 
         // Create new controller info
-        Logger.Info("Creating new controller entry");
+        Logger.Info<DualSenseProfileManager>("Creating new controller entry");
         string controllerId = GenerateControllerId(controller);
         ControllerInfo controllerInfo = new ControllerInfo
         {
@@ -169,19 +169,19 @@ public class DualSenseProfileManager
             LastConnectionType = controller.ConnectionType
         };
 
-        Logger.Debug($"  Controller ID: {controllerId}");
-        Logger.Debug($"  Name: {controllerInfo.Name}");
-        Logger.Debug($"  MAC: {controllerInfo.MacAddress ?? "None"}");
-        Logger.Debug($"  Serial: {controllerInfo.SerialNumber ?? "None"}");
-        Logger.Debug($"  Profile ID: {controllerInfo.ProfileId ?? "None"}");
+        Logger.Debug<DualSenseProfileManager>($"  Controller ID: {controllerId}");
+        Logger.Debug<DualSenseProfileManager>($"  Name: {controllerInfo.Name}");
+        Logger.Debug<DualSenseProfileManager>($"  MAC: {controllerInfo.MacAddress ?? "None"}");
+        Logger.Debug<DualSenseProfileManager>($"  Serial: {controllerInfo.SerialNumber ?? "None"}");
+        Logger.Debug<DualSenseProfileManager>($"  Profile ID: {controllerInfo.ProfileId ?? "None"}");
 
         settings.KnownControllers[controllerId] = controllerInfo;
-        Logger.Info($"Added new controller: {controllerInfo.Name} (ID: {controllerId})");
+        Logger.Info<DualSenseProfileManager>($"Added new controller: {controllerInfo.Name} (ID: {controllerId})");
 
         // Create default profile if none exists
         if (settings.Profiles.Count == 0)
         {
-            Logger.Warning("No profiles exist, creating default profile");
+            Logger.Warning<DualSenseProfileManager>("No profiles exist, creating default profile");
             CreateDefaultProfile();
         }
 
@@ -193,11 +193,11 @@ public class DualSenseProfileManager
         if (!string.IsNullOrEmpty(controller.MacAddress))
         {
             string id = controller.MacAddress.Replace(":", "");
-            Logger.Trace($"Generated controller ID from MAC: {id}");
+            Logger.Trace<DualSenseProfileManager>($"Generated controller ID from MAC: {id}");
             return id;
         }
 
-        Logger.Error("Cannot generate controller ID: MAC address is missing");
+        Logger.Error<DualSenseProfileManager>("Cannot generate controller ID: MAC address is missing");
         throw new Exception("Couldn't find MAC address of the controller");
     }
 
@@ -206,56 +206,56 @@ public class DualSenseProfileManager
         try
         {
             string? serial = device.GetSerialNumber();
-            Logger.Trace($"Retrieved serial number: {serial ?? "None"}");
+            Logger.Trace<DualSenseProfileManager>($"Retrieved serial number: {serial ?? "None"}");
             return serial;
         }
         catch (Exception ex)
         {
-            Logger.Debug($"Could not get serial number: {ex.Message}");
+            Logger.Debug<DualSenseProfileManager>($"Could not get serial number: {ex.Message}");
             return null;
         }
     }
 
     private void ApplyProfile(DualSenseController controller, ControllerInfo controllerInfo)
     {
-        Logger.Debug($"Applying profile to controller '{controllerInfo.Name}'");
+        Logger.Debug<DualSenseProfileManager>($"Applying profile to controller '{controllerInfo.Name}'");
         ControllerSettings settings = _settingsManager.Application.Controllers;
 
         // Get profile ID (use default if controller doesn't have one)
         string? profileId = controllerInfo.ProfileId ?? settings.DefaultProfileId;
-        Logger.Trace($"Profile ID to apply: {profileId ?? "None"}");
+        Logger.Trace<DualSenseProfileManager>($"Profile ID to apply: {profileId ?? "None"}");
 
         if (string.IsNullOrEmpty(profileId) || !settings.Profiles.TryGetValue(profileId, out var profile))
         {
-            Logger.Warning($"No valid profile found for controller {controllerInfo.Name}");
+            Logger.Warning<DualSenseProfileManager>($"No valid profile found for controller {controllerInfo.Name}");
             return;
         }
 
-        Logger.Info($"Applying profile '{profile.Name}' to '{controllerInfo.Name}'");
-        Logger.Debug($"  Lightbar: RGB({profile.Lightbar.Red}, {profile.Lightbar.Green}, {profile.Lightbar.Blue})");
-        Logger.Debug($"  Player LEDs: {profile.PlayerLeds.Pattern} @ {profile.PlayerLeds.Brightness}");
-        Logger.Debug($"  Mic LED: {profile.MicLed}");
+        Logger.Info<DualSenseProfileManager>($"Applying profile '{profile.Name}' to '{controllerInfo.Name}'");
+        Logger.Debug<DualSenseProfileManager>($"  Lightbar: RGB({profile.Lightbar.Red}, {profile.Lightbar.Green}, {profile.Lightbar.Blue})");
+        Logger.Debug<DualSenseProfileManager>($"  Player LEDs: {profile.PlayerLeds.Pattern} @ {profile.PlayerLeds.Brightness}");
+        Logger.Debug<DualSenseProfileManager>($"  Mic LED: {profile.MicLed}");
 
         try
         {
             // Apply lightbar settings
             controller.SetLightbar(profile.Lightbar.Red, profile.Lightbar.Green, profile.Lightbar.Blue);
-            Logger.Trace("Lightbar applied");
+            Logger.Trace<DualSenseProfileManager>("Lightbar applied");
 
             // Apply player LEDs
             controller.SetPlayerLeds(profile.PlayerLeds.Pattern, profile.PlayerLeds.Brightness);
-            Logger.Trace("Player LEDs applied");
+            Logger.Trace<DualSenseProfileManager>("Player LEDs applied");
 
             // Apply mic LED
             controller.SetMicLed(profile.MicLed);
-            Logger.Trace("Mic LED applied");
+            Logger.Trace<DualSenseProfileManager>("Mic LED applied");
 
-            Logger.Info("Profile applied successfully");
+            Logger.Info<DualSenseProfileManager>("Profile applied successfully");
         }
         catch (Exception ex)
         {
-            Logger.Error($"Failed to apply profile settings");
-            Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+            Logger.Error<DualSenseProfileManager>($"Failed to apply profile settings");
+            Logger.LogExceptionDetails<DualSenseProfileManager>(ex, includeEnvironmentInfo: false);
         }
     }
 
@@ -264,9 +264,9 @@ public class DualSenseProfileManager
     /// </summary>
     public void RefreshAllProfiles()
     {
-        Logger.Info("Refreshing profiles for all connected controllers");
+        Logger.Info<DualSenseProfileManager>("Refreshing profiles for all connected controllers");
         int count = _dualSenseManager.Controllers.Count;
-        Logger.Debug($"Connected controllers: {count}");
+        Logger.Debug<DualSenseProfileManager>($"Connected controllers: {count}");
 
         foreach (DualSenseController controller in _dualSenseManager.Controllers.Values)
         {
@@ -277,17 +277,17 @@ public class DualSenseProfileManager
             }
             catch (Exception ex)
             {
-                Logger.Error($"Failed to refresh profile for controller");
-                Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+                Logger.Error<DualSenseProfileManager>($"Failed to refresh profile for controller");
+                Logger.LogExceptionDetails<DualSenseProfileManager>(ex, includeEnvironmentInfo: false);
             }
         }
 
-        Logger.Info("Profile refresh complete");
+        Logger.Info<DualSenseProfileManager>("Profile refresh complete");
     }
 
     public void CreateDefaultProfile()
     {
-        Logger.Info("Creating default controller profile");
+        Logger.Info<DualSenseProfileManager>("Creating default controller profile");
         ControllerSettings settings = _settingsManager.Application.Controllers;
 
         ControllerProfile defaultProfile = new ControllerProfile
@@ -299,53 +299,53 @@ public class DualSenseProfileManager
             MicLed = MicLed.Off
         };
 
-        Logger.Debug("Default profile settings: Lightbar=Off, PlayerLEDs=None, MicLED=Off");
+        Logger.Debug<DualSenseProfileManager>("Default profile settings: Lightbar=Off, PlayerLEDs=None, MicLED=Off");
 
         settings.Profiles["default"] = defaultProfile;
         settings.DefaultProfileId = "default";
 
-        Logger.Info("Default controller profile created and set");
+        Logger.Info<DualSenseProfileManager>("Default controller profile created and set");
     }
 
     public void AssignProfileToController(string controllerId, string profileId)
     {
-        Logger.Info($"Assigning profile '{profileId}' to controller '{controllerId}'");
+        Logger.Info<DualSenseProfileManager>($"Assigning profile '{profileId}' to controller '{controllerId}'");
         ControllerSettings settings = _settingsManager.Application.Controllers;
 
         if (!settings.KnownControllers.TryGetValue(controllerId, out var controllerInfo))
         {
-            Logger.Warning($"Controller not found: {controllerId}");
+            Logger.Warning<DualSenseProfileManager>($"Controller not found: {controllerId}");
             return;
         }
 
         if (!settings.Profiles.ContainsKey(profileId))
         {
-            Logger.Warning($"Profile not found: {profileId}");
+            Logger.Warning<DualSenseProfileManager>($"Profile not found: {profileId}");
             return;
         }
 
-        Logger.Debug($"Updating controller '{controllerInfo.Name}' profile assignment");
+        Logger.Debug<DualSenseProfileManager>($"Updating controller '{controllerInfo.Name}' profile assignment");
         controllerInfo.ProfileId = profileId;
 
         // Apply immediately if controller is connected
         DualSenseController? connectedController = FindConnectedController(controllerInfo);
         if (connectedController != null)
         {
-            Logger.Debug("Controller is connected, applying profile immediately");
+            Logger.Debug<DualSenseProfileManager>("Controller is connected, applying profile immediately");
             ApplyProfile(connectedController, controllerInfo);
         }
         else
         {
-            Logger.Debug("Controller is not currently connected, profile will be applied on next connection");
+            Logger.Debug<DualSenseProfileManager>("Controller is not currently connected, profile will be applied on next connection");
         }
 
         _settingsManager.SaveAll();
-        Logger.Info($"Profile assignment saved successfully");
+        Logger.Info<DualSenseProfileManager>($"Profile assignment saved successfully");
     }
 
     private DualSenseController? FindConnectedController(ControllerInfo info)
     {
-        Logger.Trace($"Searching for connected controller: {info.Name}");
+        Logger.Trace<DualSenseProfileManager>($"Searching for connected controller: {info.Name}");
 
         // Try to find by MAC address
         if (!string.IsNullOrEmpty(info.MacAddress))
@@ -353,7 +353,7 @@ public class DualSenseProfileManager
             DualSenseController? controller = _dualSenseManager.Controllers.Values.FirstOrDefault(c => c.MacAddress == info.MacAddress);
             if (controller != null)
             {
-                Logger.Trace($"Found by MAC address");
+                Logger.Trace<DualSenseProfileManager>($"Found by MAC address");
                 return controller;
             }
         }
@@ -364,12 +364,12 @@ public class DualSenseProfileManager
             DualSenseController? controller = _dualSenseManager.Controllers.Values.FirstOrDefault(c => TryGetSerialNumber(c.Device) == info.SerialNumber);
             if (controller != null)
             {
-                Logger.Trace($"Found by serial number");
+                Logger.Trace<DualSenseProfileManager>($"Found by serial number");
                 return controller;
             }
         }
 
-        Logger.Trace("Controller not found in connected devices");
+        Logger.Trace<DualSenseProfileManager>("Controller not found in connected devices");
         return null;
     }
 
@@ -379,7 +379,7 @@ public class DualSenseProfileManager
     public Dictionary<string, ControllerProfile> GetAllProfiles()
     {
         int count = _settingsManager.Application.Controllers.Profiles.Count;
-        Logger.Trace($"GetAllProfiles: returning {count} profile(s)");
+        Logger.Trace<DualSenseProfileManager>($"GetAllProfiles: returning {count} profile(s)");
         return _settingsManager.Application.Controllers.Profiles;
     }
 
@@ -388,9 +388,9 @@ public class DualSenseProfileManager
     /// </summary>
     public ControllerProfile? GetProfile(string profileId)
     {
-        Logger.Trace($"GetProfile: {profileId}");
+        Logger.Trace<DualSenseProfileManager>($"GetProfile: {profileId}");
         bool found = _settingsManager.Application.Controllers.Profiles.TryGetValue(profileId, out ControllerProfile? profile);
-        Logger.Trace($"Profile {(found ? "found" : "not found")}");
+        Logger.Trace<DualSenseProfileManager>($"Profile {(found ? "found" : "not found")}");
         return profile;
     }
 
@@ -399,17 +399,17 @@ public class DualSenseProfileManager
     /// </summary>
     public ControllerProfile GetDefaultProfile()
     {
-        Logger.Trace("GetDefaultProfile called");
+        Logger.Trace<DualSenseProfileManager>("GetDefaultProfile called");
         string? defaultId = _settingsManager.Application.Controllers.DefaultProfileId;
 
         if (defaultId != null && _settingsManager.Application.Controllers.Profiles.TryGetValue(defaultId, out ControllerProfile? profile))
         {
-            Logger.Debug($"Returning default profile: {profile.Name} (ID: {defaultId})");
+            Logger.Debug<DualSenseProfileManager>($"Returning default profile: {profile.Name} (ID: {defaultId})");
             return profile;
         }
 
         // Create default if it doesn't exist
-        Logger.Warning("Default profile doesn't exist, creating it");
+        Logger.Warning<DualSenseProfileManager>("Default profile doesn't exist, creating it");
         CreateDefaultProfile();
 
         defaultId = _settingsManager.Application.Controllers.DefaultProfileId;
@@ -421,17 +421,17 @@ public class DualSenseProfileManager
     /// </summary>
     public ControllerProfile GetControllerProfile(string controllerId)
     {
-        Logger.Trace($"GetControllerProfile: {controllerId}");
+        Logger.Trace<DualSenseProfileManager>($"GetControllerProfile: {controllerId}");
 
         if (_settingsManager.Application.Controllers.KnownControllers.TryGetValue(controllerId, out ControllerInfo? controllerInfo) &&
             controllerInfo.ProfileId != null &&
             _settingsManager.Application.Controllers.Profiles.TryGetValue(controllerInfo.ProfileId, out ControllerProfile? profile))
         {
-            Logger.Debug($"Controller '{controllerInfo.Name}' assigned profile: {profile.Name}");
+            Logger.Debug<DualSenseProfileManager>($"Controller '{controllerInfo.Name}' assigned profile: {profile.Name}");
             return profile;
         }
 
-        Logger.Debug($"No specific profile assigned to controller {controllerId}, returning default");
+        Logger.Debug<DualSenseProfileManager>($"No specific profile assigned to controller {controllerId}, returning default");
         return GetDefaultProfile();
     }
 
@@ -440,7 +440,7 @@ public class DualSenseProfileManager
     /// </summary>
     public ControllerProfile CreateProfile(string name)
     {
-        Logger.Info($"Creating new profile: {name}");
+        Logger.Info<DualSenseProfileManager>($"Creating new profile: {name}");
 
         ControllerProfile profile = new ControllerProfile
         {
@@ -461,11 +461,11 @@ public class DualSenseProfileManager
             MicLed = MicLed.Off
         };
 
-        Logger.Debug($"Profile ID: {profile.Id}");
-        Logger.Debug($"Default settings: Lightbar=Blue, PlayerLEDs=None, MicLED=Off");
+        Logger.Debug<DualSenseProfileManager>($"Profile ID: {profile.Id}");
+        Logger.Debug<DualSenseProfileManager>($"Default settings: Lightbar=Blue, PlayerLEDs=None, MicLED=Off");
 
         SaveProfile(profile);
-        Logger.Info($"Profile '{name}' created successfully");
+        Logger.Info<DualSenseProfileManager>($"Profile '{name}' created successfully");
 
         return profile;
     }
@@ -475,10 +475,10 @@ public class DualSenseProfileManager
     /// </summary>
     public void SaveProfile(ControllerProfile profile)
     {
-        Logger.Debug($"Saving profile: {profile.Name} (ID: {profile.Id})");
+        Logger.Debug<DualSenseProfileManager>($"Saving profile: {profile.Name} (ID: {profile.Id})");
         _settingsManager.Application.Controllers.Profiles[profile.Id] = profile;
         _settingsManager.SaveAll();
-        Logger.Debug("Profile saved successfully");
+        Logger.Debug<DualSenseProfileManager>("Profile saved successfully");
     }
 
     /// <summary>
@@ -486,11 +486,11 @@ public class DualSenseProfileManager
     /// </summary>
     public bool DeleteProfile(string profileId)
     {
-        Logger.Info($"Attempting to delete profile: {profileId}");
+        Logger.Info<DualSenseProfileManager>($"Attempting to delete profile: {profileId}");
 
         if (_settingsManager.Application.Controllers.DefaultProfileId == profileId)
         {
-            Logger.Warning($"Cannot delete default profile: {profileId}");
+            Logger.Warning<DualSenseProfileManager>($"Cannot delete default profile: {profileId}");
             return false;
         }
 
@@ -499,14 +499,14 @@ public class DualSenseProfileManager
 
         // Remove profile assignment from controllers and assign default
         string? defaultProfileId = _settingsManager.Application.Controllers.DefaultProfileId;
-        Logger.Debug($"Reassigning controllers from deleted profile to default: {defaultProfileId}");
+        Logger.Debug<DualSenseProfileManager>($"Reassigning controllers from deleted profile to default: {defaultProfileId}");
 
         int reassignedCount = 0;
         foreach (ControllerInfo controller in _settingsManager.Application.Controllers.KnownControllers.Values)
         {
             if (controller.ProfileId == profileId)
             {
-                Logger.Trace($"Reassigning controller '{controller.Name}' to default profile");
+                Logger.Trace<DualSenseProfileManager>($"Reassigning controller '{controller.Name}' to default profile");
                 controller.ProfileId = defaultProfileId;
                 reassignedCount++;
             }
@@ -514,18 +514,18 @@ public class DualSenseProfileManager
 
         if (reassignedCount > 0)
         {
-            Logger.Debug($"Reassigned {reassignedCount} controller(s) to default profile");
+            Logger.Debug<DualSenseProfileManager>($"Reassigned {reassignedCount} controller(s) to default profile");
         }
 
         bool removed = _settingsManager.Application.Controllers.Profiles.Remove(profileId);
         if (removed)
         {
             _settingsManager.SaveAll();
-            Logger.Info($"Profile '{profileName}' deleted successfully");
+            Logger.Info<DualSenseProfileManager>($"Profile '{profileName}' deleted successfully");
         }
         else
         {
-            Logger.Warning($"Failed to remove profile '{profileName}' from profiles dictionary");
+            Logger.Warning<DualSenseProfileManager>($"Failed to remove profile '{profileName}' from profiles dictionary");
         }
 
         return removed;
@@ -536,18 +536,18 @@ public class DualSenseProfileManager
     /// </summary>
     public void SetDefaultProfile(string profileId)
     {
-        Logger.Info($"Setting default profile: {profileId}");
+        Logger.Info<DualSenseProfileManager>($"Setting default profile: {profileId}");
 
         if (_settingsManager.Application.Controllers.Profiles.ContainsKey(profileId))
         {
             string? profileName = GetProfile(profileId)?.Name;
             _settingsManager.Application.Controllers.DefaultProfileId = profileId;
             _settingsManager.SaveAll();
-            Logger.Info($"Default profile set to: {profileName}");
+            Logger.Info<DualSenseProfileManager>($"Default profile set to: {profileName}");
         }
         else
         {
-            Logger.Warning($"Cannot set default profile: profile {profileId} not found");
+            Logger.Warning<DualSenseProfileManager>($"Cannot set default profile: profile {profileId} not found");
         }
     }
 
@@ -556,16 +556,16 @@ public class DualSenseProfileManager
     /// </summary>
     public ControllerProfile DuplicateProfile(string sourceProfileId, string newName)
     {
-        Logger.Info($"Duplicating profile {sourceProfileId} as '{newName}'");
+        Logger.Info<DualSenseProfileManager>($"Duplicating profile {sourceProfileId} as '{newName}'");
 
         ControllerProfile? sourceProfile = GetProfile(sourceProfileId);
         if (sourceProfile == null)
         {
-            Logger.Error($"Source profile not found: {sourceProfileId}");
+            Logger.Error<DualSenseProfileManager>($"Source profile not found: {sourceProfileId}");
             throw new ArgumentException($"Profile not found: {sourceProfileId}");
         }
 
-        Logger.Debug($"Source profile: {sourceProfile.Name}");
+        Logger.Debug<DualSenseProfileManager>($"Source profile: {sourceProfile.Name}");
 
         ControllerProfile newProfile = new ControllerProfile
         {
@@ -586,11 +586,11 @@ public class DualSenseProfileManager
             MicLed = sourceProfile.MicLed
         };
 
-        Logger.Debug($"New profile ID: {newProfile.Id}");
-        Logger.Debug($"Copied settings: Lightbar=RGB({newProfile.Lightbar.Red},{newProfile.Lightbar.Green},{newProfile.Lightbar.Blue}), PlayerLEDs={newProfile.PlayerLeds.Pattern}");
+        Logger.Debug<DualSenseProfileManager>($"New profile ID: {newProfile.Id}");
+        Logger.Debug<DualSenseProfileManager>($"Copied settings: Lightbar=RGB({newProfile.Lightbar.Red},{newProfile.Lightbar.Green},{newProfile.Lightbar.Blue}), PlayerLEDs={newProfile.PlayerLeds.Pattern}");
 
         SaveProfile(newProfile);
-        Logger.Info($"Profile duplicated successfully: '{newName}' (ID: {newProfile.Id})");
+        Logger.Info<DualSenseProfileManager>($"Profile duplicated successfully: '{newName}' (ID: {newProfile.Id})");
 
         return newProfile;
     }
@@ -600,13 +600,13 @@ public class DualSenseProfileManager
     /// </summary>
     public ControllerProfile CreateProfileFromController(DualSenseController controller, string name)
     {
-        Logger.Info($"Creating profile '{name}' from controller state");
+        Logger.Info<DualSenseProfileManager>($"Creating profile '{name}' from controller state");
 
         LightbarColor lightbar = controller.CurrentLightbarColor;
-        Logger.Debug($"Current controller state:");
-        Logger.Debug($"  Lightbar: RGB({lightbar.Red}, {lightbar.Green}, {lightbar.Blue})");
-        Logger.Debug($"  Player LEDs: {controller.CurrentPlayerLeds} @ {controller.CurrentPlayerLedBrightness}");
-        Logger.Debug($"  Mic LED: {controller.CurrentMicLed}");
+        Logger.Debug<DualSenseProfileManager>($"Current controller state:");
+        Logger.Debug<DualSenseProfileManager>($"  Lightbar: RGB({lightbar.Red}, {lightbar.Green}, {lightbar.Blue})");
+        Logger.Debug<DualSenseProfileManager>($"  Player LEDs: {controller.CurrentPlayerLeds} @ {controller.CurrentPlayerLedBrightness}");
+        Logger.Debug<DualSenseProfileManager>($"  Mic LED: {controller.CurrentMicLed}");
 
         ControllerProfile profile = new ControllerProfile
         {
@@ -627,9 +627,9 @@ public class DualSenseProfileManager
             MicLed = controller.CurrentMicLed
         };
 
-        Logger.Debug($"Profile ID: {profile.Id}");
+        Logger.Debug<DualSenseProfileManager>($"Profile ID: {profile.Id}");
         SaveProfile(profile);
-        Logger.Info($"Profile created from controller state successfully");
+        Logger.Info<DualSenseProfileManager>($"Profile created from controller state successfully");
 
         return profile;
     }
@@ -639,32 +639,32 @@ public class DualSenseProfileManager
     /// </summary>
     public void ApplyProfileToController(DualSenseController controller, ControllerProfile profile)
     {
-        Logger.Info($"Applying profile '{profile.Name}' to controller");
-        Logger.Debug($"Profile settings:");
-        Logger.Debug($"  Lightbar: RGB({profile.Lightbar.Red}, {profile.Lightbar.Green}, {profile.Lightbar.Blue})");
-        Logger.Debug($"  Player LEDs: {profile.PlayerLeds.Pattern} @ {profile.PlayerLeds.Brightness}");
-        Logger.Debug($"  Mic LED: {profile.MicLed}");
+        Logger.Info<DualSenseProfileManager>($"Applying profile '{profile.Name}' to controller");
+        Logger.Debug<DualSenseProfileManager>($"Profile settings:");
+        Logger.Debug<DualSenseProfileManager>($"  Lightbar: RGB({profile.Lightbar.Red}, {profile.Lightbar.Green}, {profile.Lightbar.Blue})");
+        Logger.Debug<DualSenseProfileManager>($"  Player LEDs: {profile.PlayerLeds.Pattern} @ {profile.PlayerLeds.Brightness}");
+        Logger.Debug<DualSenseProfileManager>($"  Mic LED: {profile.MicLed}");
 
         try
         {
             // Apply lightbar settings
             controller.SetLightbar(profile.Lightbar.Red, profile.Lightbar.Green, profile.Lightbar.Blue);
-            Logger.Trace("Lightbar applied");
+            Logger.Trace<DualSenseProfileManager>("Lightbar applied");
 
             // Apply player LEDs
             controller.SetPlayerLeds(profile.PlayerLeds.Pattern, profile.PlayerLeds.Brightness);
-            Logger.Trace("Player LEDs applied");
+            Logger.Trace<DualSenseProfileManager>("Player LEDs applied");
 
             // Apply mic LED
             controller.SetMicLed(profile.MicLed);
-            Logger.Trace("Mic LED applied");
+            Logger.Trace<DualSenseProfileManager>("Mic LED applied");
 
-            Logger.Info("Profile applied to controller successfully");
+            Logger.Info<DualSenseProfileManager>("Profile applied to controller successfully");
         }
         catch (Exception ex)
         {
-            Logger.Error("Failed to apply profile to controller");
-            Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+            Logger.Error<DualSenseProfileManager>("Failed to apply profile to controller");
+            Logger.LogExceptionDetails<DualSenseProfileManager>(ex, includeEnvironmentInfo: false);
             throw;
         }
     }
@@ -675,7 +675,7 @@ public class DualSenseProfileManager
     public Dictionary<string, ControllerInfo> GetKnownControllers()
     {
         int count = _settingsManager.Application.Controllers.KnownControllers.Count;
-        Logger.Trace($"GetKnownControllers: returning {count} controller(s)");
+        Logger.Trace<DualSenseProfileManager>($"GetKnownControllers: returning {count} controller(s)");
         return _settingsManager.Application.Controllers.KnownControllers;
     }
 
@@ -684,28 +684,28 @@ public class DualSenseProfileManager
     /// </summary>
     public void UpdateControllerName(string controllerId, string newName)
     {
-        Logger.Info($"Updating controller name: {controllerId} -> '{newName}'");
+        Logger.Info<DualSenseProfileManager>($"Updating controller name: {controllerId} -> '{newName}'");
 
         if (_settingsManager.Application.Controllers.KnownControllers.TryGetValue(controllerId, out var controllerInfo))
         {
             string oldName = controllerInfo.Name;
             controllerInfo.Name = newName;
             _settingsManager.SaveAll();
-            Logger.Info($"Controller name updated: '{oldName}' -> '{newName}'");
+            Logger.Info<DualSenseProfileManager>($"Controller name updated: '{oldName}' -> '{newName}'");
         }
         else
         {
-            Logger.Warning($"Cannot update name: controller {controllerId} not found");
+            Logger.Warning<DualSenseProfileManager>($"Cannot update name: controller {controllerId} not found");
         }
     }
 
     public void Dispose()
     {
-        Logger.Info("Disposing DualSenseProfileManager");
+        Logger.Info<DualSenseProfileManager>("Disposing DualSenseProfileManager");
 
         _dualSenseManager.ControllerConnected -= OnControllerConnected;
         _dualSenseManager.ControllerDisconnected -= OnControllerDisconnected;
 
-        Logger.Debug("DualSenseProfileManager disposed");
+        Logger.Debug<DualSenseProfileManager>("DualSenseProfileManager disposed");
     }
 }

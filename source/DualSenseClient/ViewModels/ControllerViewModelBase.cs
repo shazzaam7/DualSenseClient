@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DualSenseClient.Core.DualSense.Devices;
 using DualSenseClient.Core.DualSense.Reports;
+using DualSenseClient.Core.Logging;
 using DualSenseClient.Core.Settings.Models;
 
 namespace DualSenseClient.ViewModels;
@@ -38,6 +39,8 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
     // Constructor
     public ControllerViewModelBase(DualSenseController controller, ControllerInfo? controllerInfo)
     {
+        Logger.Trace<ControllerViewModelBase>($"Creating ControllerViewModelBase for: {controllerInfo?.Name ?? "Unknown"}");
+
         _controller = controller;
         _controllerInfo = controllerInfo;
 
@@ -48,11 +51,14 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
         MacAddress = controller.MacAddress ?? "N/A";
 
         UpdateBatteryState(controller.Battery);
+
+        Logger.Trace<ControllerViewModelBase>("ControllerViewModelBase created successfully");
     }
 
     // Functions
     public void UpdateControllerInfo(ControllerInfo? controllerInfo)
     {
+        Logger.Debug<ControllerViewModelBase>($"Updating controller info: {controllerInfo?.Name ?? "null"}");
         _controllerInfo = controllerInfo;
         if (controllerInfo != null)
         {
@@ -62,6 +68,7 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
 
     public void UpdateName(string newName)
     {
+        Logger.Debug<ControllerViewModelBase>($"Updating controller name from '{Name}' to '{newName}'");
         Name = newName;
         if (_controllerInfo != null)
         {
@@ -71,6 +78,8 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
 
     public void UpdateBatteryState(BatteryState battery)
     {
+        Logger.Trace<ControllerViewModelBase>($"Updating battery state: Level={battery.BatteryLevel:F0}%, Charging={battery.IsCharging}, Full={battery.IsFullyCharged}");
+
         BatteryLevel = battery.BatteryLevel;
 
         bool wasCharging = IsCharging;
@@ -82,10 +91,12 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
 
         if (IsCharging && !wasCharging)
         {
+            Logger.Trace<ControllerViewModelBase>("Battery started charging, starting animation");
             StartChargingAnimation();
         }
         else if (!IsCharging && wasCharging)
         {
+            Logger.Trace<ControllerViewModelBase>("Battery stopped charging, stopping animation");
             StopChargingAnimation();
         }
     }
@@ -163,6 +174,7 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
 
     public virtual void Dispose()
     {
+        Logger.Trace<ControllerViewModelBase>($"Disposing ControllerViewModelBase for: {Name}");
         StopChargingAnimation();
     }
 }

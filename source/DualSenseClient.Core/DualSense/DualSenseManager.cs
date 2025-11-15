@@ -39,7 +39,7 @@ public class DualSenseManager : IDisposable
     // Constructor
     public DualSenseManager()
     {
-        Logger.Info("Initializing DualSense Manager");
+        Logger.Info<DualSenseManager>("Initializing DualSense Manager");
 
         // Get the device list and subscribe to changes
         _deviceList = DeviceList.Local;
@@ -48,7 +48,7 @@ public class DualSenseManager : IDisposable
         // Initial scan
         ScanForDevices();
 
-        Logger.Debug("DualSense Manager started");
+        Logger.Debug<DualSenseManager>("DualSense Manager started");
     }
 
     private void OnDeviceListChanged(object? sender, DeviceListChangedEventArgs e)
@@ -58,7 +58,7 @@ public class DualSenseManager : IDisposable
             return;
         }
 
-        Logger.Trace("Device list changed event received");
+        Logger.Trace<DualSenseManager>("Device list changed event received");
 
         // Debounce multiple rapid changes
         Task.Run(async () =>
@@ -81,7 +81,7 @@ public class DualSenseManager : IDisposable
         lock (_lock)
         {
             _scanningEnabled = true;
-            Logger.Info("DualSense scanning enabled");
+            Logger.Info<DualSenseManager>("DualSense scanning enabled");
         }
 
         // Perform immediate scan
@@ -101,7 +101,7 @@ public class DualSenseManager : IDisposable
         lock (_lock)
         {
             _scanningEnabled = false;
-            Logger.Info("DualSense scanning disabled");
+            Logger.Info<DualSenseManager>("DualSense scanning disabled");
         }
     }
 
@@ -125,14 +125,14 @@ public class DualSenseManager : IDisposable
 
         try
         {
-            Logger.Trace("Scanning for DualSense devices...");
+            Logger.Trace<DualSenseManager>("Scanning for DualSense devices...");
 
             HidDevice[] devices = _deviceList!.GetHidDevices()
                 .Where(d => d.VendorID == SonyVid)
                 .Where(d => KnownPids.Contains(d.ProductID))
                 .ToArray();
 
-            Logger.Trace($"Found {devices.Length} DualSense device(s)");
+            Logger.Trace<DualSenseManager>($"Found {devices.Length} DualSense device(s)");
 
             lock (_lock)
             {
@@ -158,8 +158,8 @@ public class DualSenseManager : IDisposable
         }
         catch (Exception ex)
         {
-            Logger.Error("Error scanning for devices");
-            Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+            Logger.Error<DualSenseManager>("Error scanning for devices");
+            Logger.LogExceptionDetails<DualSenseManager>(ex, includeEnvironmentInfo: false);
         }
     }
 
@@ -167,11 +167,11 @@ public class DualSenseManager : IDisposable
     {
         try
         {
-            Logger.Debug($"Attempting to open device: {device.DevicePath}");
+            Logger.Debug<DualSenseManager>($"Attempting to open device: {device.DevicePath}");
 
             if (!device.TryOpen(out HidStream? stream))
             {
-                Logger.Warning($"Found device but couldn't open: {device.GetProductName()} ({device.DevicePath})");
+                Logger.Warning<DualSenseManager>($"Found device but couldn't open: {device.GetProductName()} ({device.DevicePath})");
                 return;
             }
 
@@ -184,14 +184,14 @@ public class DualSenseManager : IDisposable
 
                 if (duplicateController != null)
                 {
-                    Logger.Info($"Detected same controller connected via both {duplicateController.ConnectionType} and {newController.ConnectionType}");
+                    Logger.Info<DualSenseManager>($"Detected same controller connected via both {duplicateController.ConnectionType} and {newController.ConnectionType}");
 
                     switch (newController.ConnectionType)
                     {
                         // New connection is USB, existing is Bluetooth, disconnect Bluetooth
                         case ConnectionType.USB when duplicateController.ConnectionType == ConnectionType.Bluetooth:
                         {
-                            Logger.Info("Replacing Bluetooth connection with USB connection");
+                            Logger.Info<DualSenseManager>("Replacing Bluetooth connection with USB connection");
 
                             string oldPath = duplicateController.Device.DevicePath;
 
@@ -202,11 +202,11 @@ public class DualSenseManager : IDisposable
                             try
                             {
                                 duplicateController.DisconnectBluetooth();
-                                Logger.Debug("Bluetooth disconnection initiated");
+                                Logger.Debug<DualSenseManager>("Bluetooth disconnection initiated");
                             }
                             catch (Exception ex)
                             {
-                                Logger.Warning($"Failed to disconnect Bluetooth: {ex.Message}");
+                                Logger.Warning<DualSenseManager>($"Failed to disconnect Bluetooth: {ex.Message}");
                             }
 
                             // Dispose the old controller
@@ -215,7 +215,7 @@ public class DualSenseManager : IDisposable
                             // Add the new USB controller
                             _controllers[device.DevicePath] = newController;
 
-                            Logger.Info($"Controller switched to USB: {device.GetProductName()} - {device.DevicePath}");
+                            Logger.Info<DualSenseManager>($"Controller switched to USB: {device.GetProductName()} - {device.DevicePath}");
 
                             // Fire disconnected event for old path
                             ControllerDisconnected?.Invoke(this, oldPath);
@@ -228,12 +228,12 @@ public class DualSenseManager : IDisposable
                         // If new connection is Bluetooth and existing is USB, ignore the new Bluetooth connection
                         // New connection is Bluetooth and existing is USB (Shouldn't happen, but we dispose the Bluetooth)
                         case ConnectionType.Bluetooth when duplicateController.ConnectionType == ConnectionType.USB:
-                            Logger.Info("USB connection already exists for this controller, ignoring Bluetooth connection");
+                            Logger.Info<DualSenseManager>("USB connection already exists for this controller, ignoring Bluetooth connection");
                             newController.Dispose();
                             return;
                         // Both same type (shouldn't happen, but log it out, dispose the new one)
                         default:
-                            Logger.Warning($"Same controller detected twice with same connection type: {newController.ConnectionType}");
+                            Logger.Warning<DualSenseManager>($"Same controller detected twice with same connection type: {newController.ConnectionType}");
                             newController.Dispose();
                             return;
                     }
@@ -243,14 +243,14 @@ public class DualSenseManager : IDisposable
                 _controllers[device.DevicePath] = newController;
             }
 
-            Logger.Info($"Controller added: {device.GetProductName()} ({newController.ConnectionType}) - {device.DevicePath}");
+            Logger.Info<DualSenseManager>($"Controller added: {device.GetProductName()} ({newController.ConnectionType}) - {device.DevicePath}");
 
             ControllerConnected?.Invoke(this, newController);
         }
         catch (Exception ex)
         {
-            Logger.Error($"Error adding controller: {device.GetProductName()}");
-            Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+            Logger.Error<DualSenseManager>($"Error adding controller: {device.GetProductName()}");
+            Logger.LogExceptionDetails<DualSenseManager>(ex, includeEnvironmentInfo: false);
         }
     }
 
@@ -275,7 +275,7 @@ public class DualSenseManager : IDisposable
             {
                 if (NormalizeMacAddress(newMac) == NormalizeMacAddress(existingMac))
                 {
-                    Logger.Debug($"Found duplicate controller by MAC: {newMac}");
+                    Logger.Debug<DualSenseManager>($"Found duplicate controller by MAC: {newMac}");
                     return existingController;
                 }
             }
@@ -306,7 +306,7 @@ public class DualSenseManager : IDisposable
 
         controller.Dispose();
 
-        Logger.Info($"Controller removed: {deviceName} ({connectionType}) - {path}");
+        Logger.Info<DualSenseManager>($"Controller removed: {deviceName} ({connectionType}) - {path}");
         ControllerDisconnected?.Invoke(this, path);
     }
 
@@ -352,7 +352,7 @@ public class DualSenseManager : IDisposable
             return;
         }
 
-        Logger.Debug("Disposing DualSense Manager");
+        Logger.Debug<DualSenseManager>("Disposing DualSense Manager");
         _disposed = true;
 
         if (_deviceList != null)
@@ -370,13 +370,13 @@ public class DualSenseManager : IDisposable
                 }
                 catch (Exception ex)
                 {
-                    Logger.Warning($"Error disposing controller: {ex.Message}");
+                    Logger.Warning<DualSenseManager>($"Error disposing controller: {ex.Message}");
                 }
             }
 
             _controllers.Clear();
         }
 
-        Logger.Info("DualSense Manager disposed");
+        Logger.Info<DualSenseManager>("DualSense Manager disposed");
     }
 }

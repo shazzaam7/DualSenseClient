@@ -224,7 +224,7 @@ public abstract class JsonSettingsService<T> : ISettingsService<T> where T : cla
 
     protected virtual void LogError(string message, Exception ex)
     {
-        Logger.Error(message);
-        Logger.LogExceptionDetails(ex);
+        Logger.Error<JsonSettingsService<T>>(message);
+        Logger.LogExceptionDetails<JsonSettingsService<T>>(ex);
     }
 }

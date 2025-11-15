@@ -18,20 +18,22 @@ public partial class MonitorPageViewModel : ViewModelBase
 
     public MonitorPageViewModel(SelectedControllerService selectedControllerService, DualSenseProfileManager profileManager)
     {
-        Logger.Debug("MonitorPageViewModel: Creating DebugPageViewModel");
+        Logger.Debug<MonitorPageViewModel>("Creating MonitorPageViewModel");
+
         _selectedControllerService = selectedControllerService;
         _profileManager = profileManager;
+
         _selectedControllerService.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(SelectedControllerService.SelectedController))
             {
-                Logger.Debug($"MonitorPageViewModel: Selected controller changed in service");
+                Logger.Debug<MonitorPageViewModel>("Selected controller changed in service");
                 HandleControllerSelectionChanged();
             }
         };
 
         HandleControllerSelectionChanged();
-        Logger.Debug("MonitorPageViewModel created successfully");
+        Logger.Debug<MonitorPageViewModel>("MonitorPageViewModel created successfully");
     }
 
     private void HandleControllerSelectionChanged()
@@ -40,14 +42,14 @@ public partial class MonitorPageViewModel : ViewModelBase
 
         if (SelectedController != null)
         {
-            Logger.Info($"MonitorPageViewModel: Controller selected: {SelectedController.Controller.Device.GetProductName()}");
+            Logger.Info<MonitorPageViewModel>($"Controller selected: {SelectedController.Controller.Device.GetProductName()}");
             SelectedControllerInfo = _profileManager.GetOrCreateControllerInfo(SelectedController.Controller);
-            Logger.Debug($"MonitorPageViewModel: Controller info: {SelectedControllerInfo.Name} (ID: {SelectedControllerInfo.Id})");
+            Logger.Debug<MonitorPageViewModel>($"Controller info: {SelectedControllerInfo.Name} (ID: {SelectedControllerInfo.Id})");
             InitializeControllerViewModels();
         }
         else
         {
-            Logger.Info("MonitorPageViewModel: Controller deselected");
+            Logger.Info<MonitorPageViewModel>("Controller deselected");
             CleanupControllerViewModels();
             SelectedControllerInfo = null;
         }
@@ -55,49 +57,50 @@ public partial class MonitorPageViewModel : ViewModelBase
 
     private void InitializeControllerViewModels()
     {
-        Logger.Debug("MonitorPageViewModel: Initializing controller ViewModels");
+        Logger.Debug<MonitorPageViewModel>("Initializing controller ViewModels");
 
         // Cleanup existing
         CleanupControllerViewModels();
 
         if (SelectedController == null)
         {
-            Logger.Warning("MonitorPageViewModel: Cannot initialize ViewModels: SelectedController is null");
+            Logger.Warning<MonitorPageViewModel>("Cannot initialize ViewModels: SelectedController is null");
             return;
         }
 
         try
         {
             // Create new ViewModels
-            Logger.Debug("MonitorPageViewModel: Creating ControllerMonitorViewModel");
+            Logger.Debug<MonitorPageViewModel>("Creating ControllerMonitorViewModel");
             MonitorViewModel = new ControllerMonitorViewModel(SelectedController.Controller, SelectedControllerInfo!);
+            Logger.Info<MonitorPageViewModel>("Controller ViewModels initialized successfully");
         }
         catch (Exception ex)
         {
-            Logger.Error("MonitorPageViewModel: Failed to initialize controller ViewModels");
-            Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+            Logger.Error<MonitorPageViewModel>("Failed to initialize controller ViewModels");
+            Logger.LogExceptionDetails<MonitorPageViewModel>(ex, includeEnvironmentInfo: false);
             CleanupControllerViewModels();
         }
     }
 
     private void CleanupControllerViewModels()
     {
-        Logger.Debug("MonitorPageViewModel: Cleaning up controller ViewModels");
+        Logger.Debug<MonitorPageViewModel>("Cleaning up controller ViewModels");
 
         if (MonitorViewModel != null)
         {
-            Logger.Trace("Disposing MonitorViewModel");
+            Logger.Trace<MonitorPageViewModel>("Disposing MonitorViewModel");
             MonitorViewModel.Dispose();
             MonitorViewModel = null;
         }
 
-        Logger.Debug("MonitorPageViewModel: ViewModels cleanup complete");
+        Logger.Debug<MonitorPageViewModel>("ViewModels cleanup complete");
     }
 
     public void Dispose()
     {
-        Logger.Debug("MonitorPageViewModel: Disposing DebugPageViewModel");
+        Logger.Debug<MonitorPageViewModel>("Disposing MonitorPageViewModel");
         CleanupControllerViewModels();
-        Logger.Debug("MonitorPageViewModel: DebugPageViewModel disposed");
+        Logger.Debug<MonitorPageViewModel>("MonitorPageViewModel disposed");
     }
 }

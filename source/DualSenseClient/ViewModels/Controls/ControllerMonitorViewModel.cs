@@ -26,19 +26,24 @@ public class ControllerMonitorViewModel : ControllerViewModelBase
     // Constructor
     public ControllerMonitorViewModel(DualSenseController controller, ControllerInfo controllerInfo) : base(controller, controllerInfo)
     {
+        Logger.Debug<ControllerMonitorViewModel>($"Creating ControllerMonitorViewModel for: {controllerInfo.Name}");
+
         // Subscribe to all relevant events for real-time monitoring
+        Logger.Trace<ControllerMonitorViewModel>("Subscribing to controller events");
+
         _controller.InputChanged += OnInputChanged;
         _controller.TouchpadChanged += OnTouchpadChanged;
         _controller.MotionChanged += OnMotionChanged;
         _controller.ConnectionStatusChanged += OnConnectionStatusChanged;
-        _controller.ButtonPressed += OnButtonPressed;
-        _controller.ButtonReleased += OnButtonReleased;
-        _controller.TriggerChanged += OnTriggerChanged;
-        _controller.StickMoved += OnStickMoved;
+        //_controller.ButtonPressed += OnButtonPressed;
+        //_controller.ButtonReleased += OnButtonReleased;
+        //_controller.TriggerChanged += OnTriggerChanged;
+        //_controller.StickMoved += OnStickMoved;
+        _controller.LightbarChanged += OnLightbarChanged;
+        _controller.PlayerLedsChanged += OnPlayerLedsChanged;
+        _controller.MicLedChanged += OnMicLedChanged;
 
-        controller.LightbarChanged += OnLightbarChanged;
-        controller.PlayerLedsChanged += OnPlayerLedsChanged;
-        controller.MicLedChanged += OnMicLedChanged;
+        Logger.Debug<ControllerMonitorViewModel>("ControllerMonitorViewModel created successfully");
     }
 
     // Event Handlers
@@ -65,12 +70,12 @@ public class ControllerMonitorViewModel : ControllerViewModelBase
 
     private void OnButtonPressed(object? sender, ButtonEventArgs e)
     {
-        // Could log button presses
+        // Could handle button pressed logic
     }
 
     private void OnButtonReleased(object? sender, ButtonEventArgs e)
     {
-        // Could log button presses
+        // Could handle button release logic
     }
 
     private void OnTriggerChanged(object? sender, TriggerEventArgs e)
@@ -85,9 +90,12 @@ public class ControllerMonitorViewModel : ControllerViewModelBase
 
     private void OnLightbarChanged(object? sender, LightbarChangedEventArgs e)
     {
-        Logger.Info($"Lightbar changed from RGB({e.PreviousColor.Red}, {e.PreviousColor.Green}, {e.PreviousColor.Blue}) " +
-                    $"to RGB({e.CurrentColor.Red}, {e.CurrentColor.Green}, {e.CurrentColor.Blue})");
-        Logger.Info($"Behavior changed from {e.PreviousBehavior} to {e.CurrentBehavior}");
+        Logger.Info<ControllerMonitorViewModel>(
+            $"Lightbar color changed: RGB({e.PreviousColor.Red}, {e.PreviousColor.Green}, {e.PreviousColor.Blue}) " +
+            $"-> RGB({e.CurrentColor.Red}, {e.CurrentColor.Green}, {e.CurrentColor.Blue})");
+
+        Logger.Debug<ControllerMonitorViewModel>(
+            $"Lightbar behavior changed: {e.PreviousBehavior} -> {e.CurrentBehavior}");
 
         // Update UI or perform other actions
         OnPropertyChanged(nameof(CurrentLightbarColor));
@@ -96,8 +104,8 @@ public class ControllerMonitorViewModel : ControllerViewModelBase
 
     private void OnPlayerLedsChanged(object? sender, PlayerLedsChangedEventArgs e)
     {
-        Logger.Info($"Player LEDs changed from {e.PreviousLeds} to {e.CurrentLeds}");
-        Logger.Info($"Brightness changed from {e.PreviousBrightness} to {e.CurrentBrightness}");
+        Logger.Info<ControllerMonitorViewModel>($"Player LEDs changed: {e.PreviousLeds} -> {e.CurrentLeds}");
+        Logger.Debug<ControllerMonitorViewModel>($"Player LED brightness changed: {e.PreviousBrightness} -> {e.CurrentBrightness}");
 
         // Update UI
         OnPropertyChanged(nameof(CurrentPlayerLeds));
@@ -106,7 +114,7 @@ public class ControllerMonitorViewModel : ControllerViewModelBase
 
     private void OnMicLedChanged(object? sender, MicLedChangedEventArgs e)
     {
-        Logger.Info($"Mic LED changed from {e.PreviousLed} to {e.CurrentLed}");
+        Logger.Info<ControllerMonitorViewModel>($"Mic LED changed: {e.PreviousLed} -> {e.CurrentLed}");
 
         // Update UI
         OnPropertyChanged(nameof(CurrentMicLed));
@@ -114,15 +122,23 @@ public class ControllerMonitorViewModel : ControllerViewModelBase
 
     public override void Dispose()
     {
+        Logger.Debug<ControllerMonitorViewModel>($"Disposing ControllerMonitorViewModel for: {Name}");
+        Logger.Trace<ControllerMonitorViewModel>("Unsubscribing from controller events");
+
         // Unsubscribe from all events
         _controller.InputChanged -= OnInputChanged;
         _controller.TouchpadChanged -= OnTouchpadChanged;
         _controller.MotionChanged -= OnMotionChanged;
         _controller.ConnectionStatusChanged -= OnConnectionStatusChanged;
-        _controller.ButtonPressed -= OnButtonPressed;
-        _controller.ButtonReleased -= OnButtonReleased;
-        _controller.TriggerChanged -= OnTriggerChanged;
-        _controller.StickMoved -= OnStickMoved;
+        //_controller.ButtonPressed -= OnButtonPressed;
+        //_controller.ButtonReleased -= OnButtonReleased;
+        //_controller.TriggerChanged -= OnTriggerChanged;
+        //_controller.StickMoved -= OnStickMoved;
+        _controller.LightbarChanged -= OnLightbarChanged;
+        _controller.PlayerLedsChanged -= OnPlayerLedsChanged;
+        _controller.MicLedChanged -= OnMicLedChanged;
+
+        Logger.Debug<ControllerMonitorViewModel>("ControllerMonitorViewModel disposed successfully");
 
         base.Dispose();
     }

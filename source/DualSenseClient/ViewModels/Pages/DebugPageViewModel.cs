@@ -20,7 +20,7 @@ public partial class DebugPageViewModel : ViewModelBase
 
     public DebugPageViewModel(SelectedControllerService selectedControllerService, DualSenseProfileManager profileManager)
     {
-        Logger.Debug("Creating DebugPageViewModel");
+        Logger.Debug<DebugPageViewModel>("Creating DebugPageViewModel");
 
         _selectedControllerService = selectedControllerService;
         _profileManager = profileManager;
@@ -29,7 +29,7 @@ public partial class DebugPageViewModel : ViewModelBase
         {
             if (e.PropertyName == nameof(SelectedControllerService.SelectedController))
             {
-                Logger.Debug($"Selected controller changed in service");
+                Logger.Debug<DebugPageViewModel>("Selected controller changed in service");
                 HandleControllerSelectionChanged();
             }
         };
@@ -38,15 +38,15 @@ public partial class DebugPageViewModel : ViewModelBase
         SelectedController = _selectedControllerService.SelectedController;
         if (SelectedController != null)
         {
-            Logger.Info($"Initializing with selected controller: {SelectedController.Controller.Device.GetProductName()}");
+            Logger.Info<DebugPageViewModel>($"Initializing with selected controller: {SelectedController.Controller.Device.GetProductName()}");
             InitializeControllerViewModels();
         }
         else
         {
-            Logger.Debug("No controller selected during initialization");
+            Logger.Debug<DebugPageViewModel>("No controller selected during initialization");
         }
 
-        Logger.Debug("DebugPageViewModel created successfully");
+        Logger.Debug<DebugPageViewModel>("DebugPageViewModel created successfully");
     }
 
     private void HandleControllerSelectionChanged()
@@ -55,26 +55,26 @@ public partial class DebugPageViewModel : ViewModelBase
 
         if (SelectedController != null)
         {
-            Logger.Info($"Controller selected: {SelectedController.Controller.Device.GetProductName()}");
+            Logger.Info<DebugPageViewModel>($"Controller selected: {SelectedController.Controller.Device.GetProductName()}");
             InitializeControllerViewModels();
         }
         else
         {
-            Logger.Info("Controller deselected");
+            Logger.Info<DebugPageViewModel>("Controller deselected");
             CleanupControllerViewModels();
         }
     }
 
     private void InitializeControllerViewModels()
     {
-        Logger.Debug("Initializing controller ViewModels");
+        Logger.Debug<DebugPageViewModel>("Initializing controller ViewModels");
 
         // Cleanup existing
         CleanupControllerViewModels();
 
         if (SelectedController == null)
         {
-            Logger.Warning("Cannot initialize ViewModels: SelectedController is null");
+            Logger.Warning<DebugPageViewModel>("Cannot initialize ViewModels: SelectedController is null");
             return;
         }
 
@@ -82,51 +82,51 @@ public partial class DebugPageViewModel : ViewModelBase
         {
             // Get or create controller info
             SelectedControllerInfo = _profileManager.GetOrCreateControllerInfo(SelectedController.Controller);
-            Logger.Debug($"Controller info: {SelectedControllerInfo.Name} (ID: {SelectedControllerInfo.Id})");
+            Logger.Debug<DebugPageViewModel>($"Controller info: {SelectedControllerInfo.Name} (ID: {SelectedControllerInfo.Id})");
 
             // Create new ViewModels
-            Logger.Debug("Creating ControllerMonitorViewModel");
+            Logger.Debug<DebugPageViewModel>("Creating ControllerMonitorViewModel");
             MonitorViewModel = new ControllerMonitorViewModel(SelectedController.Controller, SelectedControllerInfo);
 
-            Logger.Debug("Creating ControllerProfileViewModel");
+            Logger.Debug<DebugPageViewModel>("Creating ControllerProfileViewModel");
             ProfileViewModel = new ControllerProfileViewModel(SelectedController.Controller, SelectedControllerInfo, _profileManager);
 
-            Logger.Info("Controller ViewModels initialized successfully");
+            Logger.Info<DebugPageViewModel>("Controller ViewModels initialized successfully");
         }
         catch (Exception ex)
         {
-            Logger.Error("Failed to initialize controller ViewModels");
-            Logger.LogExceptionDetails(ex, includeEnvironmentInfo: false);
+            Logger.Error<DebugPageViewModel>("Failed to initialize controller ViewModels");
+            Logger.LogExceptionDetails<DebugPageViewModel>(ex, includeEnvironmentInfo: false);
             CleanupControllerViewModels();
         }
     }
 
     private void CleanupControllerViewModels()
     {
-        Logger.Debug("Cleaning up controller ViewModels");
+        Logger.Debug<DebugPageViewModel>("Cleaning up controller ViewModels");
 
         if (MonitorViewModel != null)
         {
-            Logger.Trace("Disposing MonitorViewModel");
+            Logger.Trace<DebugPageViewModel>("Disposing MonitorViewModel");
             MonitorViewModel.Dispose();
             MonitorViewModel = null;
         }
 
         if (ProfileViewModel != null)
         {
-            Logger.Trace("Disposing ProfileViewModel");
+            Logger.Trace<DebugPageViewModel>("Disposing ProfileViewModel");
             ProfileViewModel.Dispose();
             ProfileViewModel = null;
         }
 
         SelectedControllerInfo = null;
-        Logger.Debug("ViewModels cleanup complete");
+        Logger.Debug<DebugPageViewModel>("ViewModels cleanup complete");
     }
 
     public void Dispose()
     {
-        Logger.Debug("Disposing DebugPageViewModel");
+        Logger.Debug<DebugPageViewModel>("Disposing DebugPageViewModel");
         CleanupControllerViewModels();
-        Logger.Debug("DebugPageViewModel disposed");
+        Logger.Debug<DebugPageViewModel>("DebugPageViewModel disposed");
     }
 }
