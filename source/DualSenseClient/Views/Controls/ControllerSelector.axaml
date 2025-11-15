@@ -56,16 +56,27 @@
                                 CornerRadius="8"
                                 Padding="15"
                                 Cursor="Hand">
-                            <Border.Styles>
-                                <Style Selector="Border:pointerover">
-                                    <Setter Property="Background"
-                                            Value="{DynamicResource SubtleFillColorTertiaryBrush}" />
-                                </Style>
-                                <Style Selector="Border[BorderBrush=#00000000]:pointerover">
-                                    <Setter Property="BorderBrush"
-                                            Value="{DynamicResource ControlStrokeColorDefaultBrush}" />
-                                </Style>
-                            </Border.Styles>
+
+                            <!-- Context Flyout -->
+                            <Border.ContextFlyout>
+                                <MenuFlyout>
+                                    <MenuItem Header="Rename Controller"
+                                              Command="{Binding StartRenamingCommand}">
+                                        <MenuItem.Icon>
+                                            <ic:SymbolIcon Symbol="Rename" FontSize="16" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+
+                                    <Separator />
+
+                                    <MenuItem Header="Copy MAC Address"
+                                              Command="{Binding CopyMacAddressCommand}">
+                                        <MenuItem.Icon>
+                                            <ic:SymbolIcon Symbol="Copy" FontSize="16" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </MenuFlyout>
+                            </Border.ContextFlyout>
 
                             <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto">
                                 <!-- Controller Icon -->
@@ -89,9 +100,61 @@
                                             Grid.Column="1"
                                             Spacing="4"
                                             VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding Name}"
-                                               FontSize="15"
-                                               FontWeight="SemiBold" />
+
+                                    <!-- Name Display/Edit -->
+                                    <Grid>
+                                        <!-- Display Mode -->
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="8"
+                                                    IsVisible="{Binding !IsRenaming}">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontSize="15"
+                                                       FontWeight="SemiBold" />
+                                            <!-- Edit Button (optional, for quick access) -->
+                                            <Button Classes="AppBarButton"
+                                                    Width="24"
+                                                    Height="24"
+                                                    Padding="4"
+                                                    Command="{Binding StartRenamingCommand}"
+                                                    ToolTip.Tip="Rename Controller">
+                                                <ic:SymbolIcon Symbol="Edit" FontSize="12" />
+                                            </Button>
+                                        </StackPanel>
+
+                                        <!-- Edit Mode -->
+                                        <Grid IsVisible="{Binding IsRenaming}"
+                                              ColumnDefinitions="*,Auto,Auto">
+                                            <TextBox Grid.Column="0"
+                                                     Text="{Binding EditingName}"
+                                                     FontSize="15"
+                                                     MinWidth="200"
+                                                     KeyDown="OnRenameTextBoxKeyDown" />
+                                            <Button Grid.Column="1"
+                                                    Classes="AppBarButton"
+                                                    Width="28"
+                                                    Height="28"
+                                                    Padding="4"
+                                                    Margin="4,0,0,0"
+                                                    Command="{Binding SaveNameCommand}"
+                                                    ToolTip.Tip="Save">
+                                                <ic:SymbolIcon Symbol="Checkmark"
+                                                               FontSize="14"
+                                                               Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                                            </Button>
+                                            <Button Grid.Column="2"
+                                                    Classes="AppBarButton"
+                                                    Width="28"
+                                                    Height="28"
+                                                    Padding="4"
+                                                    Margin="2,0,0,0"
+                                                    Command="{Binding CancelRenamingCommand}"
+                                                    ToolTip.Tip="Cancel">
+                                                <ic:SymbolIcon Symbol="Dismiss"
+                                                               FontSize="14"
+                                                               Foreground="{DynamicResource SystemFillColorCriticalBrush}" />
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
 
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <!-- Connection Type Badge -->
