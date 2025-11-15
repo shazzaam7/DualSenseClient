@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading.Tasks;
@@ -132,6 +132,7 @@ public partial class ControllerListItemViewModel : ObservableObject
     public string ChargingIcon => Controller.ChargingIcon;
     public bool IsCharging => Controller.IsCharging;
     public double BatteryLevel => Controller.BatteryLevel;
+    public bool IsBluetooth => Controller.ConnectionType == "Bluetooth";
 
     public ControllerListItemViewModel(ControllerViewModelBase controller, bool isSelected, SelectedControllerService selectedControllerService)
     {
@@ -232,6 +233,29 @@ public partial class ControllerListItemViewModel : ObservableObject
         {
             Logger.Error<ControllerListItemViewModel>("Failed to copy MAC address");
             Logger.LogExceptionDetails<ControllerListItemViewModel>(ex, includeEnvironmentInfo: false);
+        }
+    }
+
+    [RelayCommand]
+    private void DisconnectController()
+    {
+        if (Controller.ConnectionType == "Bluetooth")
+        {
+            Logger.Info<ControllerListItemViewModel>($"Attempting to disconnect Bluetooth controller: {Name}");
+            bool success = Controller.Controller.DisconnectBluetooth();
+
+            if (success)
+            {
+                Logger.Info<ControllerListItemViewModel>($"Successfully disconnected Bluetooth controller: {Name}");
+            }
+            else
+            {
+                Logger.Warning<ControllerListItemViewModel>($"Failed to disconnect Bluetooth controller: {Name}");
+            }
+        }
+        else
+        {
+            Logger.Warning<ControllerListItemViewModel>($"Cannot disconnect controller via Bluetooth: {Name} is connected via {Controller.ConnectionType}");
         }
     }
 
