@@ -12,7 +12,7 @@
                        AlwaysShowHeader="False"
                        IsSettingsVisible="False"
                        PaneDisplayMode="LeftCompact"
-                       CompactPaneLength="60"
+                       CompactPaneLength="62"
                        IsPaneToggleButtonVisible="False"
                        IsPaneOpen="False"
                        ItemInvoked="NavView_OnItemInvoked">
