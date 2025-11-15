@@ -31,7 +31,6 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
 
     public event EventHandler<ControllerViewModelBase?>? SelectedControllerChanged;
 
-
     // Constructor
     public SelectedControllerService(DualSenseManager dualSenseManager, ISettingsManager settingsManager)
     {
@@ -63,6 +62,49 @@ public partial class SelectedControllerService : ObservableObject, IDisposable
             {
                 SelectControllerInternal(_controllerViewModels.Values.First());
             }
+        }
+    }
+
+    /// <summary>
+    /// Updates the name of a controller and refreshes the UI
+    /// </summary>
+    public void UpdateControllerName(string controllerId, string newName)
+    {
+        lock (_lock)
+        {
+            // Find the controller ViewModel by ID
+            ControllerViewModelBase? controllerVm = _controllerViewModels.Values.FirstOrDefault(vm => vm.ControllerId == controllerId);
+
+            if (controllerVm != null)
+            {
+                // Update the ViewModel name directly
+                controllerVm.UpdateName(newName);
+
+                // If this is the selected controller, notify of changes
+                if (SelectedController == controllerVm)
+                {
+                    // Force property change notification
+                    OnPropertyChanged(nameof(SelectedController));
+                }
+            }
+
+            // Update in settings
+            if (_settingsManager.Application.Controllers.KnownControllers.TryGetValue(controllerId, out var controllerInfo))
+            {
+                controllerInfo.Name = newName;
+                _settingsManager.SaveAll();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets a controller ViewModel by its ID
+    /// </summary>
+    public ControllerViewModelBase? GetControllerById(string controllerId)
+    {
+        lock (_lock)
+        {
+            return _controllerViewModels.Values.FirstOrDefault(vm => vm.ControllerId == controllerId);
         }
     }
 

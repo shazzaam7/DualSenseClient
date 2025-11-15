@@ -16,7 +16,7 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
 {
     // Properties
     protected readonly DualSenseController _controller;
-    protected readonly ControllerInfo? _controllerInfo;
+    protected ControllerInfo? _controllerInfo;
     private CancellationTokenSource? _animationCts;
 
     [ObservableProperty] private string _name;
@@ -33,6 +33,7 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
 
     public DualSenseController Controller => _controller;
     public ControllerInfo? ControllerInfo => _controllerInfo;
+    public string ControllerId => _controllerInfo?.Id ?? string.Empty;
 
     // Constructor
     public ControllerViewModelBase(DualSenseController controller, ControllerInfo? controllerInfo)
@@ -50,6 +51,24 @@ public partial class ControllerViewModelBase : ObservableObject, IDisposable
     }
 
     // Functions
+    public void UpdateControllerInfo(ControllerInfo? controllerInfo)
+    {
+        _controllerInfo = controllerInfo;
+        if (controllerInfo != null)
+        {
+            Name = controllerInfo.Name;
+        }
+    }
+
+    public void UpdateName(string newName)
+    {
+        Name = newName;
+        if (_controllerInfo != null)
+        {
+            _controllerInfo.Name = newName;
+        }
+    }
+
     public void UpdateBatteryState(BatteryState battery)
     {
         BatteryLevel = battery.BatteryLevel;
