@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using DualSenseClient.Core.DualSense;
+using DualSenseClient.Core.DualSense.Actions;
 using DualSenseClient.Core.Logging;
 using DualSenseClient.Core.Settings;
 using DualSenseClient.ViewModels;
@@ -21,6 +22,7 @@ public static class ServiceConfigurator
         services.AddSingleton<DualSenseProfileManager>();
         services.AddSingleton<DualSenseManager>();
         services.AddSingleton<SelectedControllerService>();
+        services.AddSingleton<SpecialActionService>();
         services.AddSingleton<NavigationService>();
         services.AddSingleton<IApplicationSettings, ApplicationSettings>();
 
@@ -44,16 +46,21 @@ public static class ServiceConfigurator
         string logLevel = settingsManager.Application.Debug.Logger.Level;
         Logger.Debug<App>($"Setting log level from settings: {logLevel}");
         Logger.SetLogLevel(LogLevelHelper.FromString(logLevel));
-        
+
         DualSenseManager dualSenseManager = serviceProvider.GetRequiredService<DualSenseManager>();
         DualSenseProfileManager profileManager = serviceProvider.GetRequiredService<DualSenseProfileManager>();
+        SpecialActionService specialActionService = serviceProvider.GetRequiredService<SpecialActionService>();
 
         DualSenseServiceLocator.RegisterSettingsManager(settingsManager);
         DualSenseServiceLocator.RegisterDualSenseManager(dualSenseManager);
         DualSenseServiceLocator.RegisterProfileManager(profileManager);
+        DualSenseServiceLocator.RegisterSpecialActionService(specialActionService);
 
         // Complete profile manager initialization after all services are registered
         profileManager.CompleteInitialization();
+
+        // Complete dualsense manager initialization after all services are registered
+        dualSenseManager.CompleteInitialization();
 
         return serviceProvider;
     }

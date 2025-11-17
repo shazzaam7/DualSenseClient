@@ -55,6 +55,9 @@ public class ControllerProfile
 
     [JsonPropertyName("micLed")]
     public MicLed MicLed { get; set; } = MicLed.Off;
+
+    [JsonPropertyName("special_actions")]
+    public List<SpecialActionSettings> SpecialActions { get; set; } = new List<SpecialActionSettings>();
 }
 
 public class LightbarSettings

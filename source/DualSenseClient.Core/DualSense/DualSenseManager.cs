@@ -45,10 +45,17 @@ public class DualSenseManager : IDisposable
         _deviceList = DeviceList.Local;
         _deviceList.Changed += OnDeviceListChanged;
 
-        // Initial scan
+        Logger.Debug<DualSenseManager>("DualSense Manager initialized (waiting for CompleteInitialization)");
+    }
+
+    public void CompleteInitialization()
+    {
+        Logger.Info<DualSenseManager>("Completing DualSense Manager initialization");
+
+        // Perform the initial device scan now that all services are registered
         ScanForDevices();
 
-        Logger.Debug<DualSenseManager>("DualSense Manager started");
+        Logger.Info<DualSenseManager>("DualSense Manager initialization completed");
     }
 
     private void OnDeviceListChanged(object? sender, DeviceListChangedEventArgs e)
@@ -175,7 +182,7 @@ public class DualSenseManager : IDisposable
                 return;
             }
 
-            DualSenseController newController = new DualSenseController(device, stream);
+            DualSenseController newController = new DualSenseController(device, stream, DualSenseServiceLocator.GetSpecialActionService());
 
             lock (_lock)
             {

@@ -34,6 +34,28 @@ public class DualSenseProfileManager
     }
 
     // Functions
+    /// <summary>
+    /// Completes the initialization of DualSenseProfileManager after all services are registered
+    /// This is needed because DualSenseManager may not be available during construction due to DI ordering
+    /// </summary>
+    public void CompleteInitialization()
+    {
+        DualSenseManager? dualSenseManager = DualSenseServiceLocator.GetDualSenseManager();
+        if (dualSenseManager != null)
+        {
+            Logger.Debug<DualSenseProfileManager>("Completing initialization, subscribing to controller events");
+            dualSenseManager.ControllerConnected += OnControllerConnected;
+            dualSenseManager.ControllerDisconnected += OnControllerDisconnected;
+
+            // Apply profiles to already connected controllers
+            InitializeExistingControllers();
+        }
+        else
+        {
+            Logger.Error<DualSenseProfileManager>("DualSenseManager still not available during CompleteInitialization");
+        }
+    }
+
     private void OnControllerConnected(object? sender, DualSenseController controller)
     {
         Logger.Info<DualSenseProfileManager>($"Controller connected event: {controller.Device.GetProductName()}");
@@ -823,28 +845,6 @@ public class DualSenseProfileManager
         else
         {
             Logger.Warning<DualSenseProfileManager>($"Cannot update name: controller {controllerId} not found");
-        }
-    }
-
-    /// <summary>
-    /// Completes the initialization of DualSenseProfileManager after all services are registered
-    /// This is needed because DualSenseManager may not be available during construction due to DI ordering
-    /// </summary>
-    public void CompleteInitialization()
-    {
-        DualSenseManager? dualSenseManager = DualSenseServiceLocator.GetDualSenseManager();
-        if (dualSenseManager != null)
-        {
-            Logger.Debug<DualSenseProfileManager>("Completing initialization, subscribing to controller events");
-            dualSenseManager.ControllerConnected += OnControllerConnected;
-            dualSenseManager.ControllerDisconnected += OnControllerDisconnected;
-
-            // Apply profiles to already connected controllers
-            InitializeExistingControllers();
-        }
-        else
-        {
-            Logger.Error<DualSenseProfileManager>("DualSenseManager still not available during CompleteInitialization");
         }
     }
 

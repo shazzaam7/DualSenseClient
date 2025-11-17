@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using DualSenseClient.Core.Bluetooth;
+using DualSenseClient.Core.DualSense.Actions;
 using DualSenseClient.Core.DualSense.Enums;
 using DualSenseClient.Core.DualSense.Events;
 using DualSenseClient.Core.DualSense.Reports;
@@ -44,6 +45,7 @@ public class DualSenseController : IDisposable
     public InputState Input { get; private set; } = new InputState();
     public TouchpadState Touchpad { get; private set; } = new TouchpadState();
     public MotionState Motion { get; private set; } = new MotionState();
+    public SpecialActionService? SpecialActionService { get; }
 
     // Events
     // Input
@@ -65,12 +67,13 @@ public class DualSenseController : IDisposable
     public event EventHandler? Disconnected;
 
     // Constructor
-    public DualSenseController(HidDevice device, HidStream stream)
+    public DualSenseController(HidDevice device, HidStream stream, SpecialActionService? specialActionService = null)
     {
         Logger.Debug<DualSenseController>($"Initializing DualSense controller: {device.GetProductName()}");
 
         Device = device;
         _stream = stream;
+        SpecialActionService = specialActionService;
         ConnectionType = device.GetMaxOutputReportLength() > 64 ? ConnectionType.Bluetooth : ConnectionType.USB;
 
         Logger.Info<DualSenseController>($"Controller mode detected: {ConnectionType}");
@@ -521,6 +524,7 @@ public class DualSenseController : IDisposable
     {
         if (oldState != newState)
         {
+            SpecialActionService?.ProcessButtonEvent(this, buttonType, newState);
             if (newState)
             {
                 ButtonPressed?.Invoke(this, new ButtonEventArgs(buttonType));
@@ -528,6 +532,7 @@ public class DualSenseController : IDisposable
             else
             {
                 ButtonReleased?.Invoke(this, new ButtonEventArgs(buttonType));
+                SpecialActionService?.CheckForActiveSpecialActionRelease(this);
             }
         }
     }
