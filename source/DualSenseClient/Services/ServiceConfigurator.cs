@@ -25,6 +25,7 @@ public static class ServiceConfigurator
         services.AddSingleton<SpecialActionService>();
         services.AddSingleton<NavigationService>();
         services.AddSingleton<IApplicationSettings, ApplicationSettings>();
+        services.AddSingleton<IProfileRenameService, ProfileRenameService>();
 
         // ViewModels
         services.AddSingleton<ControllerSelectorViewModel>();

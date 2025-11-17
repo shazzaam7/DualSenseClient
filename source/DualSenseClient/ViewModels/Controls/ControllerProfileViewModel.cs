@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Media;
@@ -219,6 +219,9 @@ public partial class ControllerProfileViewModel : ControllerViewModelBase
         {
             Logger.Debug<ControllerProfileViewModel>($"Assigning profile '{SelectedProfile.Name}' to controller '{_controllerInfo.Name}'");
             _profileManager.AssignProfileToController(_controllerInfo.Id, SelectedProfile.Id);
+
+            // Trigger the profile changed event to notify other components about the change
+            _profileManager.TriggerProfileChanged(_controllerInfo.Id, SelectedProfile);
         }
 
         InitializeLightControls();
@@ -292,6 +295,56 @@ public partial class ControllerProfileViewModel : ControllerViewModelBase
     }
 
     [RelayCommand]
+    private void RenameSelectedProfile()
+    {
+        if (SelectedProfile == null)
+        {
+            Logger.Warning<ControllerProfileViewModel>("RenameSelectedProfile called but no profile is selected");
+            return;
+        }
+
+        Logger.Info<ControllerProfileViewModel>($"Renaming profile '{SelectedProfile.Name}' (ID: {SelectedProfile.Id}) to '{NewProfileName}'");
+
+        if (string.IsNullOrWhiteSpace(NewProfileName))
+        {
+            Logger.Warning<ControllerProfileViewModel>("RenameSelectedProfile called with empty profile name");
+            return;
+        }
+
+        string newName = NewProfileName.Trim();
+
+        // Check if the new name is the same as the current name
+        if (SelectedProfile.Name.Equals(newName, StringComparison.OrdinalIgnoreCase))
+        {
+            Logger.Warning<ControllerProfileViewModel>($"New name '{newName}' is the same as the current name '{SelectedProfile.Name}', skipping rename");
+            return;
+        }
+
+        // Check if a profile with the new name already exists
+        ControllerProfile? existingProfile = Profiles.FirstOrDefault(p => !p.Id.Equals(SelectedProfile.Id) &&
+                                                                          p.Name.Equals(newName, StringComparison.OrdinalIgnoreCase));
+
+        if (existingProfile != null)
+        {
+            Logger.Warning<ControllerProfileViewModel>($"A profile with the name '{newName}' already exists");
+            return;
+        }
+
+        // Store the old name for logging
+        // Update the profile name and save
+        string oldName = SelectedProfile.Name;
+        SelectedProfile.Name = newName;
+        _profileManager.SaveProfile(SelectedProfile);
+
+        // Reload the profile list in the UI
+        LoadProfiles();
+        SelectedProfile = Profiles.FirstOrDefault(p => p.Id == SelectedProfile.Id);
+        NewProfileName = string.Empty;
+        Logger.Info<ControllerProfileViewModel>($"Profile renamed successfully from '{oldName}' to '{SelectedProfile?.Name}'");
+    }
+
+
+    [RelayCommand]
     private void DuplicateSelectedProfile()
     {
         if (SelectedProfile == null)
@@ -355,6 +408,30 @@ public partial class ControllerProfileViewModel : ControllerViewModelBase
         NewProfileName = string.Empty;
 
         Logger.Info<ControllerProfileViewModel>("Controller state saved as profile successfully");
+    }
+
+    [RelayCommand]
+    private void ApplyAllSettings()
+    {
+        Logger.Info<ControllerProfileViewModel>("Applying all settings to controller");
+
+        // Apply Lightbar
+        _controller.SetLightbar(LightbarRed, LightbarGreen, LightbarBlue);
+        Logger.Debug<ControllerProfileViewModel>($"Applied lightbar: RGB({LightbarRed}, {LightbarGreen}, {LightbarBlue})");
+
+        // Apply Player LEDs
+        PlayerLed leds = GetCurrentPlayerLedPattern();
+        PlayerLedBrightness brightness = GetCurrentPlayerLedBrightness();
+        _controller.SetPlayerLeds(leds, brightness);
+        Logger.Debug<ControllerProfileViewModel>($"Applied player LEDs: Pattern={leds}, Brightness={brightness}");
+
+        // Apply Mic LED
+        _controller.SetMicLed(MicLed);
+        Logger.Debug<ControllerProfileViewModel>($"Applied mic LED: {MicLed}");
+
+        // Update controls to reflect current state
+        InitializeLightControls();
+        Logger.Info<ControllerProfileViewModel>("All settings applied successfully");
     }
 
     [RelayCommand]

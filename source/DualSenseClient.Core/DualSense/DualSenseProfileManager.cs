@@ -1,5 +1,6 @@
-﻿using DualSenseClient.Core.DualSense.Devices;
+using DualSenseClient.Core.DualSense.Devices;
 using DualSenseClient.Core.DualSense.Enums;
+using DualSenseClient.Core.DualSense.Events;
 using DualSenseClient.Core.Logging;
 using DualSenseClient.Core.Settings;
 using DualSenseClient.Core.Settings.Models;
@@ -9,6 +10,8 @@ namespace DualSenseClient.Core.DualSense;
 
 public class DualSenseProfileManager
 {
+    public event EventHandler<ProfileChangedEventArgs>? ProfileChanged;
+
     // Constructor
     public DualSenseProfileManager()
     {
@@ -416,6 +419,13 @@ public class DualSenseProfileManager
         else
         {
             Logger.Debug<DualSenseProfileManager>("Controller is not currently connected, profile will be applied on next connection");
+        }
+
+        // Get the profile to trigger the ProfileChanged event
+        if (settings.Profiles.TryGetValue(profileId, out var profile))
+        {
+            // Trigger the profile changed event to notify other components about the change
+            TriggerProfileChanged(controllerId, profile);
         }
 
         settingsManager.SaveAll();
@@ -846,6 +856,19 @@ public class DualSenseProfileManager
         {
             Logger.Warning<DualSenseProfileManager>($"Cannot update name: controller {controllerId} not found");
         }
+    }
+
+    protected virtual void OnProfileChanged(string controllerId, ControllerProfile profile)
+    {
+        ProfileChanged?.Invoke(this, new ProfileChangedEventArgs(controllerId, profile));
+    }
+
+    /// <summary>
+    /// Triggers the ProfileChanged event for a specific controller
+    /// </summary>
+    public void TriggerProfileChanged(string controllerId, ControllerProfile profile)
+    {
+        OnProfileChanged(controllerId, profile);
     }
 
     public void Dispose()

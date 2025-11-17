@@ -1,8 +1,8 @@
-using System.Linq;
 using DualSenseClient.Core.DualSense.Actions.Handlers;
 using DualSenseClient.Core.DualSense.Actions.State;
 using DualSenseClient.Core.DualSense.Devices;
 using DualSenseClient.Core.DualSense.Enums;
+using DualSenseClient.Core.DualSense.Events;
 using DualSenseClient.Core.Settings;
 using DualSenseClient.Core.Settings.Models;
 
@@ -23,6 +23,25 @@ public class SpecialActionService
         _stateTracker = new ControllerStateTracker();
         _stateSaver = new ControllerStateSaver();
         _actionFactory = new SpecialActionFactory();
+
+        // Subscribe to profile changes to update special actions when a profile changes
+        _profileManager.ProfileChanged += OnProfileChanged;
+    }
+
+    private void OnProfileChanged(object? sender, ProfileChangedEventArgs e)
+    {
+        string controllerId = e.ControllerId;
+
+        // Reset button states to clear any held combinations from the old profile
+        _stateTracker.ResetButtonStates(controllerId);
+
+        // Reset the state saver completely for this controller ID
+        _stateSaver.ResetState(controllerId);
+    }
+
+    private string NormalizeMacAddress(string macAddress)
+    {
+        return macAddress?.Replace(":", "") ?? "";
     }
 
     public void ProcessButtonEvent(DualSenseController controller, ButtonType button, bool isPressed)
@@ -96,6 +115,10 @@ public class SpecialActionService
 
     private string GetControllerId(DualSenseController controller)
     {
-        return controller.MacAddress ?? controller.Device.DevicePath;
+        if (controller.MacAddress != null)
+        {
+            return NormalizeMacAddress(controller.MacAddress);
+        }
+        return controller.Device.DevicePath;
     }
 }

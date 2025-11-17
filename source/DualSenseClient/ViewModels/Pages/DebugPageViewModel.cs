@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DualSenseClient.Core.DualSense;
 using DualSenseClient.Core.Logging;
@@ -17,6 +17,7 @@ public partial class DebugPageViewModel : ViewModelBase
     [ObservableProperty] private ControllerInfo? _selectedControllerInfo;
     [ObservableProperty] private ControllerMonitorViewModel? _monitorViewModel;
     [ObservableProperty] private ControllerProfileViewModel? _profileViewModel;
+    [ObservableProperty] private SpecialActionsViewModel? _specialActionsViewModel;
 
     public DebugPageViewModel(SelectedControllerService selectedControllerService, DualSenseProfileManager profileManager)
     {
@@ -91,6 +92,9 @@ public partial class DebugPageViewModel : ViewModelBase
             Logger.Debug<DebugPageViewModel>("Creating ControllerProfileViewModel");
             ProfileViewModel = new ControllerProfileViewModel(SelectedController.Controller, SelectedControllerInfo, _profileManager);
 
+            Logger.Debug<DebugPageViewModel>("Creating SpecialActionsViewModel");
+            SpecialActionsViewModel = new SpecialActionsViewModel(SelectedController.Controller, SelectedControllerInfo, _profileManager);
+
             Logger.Info<DebugPageViewModel>("Controller ViewModels initialized successfully");
         }
         catch (Exception ex)
@@ -117,6 +121,13 @@ public partial class DebugPageViewModel : ViewModelBase
             Logger.Trace<DebugPageViewModel>("Disposing ProfileViewModel");
             ProfileViewModel.Dispose();
             ProfileViewModel = null;
+        }
+
+        if (SpecialActionsViewModel != null)
+        {
+            Logger.Trace<DebugPageViewModel>("Disposing SpecialActionsViewModel");
+            SpecialActionsViewModel.Dispose();
+            SpecialActionsViewModel = null;
         }
 
         SelectedControllerInfo = null;

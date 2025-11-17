@@ -1,4 +1,4 @@
-﻿using DualSenseClient.Core.DualSense.Devices;
+using DualSenseClient.Core.DualSense.Devices;
 using DualSenseClient.Core.DualSense.Enums;
 using DualSenseClient.Core.Logging;
 
@@ -48,6 +48,21 @@ public class ControllerStateSaver
 
             Logger.Info<ControllerStateSaver>($"Controller {controllerId}: Restored original LED state");
         }
+    }
+
+    public void ResetState(string controllerId)
+    {
+        if (_savedStates.ContainsKey(controllerId))
+        {
+            _savedStates.Remove(controllerId);
+        }
+
+        if (_isSpecialActionActive.ContainsKey(controllerId))
+        {
+            _isSpecialActionActive[controllerId] = false;
+        }
+
+        Logger.Info<ControllerStateSaver>($"Controller {controllerId}: Reset special action state");
     }
 
     public bool IsSpecialActionActive(string controllerId)

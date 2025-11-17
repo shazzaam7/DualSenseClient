@@ -1,421 +1,417 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent"
              xmlns:vm="clr-namespace:DualSenseClient.ViewModels.Controls"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:local="clr-namespace:DualSenseClient.Views.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="DualSenseClient.Views.Controls.ControllerProfile"
              x:DataType="vm:ControllerProfileViewModel">
-    <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
-            CornerRadius="8"
-            Padding="20">
-        <StackPanel Spacing="20">
-            <!-- Header -->
-            <Grid ColumnDefinitions="Auto,*">
-                <ic:SymbolIcon Symbol="LightbulbFilament"
-                               FontSize="20"
-                               Margin="0,0,10,0"
-                               VerticalAlignment="Center" />
-                <TextBlock Text="Controller Lights Profiles"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           VerticalAlignment="Center"
-                           Grid.Column="1" />
-            </Grid>
 
-            <Border Height="1"
-                    Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
+    <UserControl.Styles>
+        <!-- Consistent button styling -->
+        <Style Selector="Button.preset-button">
+            <Setter Property="MinWidth" Value="32" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="BorderThickness" Value="2" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+        </Style>
+        <Style Selector="Button.preset-button:pointerover">
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+        </Style>
 
-            <!-- Content Grid -->
-            <Grid RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*,*" ColumnSpacing="20" RowSpacing="20">
+        <Style Selector="Button.action-button">
+            <Setter Property="Padding" Value="8,6" />
+            <Setter Property="MinWidth" Value="36" />
+        </Style>
 
-                <!-- Profile Management Section -->
-                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="16"
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2">
-                    <StackPanel Spacing="12">
-                        <Grid ColumnDefinitions="Auto,*">
-                            <ic:SymbolIcon Symbol="Collections"
-                                           FontSize="16"
-                                           Margin="0,0,8,0"
-                                           VerticalAlignment="Center" />
-                            <TextBlock Text="Profiles"
-                                       FontSize="14"
-                                       FontWeight="SemiBold"
-                                       VerticalAlignment="Center"
-                                       Grid.Column="1" />
-                        </Grid>
+        <Style Selector="Button.apply-button">
+            <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="12,8" />
+        </Style>
 
-                        <!-- Profile Selection and Quick Actions -->
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                            <!-- Profile Dropdown -->
-                            <ComboBox ItemsSource="{Binding Profiles}"
-                                      SelectedItem="{Binding SelectedProfile}"
-                                      HorizontalAlignment="Stretch">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Name}" />
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
+        <Style Selector="TextBlock.section-header">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+        </Style>
+    </UserControl.Styles>
 
-                            <!-- Quick Actions -->
-                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4">
-                                <Button Command="{Binding ApplySelectedProfileCommand}"
-                                        ToolTip.Tip="Apply Profile"
-                                        Padding="8,6">
-                                    <ic:SymbolIcon Symbol="Play" FontSize="14" />
-                                </Button>
-                                <Button Command="{Binding UpdateSelectedProfileCommand}"
-                                        ToolTip.Tip="Update Profile"
-                                        Padding="8,6">
-                                    <ic:SymbolIcon Symbol="Save" FontSize="14" />
-                                </Button>
-                                <Button Command="{Binding DuplicateSelectedProfileCommand}"
-                                        ToolTip.Tip="Duplicate Profile"
-                                        Padding="8,6">
-                                    <ic:SymbolIcon Symbol="Copy" FontSize="14" />
-                                </Button>
-                                <Button Command="{Binding DeleteSelectedProfileCommand}"
-                                        ToolTip.Tip="Delete Profile"
-                                        Padding="8,6">
-                                    <Button.Styles>
-                                        <Style Selector="Button">
-                                            <Setter Property="Background" Value="{DynamicResource SystemFillColorCriticalBrush}" />
-                                        </Style>
-                                    </Button.Styles>
-                                    <ic:SymbolIcon Symbol="Delete" FontSize="14" />
-                                </Button>
-                            </StackPanel>
-                        </Grid>
-
-                        <!-- Create New Profile -->
-                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                            <TextBox Watermark="New profile name..."
-                                     Text="{Binding NewProfileName}" />
-                            <Button Grid.Column="1"
-                                    Content="Create"
-                                    Command="{Binding SaveCurrentAsProfileCommand}"
-                                    IsEnabled="{Binding NewProfileName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                                    Padding="12,6" />
-                            <Button Grid.Column="2"
-                                    ToolTip.Tip="Save current controller state as profile"
-                                    Command="{Binding SaveControllerStateAsProfileCommand}"
-                                    Padding="8,6">
-                                <StackPanel Orientation="Horizontal" Spacing="4">
-                                    <ic:SymbolIcon Symbol="Camera" FontSize="14" />
-                                    <TextBlock Text="Capture" FontSize="12" />
-                                </StackPanel>
-                            </Button>
-                        </Grid>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled"
+                  VerticalScrollBarVisibility="Auto">
+        <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                CornerRadius="8"
+                Padding="20">
+            <StackPanel Spacing="16">
+                <!-- Compact Header -->
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <ic:SymbolIcon Symbol="LightbulbFilament"
+                                       FontSize="18"
+                                       VerticalAlignment="Center" />
+                        <TextBlock Text="Lights"
+                                   FontSize="16"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center" />
                     </StackPanel>
-                </Border>
 
-                <!-- Lightbar Section -->
-                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="16"
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Lightbar"
-                                   FontSize="14"
-                                   FontWeight="SemiBold" />
+                    <!-- Quick Actions in Header -->
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="4">
+                        <Button Command="{Binding ResetLightsToDefaultCommand}"
+                                ToolTip.Tip="Reset to Default"
+                                Classes="action-button">
+                            <ic:SymbolIcon Symbol="ArrowReset" FontSize="14" />
+                        </Button>
+                        <Button Command="{Binding TurnOffAllLightsCommand}"
+                                ToolTip.Tip="Turn Off All Lights"
+                                Classes="action-button">
+                            <ic:SymbolIcon Symbol="Lightbulb" FontSize="14" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
 
-                        <Grid ColumnDefinitions="*,140" ColumnSpacing="12">
-                            <!-- Color Sliders -->
-                            <StackPanel Spacing="10">
-                                <!-- Red Slider -->
-                                <Grid ColumnDefinitions="30,*,50">
-                                    <Border Background="#FF0000"
-                                            CornerRadius="4"
-                                            Width="24"
-                                            Height="24"
-                                            VerticalAlignment="Center" />
-                                    <Slider Grid.Column="1"
-                                            Margin="8,0"
-                                            Minimum="0"
-                                            Maximum="255"
-                                            Value="{Binding LightbarRed}"
-                                            TickFrequency="1"
-                                            IsSnapToTickEnabled="True" />
-                                    <TextBlock Grid.Column="2"
-                                               Text="{Binding LightbarRed}"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Right"
-                                               FontFamily="Consolas"
-                                               FontSize="12" />
-                                </Grid>
+                <Border Height="1"
+                        Background="{DynamicResource DividerStrokeColorDefaultBrush}" />
 
-                                <!-- Green Slider -->
-                                <Grid ColumnDefinitions="30,*,50">
-                                    <Border Background="#00FF00"
-                                            CornerRadius="4"
-                                            Width="24"
-                                            Height="24"
-                                            VerticalAlignment="Center" />
-                                    <Slider Grid.Column="1"
-                                            Margin="8,0"
-                                            Minimum="0"
-                                            Maximum="255"
-                                            Value="{Binding LightbarGreen}"
-                                            TickFrequency="1"
-                                            IsSnapToTickEnabled="True" />
-                                    <TextBlock Grid.Column="2"
-                                               Text="{Binding LightbarGreen}"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Right"
-                                               FontFamily="Consolas"
-                                               FontSize="12" />
-                                </Grid>
+                <!-- Main Content in Two Columns -->
+                <Grid ColumnDefinitions="*,280" ColumnSpacing="16">
 
-                                <!-- Blue Slider -->
-                                <Grid ColumnDefinitions="30,*,50">
-                                    <Border Background="#0000FF"
-                                            CornerRadius="4"
-                                            Width="24"
-                                            Height="24"
-                                            VerticalAlignment="Center" />
-                                    <Slider Grid.Column="1"
-                                            Margin="8,0"
-                                            Minimum="0"
-                                            Maximum="255"
-                                            Value="{Binding LightbarBlue}"
-                                            TickFrequency="1"
-                                            IsSnapToTickEnabled="True" />
-                                    <TextBlock Grid.Column="2"
-                                               Text="{Binding LightbarBlue}"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Right"
-                                               FontFamily="Consolas"
-                                               FontSize="12" />
-                                </Grid>
-                            </StackPanel>
+                    <!-- Left Column: Light Controls -->
+                    <StackPanel Grid.Column="0" Spacing="16">
 
-                            <!-- Preview and Presets -->
-                            <StackPanel Grid.Column="1" Spacing="8">
-                                <!-- Current Color Preview -->
+                        <!-- Lightbar Control -->
+                        <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                                CornerRadius="6"
+                                Padding="12">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Lightbar Color"
+                                           Classes="section-header" />
+
+                                <!-- Color Preview with Hex -->
                                 <Border Background="{Binding LightbarPreviewColor}"
-                                        CornerRadius="6"
-                                        Height="48"
+                                        CornerRadius="4"
+                                        Height="40"
                                         BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
-                                        BorderThickness="2">
-                                    <TextBlock Text="{Binding LightbarColorHex}"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               FontFamily="Consolas"
-                                               FontSize="13"
-                                               FontWeight="SemiBold"
-                                               Foreground="White">
-                                        <TextBlock.Effect>
-                                            <DropShadowEffect Color="Black"
-                                                              BlurRadius="4"
-                                                              OffsetX="0"
-                                                              OffsetY="0" />
-                                        </TextBlock.Effect>
-                                    </TextBlock>
+                                        BorderThickness="1">
+                                    <Grid>
+                                        <TextBlock Text="{Binding LightbarColorHex}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   FontFamily="Cascadia Code,Consolas,monospace"
+                                                   FontSize="14"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="White">
+                                            <TextBlock.Effect>
+                                                <DropShadowEffect Color="Black"
+                                                                  BlurRadius="4"
+                                                                  OffsetX="0"
+                                                                  OffsetY="1" />
+                                            </TextBlock.Effect>
+                                        </TextBlock>
+                                    </Grid>
                                 </Border>
 
+                                <!-- RGB Sliders in Compact Layout -->
+                                <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
+                                    <!-- Red -->
+                                    <Grid ColumnDefinitions="24,*,45">
+                                        <Border Background="#FF0000"
+                                                CornerRadius="3"
+                                                Width="20"
+                                                Height="20" />
+                                        <Slider Grid.Column="1"
+                                                Margin="8,0"
+                                                Minimum="0"
+                                                Maximum="255"
+                                                Value="{Binding LightbarRed}"
+                                                TickFrequency="1"
+                                                IsSnapToTickEnabled="True" />
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding LightbarRed}"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right"
+                                                   FontFamily="Cascadia Code,Consolas,monospace"
+                                                   FontSize="11" />
+                                    </Grid>
+
+                                    <!-- Green -->
+                                    <Grid Grid.Row="1" ColumnDefinitions="24,*,45">
+                                        <Border Background="#00FF00"
+                                                CornerRadius="3"
+                                                Width="20"
+                                                Height="20" />
+                                        <Slider Grid.Column="1"
+                                                Margin="8,0"
+                                                Minimum="0"
+                                                Maximum="255"
+                                                Value="{Binding LightbarGreen}"
+                                                TickFrequency="1"
+                                                IsSnapToTickEnabled="True" />
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding LightbarGreen}"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right"
+                                                   FontFamily="Cascadia Code,Consolas,monospace"
+                                                   FontSize="11" />
+                                    </Grid>
+
+                                    <!-- Blue -->
+                                    <Grid Grid.Row="2" ColumnDefinitions="24,*,45">
+                                        <Border Background="#0000FF"
+                                                CornerRadius="3"
+                                                Width="20"
+                                                Height="20" />
+                                        <Slider Grid.Column="1"
+                                                Margin="8,0"
+                                                Minimum="0"
+                                                Maximum="255"
+                                                Value="{Binding LightbarBlue}"
+                                                TickFrequency="1"
+                                                IsSnapToTickEnabled="True" />
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding LightbarBlue}"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Right"
+                                                   FontFamily="Cascadia Code,Consolas,monospace"
+                                                   FontSize="11" />
+                                    </Grid>
+                                </Grid>
+
                                 <!-- Color Presets -->
-                                <UniformGrid Rows="2" Columns="4">
-                                    <Button Background="#FF0000" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,0,0" Padding="0" Margin="2" />
-                                    <Button Background="#00FF00" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,255,0" Padding="0" Margin="2" />
-                                    <Button Background="#0000FF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,0,255" Padding="0" Margin="2" />
-                                    <Button Background="#FFFF00" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,255,0" Padding="0" Margin="2" />
-                                    <Button Background="#FF00FF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,0,255" Padding="0" Margin="2" />
-                                    <Button Background="#00FFFF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,255,255" Padding="0" Margin="2" />
-                                    <Button Background="#FFFFFF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,255,255" Padding="0" Margin="2" />
-                                    <Button Background="#FFA500" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,165,0" Padding="0" Margin="2" />
-                                </UniformGrid>
-                            </StackPanel>
-                        </Grid>
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <TextBlock Text="Presets:"
+                                               FontSize="11"
+                                               VerticalAlignment="Center"
+                                               Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                               Margin="0,0,8,0" />
+                                    <ItemsControl Grid.Column="1"
+                                                  HorizontalAlignment="Left">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <Button Background="#FF0000" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,0,0" Classes="preset-button" Margin="2" ToolTip.Tip="Red" />
+                                        <Button Background="#00FF00" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,255,0" Classes="preset-button" Margin="2" ToolTip.Tip="Green" />
+                                        <Button Background="#0000FF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,0,255" Classes="preset-button" Margin="2" ToolTip.Tip="Blue" />
+                                        <Button Background="#FFFF00" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,255,0" Classes="preset-button" Margin="2" ToolTip.Tip="Yellow" />
+                                        <Button Background="#FF00FF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,0,255" Classes="preset-button" Margin="2" ToolTip.Tip="Magenta" />
+                                        <Button Background="#00FFFF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,255,255" Classes="preset-button" Margin="2" ToolTip.Tip="Cyan" />
+                                        <Button Background="#FFFFFF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,255,255" Classes="preset-button" Margin="2" ToolTip.Tip="White" />
+                                        <Button Background="#FFA500" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,165,0" Classes="preset-button" Margin="2" ToolTip.Tip="Orange" />
+                                    </ItemsControl>
+                                </Grid>
 
-                        <!-- Apply Button -->
-                        <Button Content="Apply Lightbar Color"
-                                HorizontalAlignment="Stretch"
-                                Command="{Binding ApplyLightbarCommand}">
-                            <Button.Styles>
-                                <Style Selector="Button">
-                                    <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
+                                <Button Content="Apply Lightbar"
+                                        Command="{Binding ApplyLightbarCommand}"
+                                        HorizontalAlignment="Stretch"
+                                        Classes="apply-button" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Player LEDs -->
+                        <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                                CornerRadius="6"
+                                Padding="12">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="Player LEDs"
+                                               Classes="section-header" />
+                                    <ComboBox Grid.Column="1"
+                                              SelectedIndex="{Binding PlayerLedBrightnessIndex}"
+                                              MinWidth="100">
+                                        <ComboBoxItem Content="High" />
+                                        <ComboBoxItem Content="Medium" />
+                                        <ComboBoxItem Content="Low" />
+                                    </ComboBox>
+                                </Grid>
+
+                                <!-- LED Toggle Buttons -->
+                                <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="4">
+                                    <ToggleButton Grid.Column="0"
+                                                  Content="1"
+                                                  IsChecked="{Binding PlayerLed1}"
+                                                  HorizontalAlignment="Stretch"
+                                                  Height="40"
+                                                  FontWeight="SemiBold" />
+                                    <ToggleButton Grid.Column="1"
+                                                  Content="2"
+                                                  IsChecked="{Binding PlayerLed2}"
+                                                  HorizontalAlignment="Stretch"
+                                                  Height="40"
+                                                  FontWeight="SemiBold" />
+                                    <ToggleButton Grid.Column="2"
+                                                  Content="3"
+                                                  IsChecked="{Binding PlayerLed3}"
+                                                  HorizontalAlignment="Stretch"
+                                                  Height="40"
+                                                  FontWeight="SemiBold" />
+                                    <ToggleButton Grid.Column="3"
+                                                  Content="4"
+                                                  IsChecked="{Binding PlayerLed4}"
+                                                  HorizontalAlignment="Stretch"
+                                                  Height="40"
+                                                  FontWeight="SemiBold" />
+                                    <ToggleButton Grid.Column="4"
+                                                  Content="5"
+                                                  IsChecked="{Binding PlayerLed5}"
+                                                  HorizontalAlignment="Stretch"
+                                                  Height="40"
+                                                  FontWeight="SemiBold" />
+                                </Grid>
+
+                                <!-- Quick Presets -->
+                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="4">
+                                    <Button Grid.Column="0"
+                                            Content="All On"
+                                            Command="{Binding SetPlayerLedsCommand}"
+                                            CommandParameter="All"
+                                            FontSize="12"
+                                            HorizontalAlignment="Stretch" />
+                                    <Button Grid.Column="1"
+                                            Content="Center"
+                                            Command="{Binding SetPlayerLedsCommand}"
+                                            CommandParameter="Center"
+                                            FontSize="12"
+                                            HorizontalAlignment="Stretch" />
+                                    <Button Grid.Column="2"
+                                            Content="All Off"
+                                            Command="{Binding SetPlayerLedsCommand}"
+                                            CommandParameter="None"
+                                            FontSize="12"
+                                            HorizontalAlignment="Stretch" />
+                                </Grid>
+
+                                <Button Content="Apply Player LEDs"
+                                        Command="{Binding ApplyPlayerLedsCommand}"
+                                        HorizontalAlignment="Stretch"
+                                        Classes="apply-button" />
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
-                </Border>
 
-                <!-- Player LEDs Section -->
-                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="16"
-                        Grid.Row="2"
-                        Grid.Column="0">
-                    <StackPanel Spacing="12">
-                        <TextBlock Text="Player LEDs"
-                                   FontSize="14"
-                                   FontWeight="SemiBold" />
+                    <!-- Right Column: Profile Management & Mic LED -->
+                    <StackPanel Grid.Column="1" Spacing="16">
 
-                        <!-- LED Toggles -->
-                        <UniformGrid Columns="5" HorizontalAlignment="Stretch">
-                            <ToggleButton Content="1"
-                                          IsChecked="{Binding PlayerLed1}"
-                                          Height="45"
-                                          FontSize="16"
-                                          FontWeight="SemiBold"
-                                          Margin="2" />
-                            <ToggleButton Content="2"
-                                          IsChecked="{Binding PlayerLed2}"
-                                          Height="45"
-                                          FontSize="16"
-                                          FontWeight="SemiBold"
-                                          Margin="2" />
-                            <ToggleButton Content="3"
-                                          IsChecked="{Binding PlayerLed3}"
-                                          Height="45"
-                                          FontSize="16"
-                                          FontWeight="SemiBold"
-                                          Margin="2" />
-                            <ToggleButton Content="4"
-                                          IsChecked="{Binding PlayerLed4}"
-                                          Height="45"
-                                          FontSize="16"
-                                          FontWeight="SemiBold"
-                                          Margin="2" />
-                            <ToggleButton Content="5"
-                                          IsChecked="{Binding PlayerLed5}"
-                                          Height="45"
-                                          FontSize="16"
-                                          FontWeight="SemiBold"
-                                          Margin="2" />
-                        </UniformGrid>
+                        <!-- Profile Management -->
+                        <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                                CornerRadius="6"
+                                Padding="12">
+                            <StackPanel Spacing="12">
+                                <TextBlock Text="Profile Management"
+                                           Classes="section-header" />
 
-                        <!-- Brightness and Presets -->
-                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                            <StackPanel Spacing="6">
-                                <TextBlock Text="Brightness"
-                                           FontSize="11"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                                <ComboBox SelectedIndex="{Binding PlayerLedBrightnessIndex}"
-                                          HorizontalAlignment="Stretch">
-                                    <ComboBoxItem Content="High" />
-                                    <ComboBoxItem Content="Medium" />
-                                    <ComboBoxItem Content="Low" />
-                                </ComboBox>
+                                <!-- New Profile Creation -->
+                                <StackPanel Spacing="8">
+                                    <TextBox Watermark="Enter profile name..."
+                                             Text="{Binding NewProfileName}" />
+
+                                    <Grid ColumnDefinitions="*,*" ColumnSpacing="4">
+                                        <Button Grid.Column="0"
+                                                Content="Create New"
+                                                Command="{Binding SaveCurrentAsProfileCommand}"
+                                                IsVisible="{Binding NewProfileName, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                                FontSize="12">
+                                            <Button.IsEnabled>
+                                                <MultiBinding Converter="{x:Static BoolConverters.And}">
+                                                    <Binding Path="NewProfileName" Converter="{x:Static StringConverters.IsNotNullOrEmpty}" />
+                                                </MultiBinding>
+                                            </Button.IsEnabled>
+                                        </Button>
+                                        <Button Grid.Column="1"
+                                                Command="{Binding SaveControllerStateAsProfileCommand}"
+                                                FontSize="12">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <ic:SymbolIcon Symbol="Camera" FontSize="12" />
+                                                <TextBlock Text="Capture Current" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Profile Info -->
+                                <Border Background="{DynamicResource CardBackgroundFillColorSecondaryBrush}"
+                                        CornerRadius="4"
+                                        Padding="8"
+                                        IsVisible="{Binding SelectedProfile, Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="Current Profile"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock Text="{Binding SelectedProfile.Name}"
+                                                   FontWeight="SemiBold"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Border>
                             </StackPanel>
+                        </Border>
 
-                            <StackPanel Grid.Column="1" Spacing="6">
-                                <TextBlock Text="Quick Select"
-                                           FontSize="11"
-                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
-                                <UniformGrid Columns="3">
-                                    <Button Content="All" Command="{Binding SetPlayerLedsCommand}" CommandParameter="All" Margin="1" Padding="4" FontSize="11" />
-                                    <Button Content="Off" Command="{Binding SetPlayerLedsCommand}" CommandParameter="None" Margin="1" Padding="4" FontSize="11" />
-                                    <Button Content="Mid" Command="{Binding SetPlayerLedsCommand}" CommandParameter="Center" Margin="1" Padding="4" FontSize="11" />
-                                </UniformGrid>
+                        <!-- Microphone LED -->
+                        <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
+                                CornerRadius="6"
+                                Padding="12">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <ic:SymbolIcon Symbol="Mic"
+                                                   FontSize="14"
+                                                   Margin="0,0,6,0"
+                                                   VerticalAlignment="Center" />
+                                    <TextBlock Text="Microphone LED"
+                                               Classes="section-header"
+                                               VerticalAlignment="Center"
+                                               Grid.Column="1" />
+                                </Grid>
+
+                                <StackPanel Spacing="6">
+                                    <RadioButton Content="Off"
+                                                 GroupName="MicLed"
+                                                 IsChecked="{Binding MicLed, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Off, Mode=TwoWay}" />
+                                    <RadioButton Content="On (Solid)"
+                                                 GroupName="MicLed"
+                                                 IsChecked="{Binding MicLed, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=On, Mode=TwoWay}" />
+                                    <RadioButton Content="Pulse (Breathing)"
+                                                 GroupName="MicLed"
+                                                 IsChecked="{Binding MicLed, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Pulse, Mode=TwoWay}" />
+                                </StackPanel>
+
+                                <Button Content="Apply Mic LED"
+                                        Command="{Binding ApplyMicLedCommand}"
+                                        HorizontalAlignment="Stretch"
+                                        Classes="apply-button" />
                             </StackPanel>
-                        </Grid>
+                        </Border>
 
-                        <!-- Apply Button -->
-                        <Button Content="Apply Player LEDs"
-                                HorizontalAlignment="Stretch"
-                                Command="{Binding ApplyPlayerLedsCommand}">
-                            <Button.Styles>
-                                <Style Selector="Button">
-                                    <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
-                                </Style>
-                            </Button.Styles>
-                        </Button>
-                    </StackPanel>
-                </Border>
-
-                <!-- Mic LED and Reset Section -->
-                <Border Background="{DynamicResource LayerFillColorDefaultBrush}"
-                        CornerRadius="8"
-                        Padding="16"
-                        Grid.Row="2"
-                        Grid.Column="1">
-                    <StackPanel Spacing="12">
-                        <!-- Mic LED -->
-                        <StackPanel Spacing="8">
-                            <Grid ColumnDefinitions="Auto,*">
-                                <ic:SymbolIcon Symbol="Mic"
-                                               FontSize="14"
-                                               Margin="0,0,6,0"
-                                               VerticalAlignment="Center" />
-                                <TextBlock Text="Microphone LED"
-                                           FontSize="14"
-                                           FontWeight="SemiBold"
-                                           VerticalAlignment="Center"
-                                           Grid.Column="1" />
-                            </Grid>
-
-                            <!-- Mic LED Options in Horizontal Layout -->
-                            <UniformGrid Columns="3">
-                                <RadioButton Content="Off"
-                                             GroupName="MicLed"
-                                             IsChecked="{Binding MicLed, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Off, Mode=TwoWay}"
-                                             FontSize="12"
-                                             Margin="2" />
-                                <RadioButton Content="On"
-                                             GroupName="MicLed"
-                                             IsChecked="{Binding MicLed, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=On, Mode=TwoWay}"
-                                             FontSize="12"
-                                             Margin="2" />
-                                <RadioButton Content="Pulse"
-                                             GroupName="MicLed"
-                                             IsChecked="{Binding MicLed, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter=Pulse, Mode=TwoWay}"
-                                             FontSize="12"
-                                             Margin="2" />
-                            </UniformGrid>
-
-                            <!-- Apply Button -->
-                            <Button Content="Apply Mic LED"
-                                    HorizontalAlignment="Stretch"
-                                    Command="{Binding ApplyMicLedCommand}">
-                                <Button.Styles>
-                                    <Style Selector="Button">
-                                        <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
-                                    </Style>
-                                </Button.Styles>
-                            </Button>
-                        </StackPanel>
-
-                        <Border Height="1"
-                                Background="{DynamicResource DividerStrokeColorDefaultBrush}"
-                                Margin="0,4" />
-
-                        <!-- Reset Options -->
-                        <StackPanel Spacing="8">
-                            <TextBlock Text="Reset Options"
-                                       FontSize="14"
-                                       FontWeight="SemiBold" />
-                            <UniformGrid Rows="2">
-                                <Button Content="Reset to Default"
-                                        Command="{Binding ResetLightsToDefaultCommand}"
-                                        Margin="0,0,0,4">
+                        <!-- Quick Actions -->
+                        <Border Background="{DynamicResource LayerFillColorAltBrush}"
+                                CornerRadius="6"
+                                Padding="12"
+                                BorderBrush="{DynamicResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1">
+                            <StackPanel Spacing="8">
+                                <TextBlock Text="Quick Actions"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+                                <Button Content="Apply All Settings"
+                                        Command="{Binding ApplyAllSettingsCommand}"
+                                        HorizontalAlignment="Stretch"
+                                        FontWeight="SemiBold">
                                     <Button.Styles>
                                         <Style Selector="Button">
-                                            <Setter Property="Background" Value="{DynamicResource SystemFillColorCautionBrush}" />
+                                            <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
                                         </Style>
                                     </Button.Styles>
                                 </Button>
-                                <Button Content="Turn Off All Lights"
-                                        Command="{Binding TurnOffAllLightsCommand}">
-                                    <Button.Styles>
-                                        <Style Selector="Button">
-                                            <Setter Property="Background" Value="{DynamicResource SystemFillColorCriticalBrush}" />
-                                        </Style>
-                                    </Button.Styles>
-                                </Button>
-                            </UniformGrid>
-                        </StackPanel>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
-                </Border>
-            </Grid>
-        </StackPanel>
-    </Border>
+                </Grid>
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
 </UserControl>
