@@ -9,25 +9,26 @@ namespace DualSenseClient.Core.DualSense;
 
 public class DualSenseProfileManager
 {
-    // Properties
-    private readonly ISettingsManager _settingsManager;
-    private readonly DualSenseManager _dualSenseManager;
-
     // Constructor
-    public DualSenseProfileManager(ISettingsManager settingsManager, DualSenseManager dualSenseManager)
+    public DualSenseProfileManager()
     {
         Logger.Info<DualSenseProfileManager>("Initializing DualSenseProfileManager");
 
-        _settingsManager = settingsManager;
-        _dualSenseManager = dualSenseManager;
+        // Subscribe to controller events through the service locator to avoid circular dependency
+        DualSenseManager? dualSenseManager = DualSenseServiceLocator.GetDualSenseManager();
+        if (dualSenseManager != null)
+        {
+            Logger.Debug<DualSenseProfileManager>("Subscribing to controller events");
+            dualSenseManager.ControllerConnected += OnControllerConnected;
+            dualSenseManager.ControllerDisconnected += OnControllerDisconnected;
 
-        // Subscribe to controller events
-        Logger.Debug<DualSenseProfileManager>("Subscribing to controller events");
-        _dualSenseManager.ControllerConnected += OnControllerConnected;
-        _dualSenseManager.ControllerDisconnected += OnControllerDisconnected;
-
-        // Apply profiles to already connected controllers
-        InitializeExistingControllers();
+            // Apply profiles to already connected controllers
+            InitializeExistingControllers();
+        }
+        else
+        {
+            Logger.Warning<DualSenseProfileManager>("DualSenseManager not available during initialization, controller events will be subscribed later");
+        }
 
         Logger.Info<DualSenseProfileManager>("DualSenseProfileManager initialized successfully");
     }
@@ -38,6 +39,13 @@ public class DualSenseProfileManager
         Logger.Info<DualSenseProfileManager>($"Controller connected event: {controller.Device.GetProductName()}");
         Logger.Debug<DualSenseProfileManager>($"  Connection type: {controller.ConnectionType}");
         Logger.Debug<DualSenseProfileManager>($"  MAC Address: {controller.MacAddress ?? "Unknown"}");
+
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot handle controller connection");
+            return;
+        }
 
         try
         {
@@ -54,7 +62,7 @@ public class DualSenseProfileManager
 
             // Save settings
             Logger.Debug<DualSenseProfileManager>("Saving settings after controller connection");
-            _settingsManager.SaveAll();
+            settingsManager.SaveAll();
 
             Logger.Info<DualSenseProfileManager>($"Controller '{controllerInfo.Name}' connected and configured successfully");
         }
@@ -76,9 +84,23 @@ public class DualSenseProfileManager
     /// </summary>
     private void InitializeExistingControllers()
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot initialize existing controllers");
+            return;
+        }
+
         Logger.Info<DualSenseProfileManager>("Checking for already connected controllers at startup");
 
-        List<DualSenseController> connectedControllers = _dualSenseManager.Controllers.Values.ToList();
+        DualSenseManager? dualSenseManager = DualSenseServiceLocator.GetDualSenseManager();
+        if (dualSenseManager == null)
+        {
+            Logger.Warning<DualSenseProfileManager>("DualSenseManager not available, cannot initialize existing controllers");
+            return;
+        }
+
+        List<DualSenseController> connectedControllers = dualSenseManager.Controllers.Values.ToList();
 
         if (connectedControllers.Count == 0)
         {
@@ -127,7 +149,7 @@ public class DualSenseProfileManager
         if (settingsChanged)
         {
             Logger.Debug<DualSenseProfileManager>("Saving settings after initializing existing controllers");
-            _settingsManager.SaveAll();
+            settingsManager.SaveAll();
         }
 
         Logger.Info<DualSenseProfileManager>($"Existing controllers initialization complete: {successCount} succeeded, {failureCount} failed");
@@ -135,8 +157,15 @@ public class DualSenseProfileManager
 
     public ControllerInfo GetOrCreateControllerInfo(DualSenseController controller)
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot get or create controller info");
+            throw new InvalidOperationException("Settings manager not available");
+        }
+
         Logger.Debug<DualSenseProfileManager>($"Getting or creating controller info");
-        ControllerSettings settings = _settingsManager.Application.Controllers;
+        ControllerSettings settings = settingsManager.Application.Controllers;
 
         // Try to find by MAC address first (most reliable for Bluetooth)
         if (!string.IsNullOrEmpty(controller.MacAddress))
@@ -218,8 +247,15 @@ public class DualSenseProfileManager
 
     private void ApplyProfile(DualSenseController controller, ControllerInfo controllerInfo)
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot apply profile");
+            return;
+        }
+
         Logger.Debug<DualSenseProfileManager>($"Applying profile to controller '{controllerInfo.Name}'");
-        ControllerSettings settings = _settingsManager.Application.Controllers;
+        ControllerSettings settings = settingsManager.Application.Controllers;
 
         // Get profile ID (use default if controller doesn't have one)
         string? profileId = controllerInfo.ProfileId ?? settings.DefaultProfileId;
@@ -264,11 +300,18 @@ public class DualSenseProfileManager
     /// </summary>
     public void RefreshAllProfiles()
     {
+        DualSenseManager? dualSenseManager = DualSenseServiceLocator.GetDualSenseManager();
+        if (dualSenseManager == null)
+        {
+            Logger.Warning<DualSenseProfileManager>("DualSenseManager not available, cannot refresh profiles");
+            return;
+        }
+
         Logger.Info<DualSenseProfileManager>("Refreshing profiles for all connected controllers");
-        int count = _dualSenseManager.Controllers.Count;
+        int count = dualSenseManager.Controllers.Count;
         Logger.Debug<DualSenseProfileManager>($"Connected controllers: {count}");
 
-        foreach (DualSenseController controller in _dualSenseManager.Controllers.Values)
+        foreach (DualSenseController controller in dualSenseManager.Controllers.Values)
         {
             try
             {
@@ -287,8 +330,15 @@ public class DualSenseProfileManager
 
     public void CreateDefaultProfile()
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot create default profile");
+            return;
+        }
+
         Logger.Info<DualSenseProfileManager>("Creating default controller profile");
-        ControllerSettings settings = _settingsManager.Application.Controllers;
+        ControllerSettings settings = settingsManager.Application.Controllers;
 
         ControllerProfile defaultProfile = new ControllerProfile
         {
@@ -309,8 +359,15 @@ public class DualSenseProfileManager
 
     public void AssignProfileToController(string controllerId, string profileId)
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot assign profile to controller");
+            return;
+        }
+
         Logger.Info<DualSenseProfileManager>($"Assigning profile '{profileId}' to controller '{controllerId}'");
-        ControllerSettings settings = _settingsManager.Application.Controllers;
+        ControllerSettings settings = settingsManager.Application.Controllers;
 
         if (!settings.KnownControllers.TryGetValue(controllerId, out var controllerInfo))
         {
@@ -339,7 +396,7 @@ public class DualSenseProfileManager
             Logger.Debug<DualSenseProfileManager>("Controller is not currently connected, profile will be applied on next connection");
         }
 
-        _settingsManager.SaveAll();
+        settingsManager.SaveAll();
         Logger.Info<DualSenseProfileManager>($"Profile assignment saved successfully");
     }
 
@@ -347,10 +404,17 @@ public class DualSenseProfileManager
     {
         Logger.Trace<DualSenseProfileManager>($"Searching for connected controller: {info.Name}");
 
+        DualSenseManager? dualSenseManager = DualSenseServiceLocator.GetDualSenseManager();
+        if (dualSenseManager == null)
+        {
+            Logger.Warning<DualSenseProfileManager>("DualSenseManager not available, cannot find connected controller");
+            return null;
+        }
+
         // Try to find by MAC address
         if (!string.IsNullOrEmpty(info.MacAddress))
         {
-            DualSenseController? controller = _dualSenseManager.Controllers.Values.FirstOrDefault(c => c.MacAddress == info.MacAddress);
+            DualSenseController? controller = dualSenseManager.Controllers.Values.FirstOrDefault(c => c.MacAddress == info.MacAddress);
             if (controller != null)
             {
                 Logger.Trace<DualSenseProfileManager>($"Found by MAC address");
@@ -361,7 +425,7 @@ public class DualSenseProfileManager
         // Try to find by serial number
         if (!string.IsNullOrEmpty(info.SerialNumber))
         {
-            DualSenseController? controller = _dualSenseManager.Controllers.Values.FirstOrDefault(c => TryGetSerialNumber(c.Device) == info.SerialNumber);
+            DualSenseController? controller = dualSenseManager.Controllers.Values.FirstOrDefault(c => TryGetSerialNumber(c.Device) == info.SerialNumber);
             if (controller != null)
             {
                 Logger.Trace<DualSenseProfileManager>($"Found by serial number");
@@ -378,9 +442,16 @@ public class DualSenseProfileManager
     /// </summary>
     public Dictionary<string, ControllerProfile> GetAllProfiles()
     {
-        int count = _settingsManager.Application.Controllers.Profiles.Count;
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot get all profiles");
+            return new Dictionary<string, ControllerProfile>();
+        }
+
+        int count = settingsManager.Application.Controllers.Profiles.Count;
         Logger.Trace<DualSenseProfileManager>($"GetAllProfiles: returning {count} profile(s)");
-        return _settingsManager.Application.Controllers.Profiles;
+        return settingsManager.Application.Controllers.Profiles;
     }
 
     /// <summary>
@@ -388,8 +459,15 @@ public class DualSenseProfileManager
     /// </summary>
     public ControllerProfile? GetProfile(string profileId)
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot get profile");
+            return null;
+        }
+
         Logger.Trace<DualSenseProfileManager>($"GetProfile: {profileId}");
-        bool found = _settingsManager.Application.Controllers.Profiles.TryGetValue(profileId, out ControllerProfile? profile);
+        bool found = settingsManager.Application.Controllers.Profiles.TryGetValue(profileId, out ControllerProfile? profile);
         Logger.Trace<DualSenseProfileManager>($"Profile {(found ? "found" : "not found")}");
         return profile;
     }
@@ -399,10 +477,17 @@ public class DualSenseProfileManager
     /// </summary>
     public ControllerProfile GetDefaultProfile()
     {
-        Logger.Trace<DualSenseProfileManager>("GetDefaultProfile called");
-        string? defaultId = _settingsManager.Application.Controllers.DefaultProfileId;
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot get default profile");
+            throw new InvalidOperationException("Settings manager not available");
+        }
 
-        if (defaultId != null && _settingsManager.Application.Controllers.Profiles.TryGetValue(defaultId, out ControllerProfile? profile))
+        Logger.Trace<DualSenseProfileManager>("GetDefaultProfile called");
+        string? defaultId = settingsManager.Application.Controllers.DefaultProfileId;
+
+        if (defaultId != null && settingsManager.Application.Controllers.Profiles.TryGetValue(defaultId, out ControllerProfile? profile))
         {
             Logger.Debug<DualSenseProfileManager>($"Returning default profile: {profile.Name} (ID: {defaultId})");
             return profile;
@@ -412,8 +497,8 @@ public class DualSenseProfileManager
         Logger.Warning<DualSenseProfileManager>("Default profile doesn't exist, creating it");
         CreateDefaultProfile();
 
-        defaultId = _settingsManager.Application.Controllers.DefaultProfileId;
-        return _settingsManager.Application.Controllers.Profiles[defaultId!];
+        defaultId = settingsManager.Application.Controllers.DefaultProfileId;
+        return settingsManager.Application.Controllers.Profiles[defaultId!];
     }
 
     /// <summary>
@@ -421,11 +506,18 @@ public class DualSenseProfileManager
     /// </summary>
     public ControllerProfile GetControllerProfile(string controllerId)
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot get controller profile");
+            throw new InvalidOperationException("Settings manager not available");
+        }
+
         Logger.Trace<DualSenseProfileManager>($"GetControllerProfile: {controllerId}");
 
-        if (_settingsManager.Application.Controllers.KnownControllers.TryGetValue(controllerId, out ControllerInfo? controllerInfo) &&
+        if (settingsManager.Application.Controllers.KnownControllers.TryGetValue(controllerId, out ControllerInfo? controllerInfo) &&
             controllerInfo.ProfileId != null &&
-            _settingsManager.Application.Controllers.Profiles.TryGetValue(controllerInfo.ProfileId, out ControllerProfile? profile))
+            settingsManager.Application.Controllers.Profiles.TryGetValue(controllerInfo.ProfileId, out ControllerProfile? profile))
         {
             Logger.Debug<DualSenseProfileManager>($"Controller '{controllerInfo.Name}' assigned profile: {profile.Name}");
             return profile;
@@ -475,9 +567,16 @@ public class DualSenseProfileManager
     /// </summary>
     public void SaveProfile(ControllerProfile profile)
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot save profile");
+            return;
+        }
+
         Logger.Debug<DualSenseProfileManager>($"Saving profile: {profile.Name} (ID: {profile.Id})");
-        _settingsManager.Application.Controllers.Profiles[profile.Id] = profile;
-        _settingsManager.SaveAll();
+        settingsManager.Application.Controllers.Profiles[profile.Id] = profile;
+        settingsManager.SaveAll();
         Logger.Debug<DualSenseProfileManager>("Profile saved successfully");
     }
 
@@ -486,9 +585,16 @@ public class DualSenseProfileManager
     /// </summary>
     public bool DeleteProfile(string profileId)
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot delete profile");
+            return false;
+        }
+
         Logger.Info<DualSenseProfileManager>($"Attempting to delete profile: {profileId}");
 
-        if (_settingsManager.Application.Controllers.DefaultProfileId == profileId)
+        if (settingsManager.Application.Controllers.DefaultProfileId == profileId)
         {
             Logger.Warning<DualSenseProfileManager>($"Cannot delete default profile: {profileId}");
             return false;
@@ -498,11 +604,11 @@ public class DualSenseProfileManager
         string? profileName = GetProfile(profileId)?.Name;
 
         // Remove profile assignment from controllers and assign default
-        string? defaultProfileId = _settingsManager.Application.Controllers.DefaultProfileId;
+        string? defaultProfileId = settingsManager.Application.Controllers.DefaultProfileId;
         Logger.Debug<DualSenseProfileManager>($"Reassigning controllers from deleted profile to default: {defaultProfileId}");
 
         int reassignedCount = 0;
-        foreach (ControllerInfo controller in _settingsManager.Application.Controllers.KnownControllers.Values)
+        foreach (ControllerInfo controller in settingsManager.Application.Controllers.KnownControllers.Values)
         {
             if (controller.ProfileId == profileId)
             {
@@ -517,10 +623,10 @@ public class DualSenseProfileManager
             Logger.Debug<DualSenseProfileManager>($"Reassigned {reassignedCount} controller(s) to default profile");
         }
 
-        bool removed = _settingsManager.Application.Controllers.Profiles.Remove(profileId);
+        bool removed = settingsManager.Application.Controllers.Profiles.Remove(profileId);
         if (removed)
         {
-            _settingsManager.SaveAll();
+            settingsManager.SaveAll();
             Logger.Info<DualSenseProfileManager>($"Profile '{profileName}' deleted successfully");
         }
         else
@@ -536,13 +642,20 @@ public class DualSenseProfileManager
     /// </summary>
     public void SetDefaultProfile(string profileId)
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot set default profile");
+            return;
+        }
+
         Logger.Info<DualSenseProfileManager>($"Setting default profile: {profileId}");
 
-        if (_settingsManager.Application.Controllers.Profiles.ContainsKey(profileId))
+        if (settingsManager.Application.Controllers.Profiles.ContainsKey(profileId))
         {
             string? profileName = GetProfile(profileId)?.Name;
-            _settingsManager.Application.Controllers.DefaultProfileId = profileId;
-            _settingsManager.SaveAll();
+            settingsManager.Application.Controllers.DefaultProfileId = profileId;
+            settingsManager.SaveAll();
             Logger.Info<DualSenseProfileManager>($"Default profile set to: {profileName}");
         }
         else
@@ -674,9 +787,16 @@ public class DualSenseProfileManager
     /// </summary>
     public Dictionary<string, ControllerInfo> GetKnownControllers()
     {
-        int count = _settingsManager.Application.Controllers.KnownControllers.Count;
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot get known controllers");
+            return new Dictionary<string, ControllerInfo>();
+        }
+
+        int count = settingsManager.Application.Controllers.KnownControllers.Count;
         Logger.Trace<DualSenseProfileManager>($"GetKnownControllers: returning {count} controller(s)");
-        return _settingsManager.Application.Controllers.KnownControllers;
+        return settingsManager.Application.Controllers.KnownControllers;
     }
 
     /// <summary>
@@ -684,13 +804,20 @@ public class DualSenseProfileManager
     /// </summary>
     public void UpdateControllerName(string controllerId, string newName)
     {
+        ISettingsManager? settingsManager = DualSenseServiceLocator.GetSettingsManager();
+        if (settingsManager == null)
+        {
+            Logger.Error<DualSenseProfileManager>("Settings manager not available, cannot update controller name");
+            return;
+        }
+
         Logger.Info<DualSenseProfileManager>($"Updating controller name: {controllerId} -> '{newName}'");
 
-        if (_settingsManager.Application.Controllers.KnownControllers.TryGetValue(controllerId, out var controllerInfo))
+        if (settingsManager.Application.Controllers.KnownControllers.TryGetValue(controllerId, out var controllerInfo))
         {
             string oldName = controllerInfo.Name;
             controllerInfo.Name = newName;
-            _settingsManager.SaveAll();
+            settingsManager.SaveAll();
             Logger.Info<DualSenseProfileManager>($"Controller name updated: '{oldName}' -> '{newName}'");
         }
         else
@@ -699,12 +826,38 @@ public class DualSenseProfileManager
         }
     }
 
+    /// <summary>
+    /// Completes the initialization of DualSenseProfileManager after all services are registered
+    /// This is needed because DualSenseManager may not be available during construction due to DI ordering
+    /// </summary>
+    public void CompleteInitialization()
+    {
+        DualSenseManager? dualSenseManager = DualSenseServiceLocator.GetDualSenseManager();
+        if (dualSenseManager != null)
+        {
+            Logger.Debug<DualSenseProfileManager>("Completing initialization, subscribing to controller events");
+            dualSenseManager.ControllerConnected += OnControllerConnected;
+            dualSenseManager.ControllerDisconnected += OnControllerDisconnected;
+
+            // Apply profiles to already connected controllers
+            InitializeExistingControllers();
+        }
+        else
+        {
+            Logger.Error<DualSenseProfileManager>("DualSenseManager still not available during CompleteInitialization");
+        }
+    }
+
     public void Dispose()
     {
         Logger.Info<DualSenseProfileManager>("Disposing DualSenseProfileManager");
 
-        _dualSenseManager.ControllerConnected -= OnControllerConnected;
-        _dualSenseManager.ControllerDisconnected -= OnControllerDisconnected;
+        DualSenseManager? dualSenseManager = DualSenseServiceLocator.GetDualSenseManager();
+        if (dualSenseManager != null)
+        {
+            dualSenseManager.ControllerConnected -= OnControllerConnected;
+            dualSenseManager.ControllerDisconnected -= OnControllerDisconnected;
+        }
 
         Logger.Debug<DualSenseProfileManager>("DualSenseProfileManager disposed");
     }

@@ -62,39 +62,6 @@ public class App : Application
             Logger.Debug<App>("Resolving MainWindow from services");
             MainWindow mainWindow = Services.GetRequiredService<MainWindow>();
 
-            // Get settings and configure logger
-            Logger.Debug<App>("Resolving settings manager");
-            ISettingsManager settingsManager = Services.GetRequiredService<ISettingsManager>();
-
-            string logLevel = settingsManager.Application.Debug.Logger.Level;
-            Logger.Debug<App>($"Setting log level from settings: {logLevel}");
-            Logger.SetLogLevel(LogLevelHelper.FromString(logLevel));
-
-            // Initialize DualSense services
-            Logger.Debug<App>("Initializing DualSense Manager");
-            try
-            {
-                _ = Services.GetRequiredService<DualSenseManager>();
-                Logger.Info<App>("DualSense Manager initialized");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error<App>("Failed to initialize DualSense Manager");
-                Logger.LogExceptionDetails<App>(ex, includeEnvironmentInfo: false);
-            }
-
-            Logger.Debug<App>("Initializing DualSense Profile Manager");
-            try
-            {
-                _ = Services.GetRequiredService<DualSenseProfileManager>();
-                Logger.Info<App>("DualSense Profile Manager initialized");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error<App>("Failed to initialize DualSense Profile Manager");
-                Logger.LogExceptionDetails<App>(ex, includeEnvironmentInfo: false);
-            }
-
             // Wire up window events
             mainWindow.Opened += (_, _) =>
             {

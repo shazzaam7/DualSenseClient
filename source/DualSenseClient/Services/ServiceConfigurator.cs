@@ -1,5 +1,6 @@
 ﻿using System;
 using DualSenseClient.Core.DualSense;
+using DualSenseClient.Core.Logging;
 using DualSenseClient.Core.Settings;
 using DualSenseClient.ViewModels;
 using DualSenseClient.ViewModels.Controls;
@@ -16,12 +17,12 @@ public static class ServiceConfigurator
         ServiceCollection services = new ServiceCollection();
 
         // Core
-        services.AddSingleton<SelectedControllerService>();
-        services.AddSingleton<DualSenseManager>();
+        services.AddSingleton<ISettingsManager, SettingsManager>();
         services.AddSingleton<DualSenseProfileManager>();
+        services.AddSingleton<DualSenseManager>();
+        services.AddSingleton<SelectedControllerService>();
         services.AddSingleton<NavigationService>();
         services.AddSingleton<IApplicationSettings, ApplicationSettings>();
-        services.AddSingleton<ISettingsManager, SettingsManager>();
 
         // ViewModels
         services.AddSingleton<ControllerSelectorViewModel>();
@@ -36,6 +37,24 @@ public static class ServiceConfigurator
         // Windows
         services.AddSingleton<MainWindow>();
 
-        return services.BuildServiceProvider();
+        IServiceProvider serviceProvider = services.BuildServiceProvider();
+
+        // Initialize the service locator with the services after the provider is built
+        ISettingsManager settingsManager = serviceProvider.GetRequiredService<ISettingsManager>();
+        string logLevel = settingsManager.Application.Debug.Logger.Level;
+        Logger.Debug<App>($"Setting log level from settings: {logLevel}");
+        Logger.SetLogLevel(LogLevelHelper.FromString(logLevel));
+        
+        DualSenseManager dualSenseManager = serviceProvider.GetRequiredService<DualSenseManager>();
+        DualSenseProfileManager profileManager = serviceProvider.GetRequiredService<DualSenseProfileManager>();
+
+        DualSenseServiceLocator.RegisterSettingsManager(settingsManager);
+        DualSenseServiceLocator.RegisterDualSenseManager(dualSenseManager);
+        DualSenseServiceLocator.RegisterProfileManager(profileManager);
+
+        // Complete profile manager initialization after all services are registered
+        profileManager.CompleteInitialization();
+
+        return serviceProvider;
     }
 }

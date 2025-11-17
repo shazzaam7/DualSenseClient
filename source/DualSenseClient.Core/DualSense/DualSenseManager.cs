@@ -1,4 +1,4 @@
-﻿using DualSenseClient.Core.DualSense.Devices;
+using DualSenseClient.Core.DualSense.Devices;
 using DualSenseClient.Core.DualSense.Enums;
 using DualSenseClient.Core.Logging;
 using HidSharp;
