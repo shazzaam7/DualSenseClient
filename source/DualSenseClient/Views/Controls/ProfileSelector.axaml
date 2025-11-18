@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ic="using:FluentIcons.Avalonia.Fluent"
              xmlns:vm="clr-namespace:DualSenseClient.ViewModels.Controls"
@@ -18,7 +18,8 @@
             Padding="12">
         <Grid ColumnDefinitions="*,Auto">
             <!-- ComboBox with flexible width -->
-            <ComboBox Grid.Column="0"
+            <ComboBox Name="ProfileComboBox"
+                      Grid.Column="0"
                       ItemsSource="{Binding Profiles}"
                       SelectedItem="{Binding SelectedProfile}"
                       MinWidth="0"
@@ -58,6 +59,16 @@
                         ToolTip.Tip="Update Profile"
                         Classes="action-button">
                     <ic:SymbolIcon Symbol="Save" FontSize="14" />
+                </Button>
+                <Button Command="{Binding ExportProfileCommand}"
+                        ToolTip.Tip="Export Profile"
+                        Classes="action-button">
+                    <ic:SymbolIcon Symbol="ArrowDownload" FontSize="14" />
+                </Button>
+                <Button Command="{Binding ImportProfileCommand}"
+                        ToolTip.Tip="Import Profile"
+                        Classes="action-button">
+                    <ic:SymbolIcon Symbol="ArrowUpload" FontSize="14" />
                 </Button>
                 <Button Command="{Binding DuplicateSelectedProfileCommand}"
                         ToolTip.Tip="Duplicate Profile"

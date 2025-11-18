@@ -20,6 +20,9 @@ public partial class ProfileSelector : UserControl
 
         // Find the RenameButton and attach the click event
         RenameButton.Click += OnRenameButtonClick;
+
+        // Subscribe to the selection changed event to auto-apply profiles
+        ProfileComboBox.SelectionChanged += OnProfileSelectionChanged;
     }
 
     private async void OnRenameButtonClick(object? sender, RoutedEventArgs e)
@@ -30,21 +33,40 @@ public partial class ProfileSelector : UserControl
         }
     }
 
+    private void OnProfileSelectionChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is ControllerProfileViewModel viewModel && viewModel.SelectedProfile != null)
+        {
+            // Auto-apply the selected profile
+            viewModel.ApplySelectedProfileCommand.Execute(null);
+        }
+    }
+
     public void DataContextBeginUpdate()
     {
-        // Detach the event when changing DataContext to prevent memory leaks
+        // Detach the events when changing DataContext to prevent memory leaks
         if (RenameButton != null)
         {
             RenameButton.Click -= OnRenameButtonClick;
+        }
+
+        if (ProfileComboBox != null)
+        {
+            ProfileComboBox.SelectionChanged -= OnProfileSelectionChanged;
         }
     }
 
     public void DataContextEndUpdate()
     {
-        // Reattach the event when DataContext changes
+        // Reattach the events when DataContext changes
         if (RenameButton != null)
         {
             RenameButton.Click += OnRenameButtonClick;
+        }
+
+        if (ProfileComboBox != null)
+        {
+            ProfileComboBox.SelectionChanged += OnProfileSelectionChanged;
         }
     }
 }

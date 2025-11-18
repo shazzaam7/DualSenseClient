@@ -1,7 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Platform.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DualSenseClient.Core.DualSense;
@@ -540,6 +545,128 @@ public partial class ControllerProfileViewModel : ControllerViewModelBase
         _controller.SetMicLed(MicLed.Off);
         InitializeLightControls();
         Logger.Debug<ControllerProfileViewModel>("All lights turned off successfully");
+    }
+
+    [RelayCommand]
+    private async Task ExportProfileAsync()
+    {
+        if (SelectedProfile == null)
+        {
+            Logger.Warning<ControllerProfileViewModel>("ExportProfile called but no profile is selected");
+            return;
+        }
+
+        try
+        {
+            // This requires access to the main window
+            Window? window = App.MainWindow;
+
+            if (window != null)
+            {
+                IStorageFile? file = await window.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
+                {
+                    Title = "Export Profile",
+                    SuggestedFileName = $"{SelectedProfile.Name.Replace(" ", "_")}.json",
+                    FileTypeChoices =
+                    [
+                        new FilePickerFileType("JSON files")
+                        {
+                            Patterns = ["*.json"],
+                            MimeTypes = ["application/json"]
+                        }
+                    ]
+                });
+
+                if (file != null)
+                {
+                    // Serialize the profile to JSON
+                    string json = System.Text.Json.JsonSerializer.Serialize(SelectedProfile, new System.Text.Json.JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    });
+
+                    await using Stream stream = await file.OpenWriteAsync();
+                    await using StreamWriter writer = new StreamWriter(stream);
+                    await writer.WriteAsync(json);
+                    await writer.FlushAsync();
+
+                    Logger.Info<ControllerProfileViewModel>($"Profile '{SelectedProfile.Name}' exported to '{file.Path.AbsolutePath}'");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Error<ControllerProfileViewModel>($"Failed to export profile: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private async Task ImportProfileAsync()
+    {
+        try
+        {
+            // This requires access to the main window
+            Window? window = App.MainWindow;
+
+            if (window != null)
+            {
+                IReadOnlyList<IStorageFile> files = await window.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
+                {
+                    Title = "Import Profile",
+                    AllowMultiple = false,
+                    FileTypeFilter =
+                    [
+                        new FilePickerFileType("JSON files")
+                        {
+                            Patterns = ["*.json"],
+                            MimeTypes = ["application/json"]
+                        }
+                    ]
+                });
+
+                if (files.Any())
+                {
+                    IStorageFile file = files.First();
+                    string json;
+
+                    await using (Stream stream = await file.OpenReadAsync())
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        json = await reader.ReadToEndAsync();
+                    }
+
+                    // Deserialize the profile
+                    ControllerProfile? profile = System.Text.Json.JsonSerializer.Deserialize<ControllerProfile>(json, new System.Text.Json.JsonSerializerOptions());
+
+                    if (profile != null)
+                    {
+                        // Check if a profile with the same name already exists
+                        ControllerProfile? existingProfile = Profiles.FirstOrDefault(p => p.Name.Equals(profile.Name, StringComparison.OrdinalIgnoreCase));
+
+                        if (existingProfile != null)
+                        {
+                            Logger.Warning<ControllerProfileViewModel>($"A profile with the name '{profile.Name}' already exists, importing with new ID");
+                        }
+
+                        // Generate a new ID for the imported profile to avoid conflicts
+                        profile.Id = Guid.NewGuid().ToString();
+
+                        // Save the imported profile
+                        _profileManager.SaveProfile(profile);
+
+                        // Reload profiles and select the new one
+                        LoadProfiles();
+                        SelectedProfile = Profiles.FirstOrDefault(p => p.Id == profile.Id);
+
+                        Logger.Info<ControllerProfileViewModel>($"Profile '{profile.Name}' imported successfully from '{file.Path.AbsolutePath}'");
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.Error<ControllerProfileViewModel>($"Failed to import profile: {ex.Message}");
+        }
     }
 
     public override void Dispose()

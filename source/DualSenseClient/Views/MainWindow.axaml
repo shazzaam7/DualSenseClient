@@ -10,7 +10,7 @@
                      x:DataType="vm:MainWindowViewModel"
                      Icon="/Assets/icon.ico"
                      Title="DualSense Manager"
-                     MinWidth="660"
+                     MinWidth="700"
                      MinHeight="420">
     <Design.DataContext>
         <vm:MainWindowViewModel />
