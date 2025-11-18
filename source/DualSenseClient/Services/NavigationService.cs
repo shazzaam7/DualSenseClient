@@ -59,6 +59,10 @@ public class NavigationService
                 Logger.Info<NavigationService>("Navigating to monitor page");
                 frame.Navigate(typeof(MonitorPage));
                 break;
+            case "Profile":
+                Logger.Info<NavigationService>("Navigating to profile page");
+                frame.Navigate(typeof(ProfilePage));
+                break;
             case "Devices":
                 Logger.Info<NavigationService>("Navigating to devices page");
                 frame.Navigate(typeof(DevicesPage));

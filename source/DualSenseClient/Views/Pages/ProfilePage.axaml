@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:ui="using:FluentAvalonia.UI.Controls"
+             xmlns:vm="clr-namespace:DualSenseClient.ViewModels.Pages"
+             xmlns:controls="clr-namespace:DualSenseClient.Views.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="DualSenseClient.Views.Pages.ProfilePage"
+             x:DataType="vm:ProfilePageViewModel">
+    <Design.DataContext>
+        <vm:ProfilePageViewModel />
+    </Design.DataContext>
+    <ScrollViewer>
+        <StackPanel Margin="20" Spacing="20">
+            <!-- Controller Profiles -->
+            <StackPanel IsVisible="{Binding ProfileViewModel, Converter={x:Static ObjectConverters.IsNotNull}}" Spacing="12">
+                <controls:ProfileSelector DataContext="{Binding ProfileViewModel}" />
+                <controls:ControllerProfile DataContext="{Binding ProfileViewModel}" />
+            </StackPanel>
+
+            <!-- Special Actions -->
+            <Border IsVisible="{Binding SpecialActionsViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+                <controls:SpecialActions DataContext="{Binding SpecialActionsViewModel}" />
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

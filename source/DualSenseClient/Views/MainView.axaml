@@ -31,6 +31,13 @@
                     <ic:SymbolIcon Symbol="EyeCircle" FontSize="24" />
                 </ui:NavigationViewItem.Content>
             </ui:NavigationViewItem>
+
+            <ui:NavigationViewItem Tag="Profile"
+                                   IsVisible="{Binding HasSelectedController}">
+                <ui:NavigationViewItem.Content>
+                    <ic:SymbolIcon Symbol="EditPerson" FontSize="24" />
+                </ui:NavigationViewItem.Content>
+            </ui:NavigationViewItem>
         </ui:NavigationView.MenuItems>
 
         <!-- Footer (always at bottom) -->
