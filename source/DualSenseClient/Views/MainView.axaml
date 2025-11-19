@@ -15,7 +15,8 @@
                        CompactPaneLength="62"
                        IsPaneToggleButtonVisible="False"
                        IsPaneOpen="False"
-                       ItemInvoked="NavView_OnItemInvoked">
+                       ItemInvoked="NavView_OnItemInvoked"
+                       Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
 
         <!-- Menu Items -->
         <ui:NavigationView.MenuItems>
@@ -64,7 +65,7 @@
         </ui:NavigationView.FooterMenuItems>
 
         <ui:NavigationView.Content>
-            <ui:Frame x:Name="ContentFrame" />
+            <ui:Frame x:Name="ContentFrame" Background="{DynamicResource ApplicationPageBackgroundThemeBrush}" />
         </ui:NavigationView.Content>
     </ui:NavigationView>
 

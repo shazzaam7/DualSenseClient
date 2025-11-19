@@ -12,8 +12,8 @@
     <Design.DataContext>
         <vm:HomePageViewModel />
     </Design.DataContext>
-    <ScrollViewer>
-        <Panel>
+    <ScrollViewer Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
+        <Panel Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
             <!-- No Controller Connected -->
             <StackPanel Spacing="16" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNull}}">
                 <ic:SymbolIcon Symbol="XboxControllerError"
@@ -35,7 +35,8 @@
             </StackPanel>
 
             <!-- Controller Information -->
-            <Border IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <Border IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}"
+                    Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
                 <controls:ControllerInformation DataContext="{Binding SelectedController}" />
             </Border>
         </Panel>

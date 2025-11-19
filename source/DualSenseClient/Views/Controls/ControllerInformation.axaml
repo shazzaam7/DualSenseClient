@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -25,7 +25,7 @@
                     </Border>
 
                     <!-- Battery Display -->
-                    <Border Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                    <Border Background="{DynamicResource SolidBackgroundFillColorTertiaryBrush}"
                             CornerRadius="10"
                             Padding="24,16">
                         <StackPanel Orientation="Horizontal"
@@ -64,7 +64,7 @@
                         CornerRadius="8"
                         Padding="16,12">
                     <Grid ColumnDefinitions="Auto,*,Auto">
-                        <Border Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                        <Border Background="{DynamicResource ControlAltFillColorSecondaryBrush}"
                                 CornerRadius="6"
                                 Width="36"
                                 Height="36"
@@ -91,7 +91,7 @@
                         CornerRadius="8"
                         Padding="16,12">
                     <Grid ColumnDefinitions="Auto,*,Auto">
-                        <Border Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                        <Border Background="{DynamicResource ControlAltFillColorSecondaryBrush}"
                                 CornerRadius="6"
                                 Width="36"
                                 Height="36"

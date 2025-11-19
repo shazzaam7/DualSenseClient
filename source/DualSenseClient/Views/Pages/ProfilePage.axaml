@@ -11,8 +11,9 @@
     <Design.DataContext>
         <vm:ProfilePageViewModel />
     </Design.DataContext>
-    <ScrollViewer>
-        <StackPanel Margin="20" Spacing="20">
+    <ScrollViewer Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Margin="20" Spacing="20"
+                    Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
             <!-- Controller Profiles -->
             <StackPanel IsVisible="{Binding ProfileViewModel, Converter={x:Static ObjectConverters.IsNotNull}}" Spacing="12">
                 <controls:ProfileSelector DataContext="{Binding ProfileViewModel}" />
@@ -20,7 +21,10 @@
             </StackPanel>
 
             <!-- Special Actions -->
-            <Border IsVisible="{Binding SpecialActionsViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    IsVisible="{Binding SpecialActionsViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
                 <controls:SpecialActions DataContext="{Binding SpecialActionsViewModel}" />
             </Border>
         </StackPanel>

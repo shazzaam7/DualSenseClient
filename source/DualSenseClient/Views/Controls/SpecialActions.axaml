@@ -137,14 +137,15 @@
                                                 </ItemsControl.ItemsPanel>
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
-                                                        <Border Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                                        <Border Background="{DynamicResource SystemAccentColorBrush}"
                                                                 CornerRadius="6"
                                                                 Padding="10,6"
                                                                 Margin="0,0,6,6">
                                                             <StackPanel Orientation="Horizontal" Spacing="6">
                                                                 <TextBlock Text="{Binding .}"
                                                                            FontWeight="Medium"
-                                                                           FontSize="13" />
+                                                                           FontSize="13"
+                                                                           Foreground="{DynamicResource TextFillColorInverseBrush}" />
                                                                 <Button Command="{Binding $parent[UserControl].DataContext.RemoveButtonCommand}"
                                                                         CommandParameter="{Binding .}"
                                                                         Background="Transparent"
@@ -194,10 +195,11 @@
                                             Command="{Binding AddSpecialActionCommand}"
                                             HorizontalAlignment="Stretch"
                                             Grid.Column="0"
-                                            FontWeight="SemiBold">
+                                            FontWeight="SemiBold"
+                                            Foreground="{DynamicResource TextFillColorInverseBrush}">
                                         <Button.Styles>
                                             <Style Selector="Button">
-                                                <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                                <Setter Property="Background" Value="{DynamicResource SystemAccentColorBrush}" />
                                             </Style>
                                         </Button.Styles>
                                     </Button>
@@ -205,10 +207,11 @@
                                             Command="{Binding UpdateSpecialActionCommand}"
                                             HorizontalAlignment="Stretch"
                                             Grid.Column="1"
-                                            IsEnabled="{Binding SelectedSpecialAction, Converter={StaticResource ObjectToBooleanConverter}}">
+                                            IsEnabled="{Binding SelectedSpecialAction, Converter={StaticResource ObjectToBooleanConverter}}"
+                                            Foreground="{DynamicResource TextFillColorInverseBrush}">
                                         <Button.Styles>
                                             <Style Selector="Button">
-                                                <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                                <Setter Property="Background" Value="{DynamicResource SystemAccentColorBrush}" />
                                             </Style>
                                             <Style Selector="Button:disabled">
                                                 <Setter Property="Opacity" Value="0.5" />
@@ -219,7 +222,8 @@
                                             Command="{Binding DeleteSpecialActionCommand}"
                                             HorizontalAlignment="Stretch"
                                             Grid.Column="2"
-                                            IsEnabled="{Binding SelectedSpecialAction, Converter={StaticResource ObjectToBooleanConverter}}">
+                                            IsEnabled="{Binding SelectedSpecialAction, Converter={StaticResource ObjectToBooleanConverter}}"
+                                            Foreground="{DynamicResource TextFillColorInverseBrush}">
                                         <Button.Styles>
                                             <Style Selector="Button">
                                                 <Setter Property="Background" Value="{DynamicResource SystemFillColorCriticalBrush}" />
@@ -253,13 +257,14 @@
                                                VerticalAlignment="Center"
                                                Grid.Column="1" />
                                     <Border Grid.Column="2"
-                                            Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                            Background="{DynamicResource SystemAccentColorBrush}"
                                             CornerRadius="12"
                                             Padding="8,4"
                                             VerticalAlignment="Center">
                                         <TextBlock Text="{Binding SpecialActions.Count}"
                                                    FontSize="12"
-                                                   FontWeight="SemiBold" />
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextFillColorInverseBrush}" />
                                     </Border>
                                 </Grid>
 
@@ -291,12 +296,13 @@
 
                                                     <!-- Type & Indicator -->
                                                     <StackPanel Orientation="Horizontal" Spacing="12" Grid.Row="1">
-                                                        <Border Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                                                        <Border Background="{DynamicResource SystemAccentColorBrush}"
                                                                 CornerRadius="4"
                                                                 Padding="8,4">
                                                             <TextBlock Text="{Binding Type}"
                                                                        FontSize="11"
-                                                                       FontWeight="Medium" />
+                                                                       FontWeight="Medium"
+                                                                       Foreground="{DynamicResource TextFillColorInverseBrush}" />
                                                         </Border>
                                                         <Border Background="{DynamicResource ControlAltFillColorTertiaryBrush}"
                                                                 CornerRadius="4"
@@ -388,21 +394,21 @@
                                     </StackPanel>
                                 </Border>
 
-                                <Border Background="{DynamicResource AccentFillColorTertiaryBrush}"
+                                <Border Background="{DynamicResource SystemFillColorAttentionBackgroundBrush}"
                                         CornerRadius="6"
                                         Padding="12"
-                                        BorderBrush="{DynamicResource AccentControlElevationBorderBrush}"
+                                        BorderBrush="{DynamicResource DividerStrokeColorDefaultBrush}"
                                         BorderThickness="1">
                                     <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
                                         <ic:SymbolIcon Symbol="Info"
                                                        FontSize="16"
-                                                       Foreground="{DynamicResource AccentTextFillColorPrimaryBrush}"
                                                        VerticalAlignment="Top"
-                                                       Margin="0,2,0,0" />
-                                        <TextBlock TextWrapping="Wrap"
+                                                       Margin="0,2,0,0"
+                                                       Foreground="{DynamicResource TextFillColorInverseBrush}" />
+                                        <TextBlock Grid.Column="1"
+                                                   TextWrapping="Wrap"
                                                    FontSize="12"
-                                                   Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                                   Grid.Column="1">
+                                                   Foreground="{DynamicResource TextFillColorInverseBrush}">
                                             Configure your action above, select button combinations, then click "Add New" to save or select an existing action to update it.
                                         </TextBlock>
                                     </Grid>

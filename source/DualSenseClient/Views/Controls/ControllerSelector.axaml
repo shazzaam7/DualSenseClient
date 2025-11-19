@@ -26,13 +26,14 @@
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"
                            Grid.Column="1" />
-                <Border Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                <Border Background="{DynamicResource SystemAccentColorBrush}"
                         CornerRadius="12"
                         Padding="10,4"
                         Grid.Column="2">
                     <TextBlock Text="{Binding Controllers.Count, StringFormat='{}{0} Connected'}"
                                FontSize="12"
-                               FontWeight="SemiBold" />
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextFillColorInverseBrush}" />
                 </Border>
             </Grid>
 
@@ -91,7 +92,7 @@
                                 <Border Grid.Row="0"
                                         Grid.Column="0"
                                         Grid.RowSpan="2"
-                                        Background="{DynamicResource AccentFillColorSecondaryBrush}"
+                                        Background="{DynamicResource SystemAccentColorBrush}"
                                         CornerRadius="8"
                                         Width="56"
                                         Height="56"
@@ -192,7 +193,7 @@
                                         Grid.Column="2"
                                         Grid.RowSpan="2"
                                         IsVisible="{Binding IsSelected}"
-                                        Background="{DynamicResource AccentFillColorDefaultBrush}"
+                                        Background="{DynamicResource SystemAccentColorBrush}"
                                         CornerRadius="12"
                                         Padding="8,4"
                                         Margin="10,0,0,0"
@@ -204,7 +205,7 @@
                                         <TextBlock Text="Selected"
                                                    FontSize="12"
                                                    FontWeight="SemiBold"
-                                                   Foreground="White" />
+                                                   Foreground="{DynamicResource TextFillColorInverseBrush}" />
                                     </StackPanel>
                                 </Border>
                             </Grid>

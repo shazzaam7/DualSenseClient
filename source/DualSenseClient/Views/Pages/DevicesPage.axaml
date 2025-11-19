@@ -11,8 +11,8 @@
     <Design.DataContext>
         <vm:DevicesPageViewModel />
     </Design.DataContext>
-    <ScrollViewer>
+    <ScrollViewer Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
         <!-- Controller Selection -->
-        <controls:ControllerSelector />
+        <controls:ControllerSelector Background="{DynamicResource ApplicationPageBackgroundThemeBrush}" />
     </ScrollViewer>
 </UserControl>

@@ -11,9 +11,10 @@
     <Design.DataContext>
         <vm:MonitorPageViewModel />
     </Design.DataContext>
-    <ScrollViewer>
+    <ScrollViewer Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
         <!-- Controller Monitor -->
-        <Border IsVisible="{Binding MonitorViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <Border Background="{DynamicResource ApplicationPageBackgroundThemeBrush}"
+                IsVisible="{Binding MonitorViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
             <controls:ControllerMonitor DataContext="{Binding MonitorViewModel}" />
         </Border>
     </ScrollViewer>

@@ -175,7 +175,7 @@
                                     <!-- Stick Position -->
                                     <Ellipse Width="16"
                                              Height="16"
-                                             Fill="{DynamicResource AccentFillColorDefaultBrush}"
+                                             Fill="{DynamicResource SystemAccentColorBrush}"
                                              Canvas.Left="{Binding InputState.LeftStickX, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=100}"
                                              Canvas.Top="{Binding InputState.LeftStickY, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=100}" />
                                 </Canvas>
@@ -265,7 +265,7 @@
                                     <!-- Touch Point 1 -->
                                     <Ellipse Width="24"
                                              Height="24"
-                                             Fill="{DynamicResource AccentFillColorDefaultBrush}"
+                                             Fill="{DynamicResource SystemAccentColorBrush}"
                                              Opacity="0.8"
                                              IsVisible="{Binding TouchpadState.Touch1.IsActive}"
                                              Canvas.Left="{Binding TouchpadState.Touch1.X, Converter={StaticResource TouchToCanvasConverter}, ConverterParameter='240;1920'}"
@@ -486,7 +486,7 @@
                                            VerticalAlignment="Center"
                                            FontSize="18"
                                            FontWeight="Bold"
-                                           Foreground="#00D9A3" />
+                                           Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
                             </Border>
                             <!-- Square (Left) - Using Path for better rendering -->
                             <Border Background="{Binding InputState.Square, Converter={StaticResource BoolToButtonBackgroundConverter}}"
@@ -496,7 +496,7 @@
                                 <Viewbox Width="18" Height="18">
                                     <Canvas Width="24" Height="24">
                                         <Path Data="M 6,6 L 18,6 L 18,18 L 6,18 Z"
-                                              Stroke="#FF6B9D"
+                                              Stroke="{DynamicResource SystemFillColorCriticalBrush}"
                                               StrokeThickness="2.5"
                                               Fill="Transparent" />
                                     </Canvas>
@@ -512,7 +512,7 @@
                                            VerticalAlignment="Center"
                                            FontSize="18"
                                            FontWeight="Bold"
-                                           Foreground="#FF4757" />
+                                           Foreground="{DynamicResource SystemFillColorCriticalBrush}" />
                             </Border>
                             <!-- Cross (Bottom) -->
                             <Border Background="{Binding InputState.Cross, Converter={StaticResource BoolToButtonBackgroundConverter}}"
@@ -524,7 +524,7 @@
                                            VerticalAlignment="Center"
                                            FontSize="16"
                                            FontWeight="Bold"
-                                           Foreground="#5C7CFA" />
+                                           Foreground="{DynamicResource SystemAccentColorBrush}" />
                             </Border>
                         </Grid>
                     </StackPanel>
@@ -562,7 +562,7 @@
                                     <!-- Stick Position -->
                                     <Ellipse Width="16"
                                              Height="16"
-                                             Fill="{DynamicResource AccentFillColorDefaultBrush}"
+                                             Fill="{DynamicResource SystemAccentColorBrush}"
                                              Canvas.Left="{Binding InputState.RightStickX, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=100}"
                                              Canvas.Top="{Binding InputState.RightStickY, Converter={StaticResource StickToCanvasConverter}, ConverterParameter=100}" />
                                 </Canvas>

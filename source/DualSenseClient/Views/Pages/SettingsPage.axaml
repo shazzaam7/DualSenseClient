@@ -10,5 +10,15 @@
     <Design.DataContext>
         <vm:SettingsPageViewModel />
     </Design.DataContext>
-    Settings Page
+    <ScrollViewer Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Margin="20" Spacing="20" Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
+            <TextBlock Text="Settings"
+                       FontSize="24"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
+            <TextBlock Text="Settings functionality will be implemented here"
+                       FontSize="14"
+                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+        </StackPanel>
+    </ScrollViewer>
 </UserControl>

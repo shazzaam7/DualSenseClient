@@ -20,7 +20,7 @@
             <Setter Property="BorderBrush" Value="Transparent" />
         </Style>
         <Style Selector="Button.preset-button:pointerover">
-            <Setter Property="BorderBrush" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColorBrush}" />
         </Style>
 
         <Style Selector="Button.action-button">
@@ -29,7 +29,7 @@
         </Style>
 
         <Style Selector="Button.apply-button">
-            <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+            <Setter Property="Background" Value="{DynamicResource SystemAccentColorBrush}" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Padding" Value="12,8" />
         </Style>
@@ -121,7 +121,7 @@
                                 <Grid RowDefinitions="Auto,Auto,Auto" RowSpacing="8">
                                     <!-- Red -->
                                     <Grid ColumnDefinitions="24,*,45">
-                                        <Border Background="#FF0000"
+                                        <Border Background="{DynamicResource SystemFillColorCriticalBrush}"
                                                 CornerRadius="3"
                                                 Width="20"
                                                 Height="20" />
@@ -142,7 +142,7 @@
 
                                     <!-- Green -->
                                     <Grid Grid.Row="1" ColumnDefinitions="24,*,45">
-                                        <Border Background="#00FF00"
+                                        <Border Background="{DynamicResource SystemFillColorSuccessBrush}"
                                                 CornerRadius="3"
                                                 Width="20"
                                                 Height="20" />
@@ -163,7 +163,7 @@
 
                                     <!-- Blue -->
                                     <Grid Grid.Row="2" ColumnDefinitions="24,*,45">
-                                        <Border Background="#0000FF"
+                                        <Border Background="{DynamicResource SystemAccentColorBrush}"
                                                 CornerRadius="3"
                                                 Width="20"
                                                 Height="20" />
@@ -197,11 +197,11 @@
                                                 <WrapPanel Orientation="Horizontal" />
                                             </ItemsPanelTemplate>
                                         </ItemsControl.ItemsPanel>
-                                        <Button Background="#FF0000" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,0,0" Classes="preset-button" Margin="2" ToolTip.Tip="Red" />
-                                        <Button Background="#00FF00" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,255,0" Classes="preset-button" Margin="2" ToolTip.Tip="Green" />
-                                        <Button Background="#0000FF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,0,255" Classes="preset-button" Margin="2" ToolTip.Tip="Blue" />
-                                        <Button Background="#FFFF00" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,255,0" Classes="preset-button" Margin="2" ToolTip.Tip="Yellow" />
-                                        <Button Background="#FF00FF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,0,255" Classes="preset-button" Margin="2" ToolTip.Tip="Magenta" />
+                                        <Button Background="{DynamicResource SystemFillColorCriticalBrush}" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,0,0" Classes="preset-button" Margin="2" ToolTip.Tip="Red" />
+                                        <Button Background="{DynamicResource SystemFillColorSuccessBrush}" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,255,0" Classes="preset-button" Margin="2" ToolTip.Tip="Green" />
+                                        <Button Background="{DynamicResource SystemAccentColorBrush}" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,0,255" Classes="preset-button" Margin="2" ToolTip.Tip="Blue" />
+                                        <Button Background="{DynamicResource SystemFillColorCautionBrush}" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,255,0" Classes="preset-button" Margin="2" ToolTip.Tip="Yellow" />
+                                        <Button Background="#FF6B9D" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,0,255" Classes="preset-button" Margin="2" ToolTip.Tip="Magenta" />
                                         <Button Background="#00FFFF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="0,255,255" Classes="preset-button" Margin="2" ToolTip.Tip="Cyan" />
                                         <Button Background="#FFFFFF" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,255,255" Classes="preset-button" Margin="2" ToolTip.Tip="White" />
                                         <Button Background="#FFA500" Command="{Binding SetLightbarPresetCommand}" CommandParameter="255,165,0" Classes="preset-button" Margin="2" ToolTip.Tip="Orange" />
@@ -211,7 +211,8 @@
                                 <Button Content="Apply Lightbar"
                                         Command="{Binding ApplyLightbarCommand}"
                                         HorizontalAlignment="Stretch"
-                                        Classes="apply-button" />
+                                        Classes="apply-button"
+                                        Foreground="{DynamicResource TextFillColorInverseBrush}" />
                             </StackPanel>
                         </Border>
 
@@ -291,7 +292,8 @@
                                 <Button Content="Apply Player LEDs"
                                         Command="{Binding ApplyPlayerLedsCommand}"
                                         HorizontalAlignment="Stretch"
-                                        Classes="apply-button" />
+                                        Classes="apply-button"
+                                        Foreground="{DynamicResource TextFillColorInverseBrush}" />
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -383,7 +385,8 @@
                                 <Button Content="Apply Mic LED"
                                         Command="{Binding ApplyMicLedCommand}"
                                         HorizontalAlignment="Stretch"
-                                        Classes="apply-button" />
+                                        Classes="apply-button"
+                                        Foreground="{DynamicResource TextFillColorInverseBrush}" />
                             </StackPanel>
                         </Border>
 
@@ -400,10 +403,11 @@
                                 <Button Content="Apply All Settings"
                                         Command="{Binding ApplyAllSettingsCommand}"
                                         HorizontalAlignment="Stretch"
-                                        FontWeight="SemiBold">
+                                        FontWeight="SemiBold"
+                                        Foreground="{DynamicResource TextFillColorInverseBrush}">
                                     <Button.Styles>
                                         <Style Selector="Button">
-                                            <Setter Property="Background" Value="{DynamicResource AccentFillColorDefaultBrush}" />
+                                            <Setter Property="Background" Value="{DynamicResource SystemAccentColorBrush}" />
                                         </Style>
                                     </Button.Styles>
                                 </Button>

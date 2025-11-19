@@ -12,29 +12,49 @@
     <Design.DataContext>
         <vm:DebugPageViewModel />
     </Design.DataContext>
-    <ScrollViewer>
-        <StackPanel Margin="20" Spacing="20">
+    <ScrollViewer Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel Margin="20" Spacing="20"
+                    Background="{DynamicResource ApplicationPageBackgroundThemeBrush}">
             <!-- Controller Selection -->
-            <controls:ControllerSelector />
+            <controls:ControllerSelector Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                                        CornerRadius="8"
+                                        Padding="16" />
 
             <!-- Controller Information -->
-            <Border IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    IsVisible="{Binding SelectedController, Converter={x:Static ObjectConverters.IsNotNull}}">
                 <controls:ControllerInformation DataContext="{Binding SelectedController}" />
             </Border>
 
             <!-- Controller Monitor -->
-            <Border IsVisible="{Binding MonitorViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    IsVisible="{Binding MonitorViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
                 <controls:ControllerMonitor DataContext="{Binding MonitorViewModel}" />
             </Border>
 
             <!-- Controller Profiles -->
             <StackPanel IsVisible="{Binding ProfileViewModel, Converter={x:Static ObjectConverters.IsNotNull}}" Spacing="12">
-                <controls:ProfileSelector DataContext="{Binding ProfileViewModel}" />
-                <controls:ControllerProfile DataContext="{Binding ProfileViewModel}" />
+                <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="8"
+                        Padding="16">
+                    <controls:ProfileSelector DataContext="{Binding ProfileViewModel}" />
+                </Border>
+                <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="8"
+                        Padding="16">
+                    <controls:ControllerProfile DataContext="{Binding ProfileViewModel}" />
+                </Border>
             </StackPanel>
 
             <!-- Special Actions -->
-            <Border IsVisible="{Binding SpecialActionsViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    IsVisible="{Binding SpecialActionsViewModel, Converter={x:Static ObjectConverters.IsNotNull}}">
                 <local:SpecialActions DataContext="{Binding SpecialActionsViewModel}" />
             </Border>
         </StackPanel>
