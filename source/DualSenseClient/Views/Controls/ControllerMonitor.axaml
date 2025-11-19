@@ -486,7 +486,7 @@
                                            VerticalAlignment="Center"
                                            FontSize="18"
                                            FontWeight="Bold"
-                                           Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                                           Foreground="#0ABF53" />
                             </Border>
                             <!-- Square (Left) - Using Path for better rendering -->
                             <Border Background="{Binding InputState.Square, Converter={StaticResource BoolToButtonBackgroundConverter}}"
@@ -496,7 +496,7 @@
                                 <Viewbox Width="18" Height="18">
                                     <Canvas Width="24" Height="24">
                                         <Path Data="M 6,6 L 18,6 L 18,18 L 6,18 Z"
-                                              Stroke="{DynamicResource SystemFillColorCriticalBrush}"
+                                              Stroke="#9A4DFF"
                                               StrokeThickness="2.5"
                                               Fill="Transparent" />
                                     </Canvas>
@@ -512,7 +512,7 @@
                                            VerticalAlignment="Center"
                                            FontSize="18"
                                            FontWeight="Bold"
-                                           Foreground="{DynamicResource SystemFillColorCriticalBrush}" />
+                                           Foreground="#D02128" />
                             </Border>
                             <!-- Cross (Bottom) -->
                             <Border Background="{Binding InputState.Cross, Converter={StaticResource BoolToButtonBackgroundConverter}}"
@@ -524,7 +524,7 @@
                                            VerticalAlignment="Center"
                                            FontSize="16"
                                            FontWeight="Bold"
-                                           Foreground="{DynamicResource SystemAccentColorBrush}" />
+                                           Foreground="#1E4BD8" />
                             </Border>
                         </Grid>
                     </StackPanel>

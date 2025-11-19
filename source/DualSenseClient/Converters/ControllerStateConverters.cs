@@ -1,12 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Media;
+using Avalonia.Styling;
 using DualSenseClient.Core.DualSense.Enums;
 using DualSenseClient.Core.Logging;
 
 namespace DualSenseClient.Converters;
+
+/// <summary>
+/// Helper class to retrieve resources from FluentAvalonia theme
+/// </summary>
+public static class ResourceHelper
+{
+    public static IBrush? GetThemedBrush(string resourceKey, IBrush? fallback = null)
+    {
+        // Try direct application resources first
+        if (Application.Current?.Resources.TryGetResource(resourceKey, null, out object? resource) == true)
+        {
+            if (resource is IBrush brush)
+            {
+                return brush;
+            }
+        }
+
+        // Try to find in styles (FluentAvalonia loads resources through styles)
+        if (Application.Current?.Styles != null)
+        {
+            foreach (IStyle style in Application.Current.Styles)
+            {
+                if (style is Styles styles)
+                {
+                    if (TryFindResourceInStyles(styles, resourceKey, out IBrush? foundBrush))
+                    {
+                        return foundBrush;
+                    }
+                }
+                else if (style is ResourceDictionary dict)
+                {
+                    if (dict.TryGetResource(resourceKey, null, out object? dictResource) && dictResource is IBrush dictBrush)
+                    {
+                        return dictBrush;
+                    }
+                }
+            }
+        }
+
+        // Try ActualThemeVariant resources
+        if (Application.Current?.ActualThemeVariant != null)
+        {
+            if (Application.Current.TryGetResource(resourceKey, Application.Current.ActualThemeVariant, out var themeResource))
+            {
+                if (themeResource is IBrush themeBrush)
+                {
+                    return themeBrush;
+                }
+            }
+        }
+
+        return fallback;
+    }
+
+    private static bool TryFindResourceInStyles(Styles styles, string resourceKey, out IBrush? brush)
+    {
+        brush = null;
+        foreach (IStyle item in styles)
+        {
+            if (item is ResourceDictionary dict)
+            {
+                if (dict.TryGetResource(resourceKey, null, out object? resource) && resource is IBrush foundBrush)
+                {
+                    brush = foundBrush;
+                    return true;
+                }
+            }
+            else if (item is Styles nestedStyles)
+            {
+                if (TryFindResourceInStyles(nestedStyles, resourceKey, out brush))
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+}
 
 public class StickToCanvasConverter : IValueConverter
 {
@@ -179,10 +260,14 @@ public class BoolToButtonBackgroundConverter : IValueConverter
         if (value is bool isPressed && isPressed)
         {
             Logger.Trace<BoolToButtonBackgroundConverter>("button pressed, returning accent color");
-            return new SolidColorBrush(Color.FromRgb(0, 120, 212)); // Accent color when pressed
+            // Using the accent button background when pressed
+            IBrush? accentBrush = ResourceHelper.GetThemedBrush("AccentButtonBackgroundPressed", new SolidColorBrush(Color.FromRgb(0, 120, 212)));
+            return accentBrush;
         }
-        Logger.Trace<BoolToButtonBackgroundConverter>("button not pressed, returning gray");
-        return new SolidColorBrush(Color.FromArgb(40, 128, 128, 128)); // Subtle gray when not pressed
+        Logger.Trace<BoolToButtonBackgroundConverter>("button not pressed, returning default");
+        // Using the default button background when not pressed
+        IBrush? defaultBrush = ResourceHelper.GetThemedBrush("ButtonBackground", new SolidColorBrush(Color.FromArgb(40, 128, 128, 128)));
+        return defaultBrush;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -221,14 +306,13 @@ public class ColorToBrushConverter : IValueConverter
 /// </summary>
 public class PlayerLedFlagToBrushConverter : IValueConverter
 {
-    private static readonly IBrush ActiveLedBrush = new SolidColorBrush(Colors.White);
-    private static readonly IBrush InactiveLedBrush = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255));
-
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not PlayerLed playerLeds || parameter is not string ledFlag)
         {
-            return InactiveLedBrush;
+            // Use theme-based inactive LED brush
+            IBrush? defaultInactiveBrush = ResourceHelper.GetThemedBrush("TextFillColorTertiaryBrush", new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)));
+            return defaultInactiveBrush;
         }
 
         PlayerLed flag = ledFlag switch
@@ -241,7 +325,11 @@ public class PlayerLedFlagToBrushConverter : IValueConverter
             _ => PlayerLed.None
         };
 
-        return playerLeds.HasFlag(flag) ? ActiveLedBrush : InactiveLedBrush;
+        // Use theme-based active LED brush
+        IBrush? activeBrush = ResourceHelper.GetThemedBrush("TextFillColorPrimaryBrush", new SolidColorBrush(Colors.White));
+        IBrush? inactiveBrushForComparison = ResourceHelper.GetThemedBrush("TextFillColorTertiaryBrush", new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)));
+
+        return playerLeds.HasFlag(flag) ? activeBrush : inactiveBrushForComparison;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -255,23 +343,21 @@ public class PlayerLedFlagToBrushConverter : IValueConverter
 /// </summary>
 public class MicLedToBrushConverter : IValueConverter
 {
-    private static readonly IBrush MicOnBrush = new SolidColorBrush(Color.FromRgb(255, 140, 0)); // Orange
-    private static readonly IBrush MicPulseBrush = new SolidColorBrush(Color.FromRgb(255, 69, 0)); // Red-Orange
-    private static readonly IBrush MicOffBrush = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)); // Dim white
-
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is not MicLed micLed)
         {
-            return MicOffBrush;
+            // Use theme-based off state brush
+            IBrush? micOffBrush = ResourceHelper.GetThemedBrush("SystemFillColorNeutralBrush", new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)));
+            return micOffBrush;
         }
 
         return micLed switch
         {
-            MicLed.On => MicOnBrush,
-            MicLed.Pulse => MicPulseBrush,
-            MicLed.Off => MicOffBrush,
-            _ => MicOffBrush
+            MicLed.On => ResourceHelper.GetThemedBrush("SystemFillColorSuccessBrush", new SolidColorBrush(Color.FromRgb(255, 140, 0))), // Orange
+            MicLed.Pulse => ResourceHelper.GetThemedBrush("SystemFillColorCriticalBrush", new SolidColorBrush(Color.FromRgb(255, 69, 0))), // Red-Orange
+            MicLed.Off => ResourceHelper.GetThemedBrush("SystemFillColorNeutralBrush", new SolidColorBrush(Color.FromArgb(40, 255, 255, 255))), // Dim white
+            _ => ResourceHelper.GetThemedBrush("SystemFillColorNeutralBrush", new SolidColorBrush(Color.FromArgb(40, 255, 255, 255)))
         };
     }
 
@@ -374,16 +460,27 @@ public class PlayerLedBrightnessToOpacityConverter : IValueConverter
 /// </summary>
 public class BoolToColorConverter : IValueConverter
 {
-    private static readonly IBrush ActiveBrush = new SolidColorBrush(Color.FromRgb(0, 217, 163)); // Green
-    private static readonly IBrush InactiveBrush = new SolidColorBrush(Color.FromRgb(150, 150, 150)); // Gray
-
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         if (value is bool isActive)
         {
-            return isActive ? ActiveBrush : InactiveBrush;
+            if (isActive)
+            {
+                // Use theme-based active state brush (success color for active state)
+                IBrush? activeBrush = ResourceHelper.GetThemedBrush("SystemFillColorSuccessBrush", new SolidColorBrush(Color.FromRgb(0, 217, 163))); // Green
+                return activeBrush;
+            }
+            else
+            {
+                // Use theme-based inactive state brush (neutral color for inactive state)
+                IBrush? inactiveBrush = ResourceHelper.GetThemedBrush("SystemFillColorNeutralBrush", new SolidColorBrush(Color.FromRgb(150, 150, 150))); // Gray
+                return inactiveBrush;
+            }
         }
-        return InactiveBrush;
+
+        // Default to inactive state if value is not boolean
+        IBrush? defaultInactiveBrush = ResourceHelper.GetThemedBrush("SystemFillColorNeutralBrush", new SolidColorBrush(Color.FromRgb(150, 150, 150))); // Gray
+        return defaultInactiveBrush;
     }
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

@@ -17,5 +17,7 @@ public class UiSettings
 public enum AppTheme
 {
     Light,
-    Dark
+    Dark,
+    CosmicRed,
+    PlayStation4
 }

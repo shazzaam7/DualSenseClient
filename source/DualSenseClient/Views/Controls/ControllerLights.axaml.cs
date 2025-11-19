@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace DualSenseClient.Views.Controls;
 
-public partial class ControllerProfile : UserControl
+public partial class ControllerLights : UserControl
 {
-    public ControllerProfile()
+    public ControllerLights()
     {
         InitializeComponent();
     }

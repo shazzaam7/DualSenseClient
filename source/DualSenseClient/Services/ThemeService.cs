@@ -40,6 +40,18 @@ public class ThemeService
                 BaseTheme = ThemeVariant.Dark,
                 ResourcePath = "avares://DualSenseClient/Resources/Themes/PSDark.axaml",
                 FallbackTheme = null
+            },
+            [AppTheme.CosmicRed] = new ThemeConfiguration
+            {
+                BaseTheme = ThemeVariant.Dark,
+                ResourcePath = "avares://DualSenseClient/Resources/Themes/CosmicRed.axaml",
+                FallbackTheme = null
+            },
+            [AppTheme.PlayStation4] = new ThemeConfiguration
+            {
+                BaseTheme = ThemeVariant.Dark,
+                ResourcePath = "avares://DualSenseClient/Resources/Themes/PS4Blue.axaml",
+                FallbackTheme = null
             }
             // New themes need to be added here
         };

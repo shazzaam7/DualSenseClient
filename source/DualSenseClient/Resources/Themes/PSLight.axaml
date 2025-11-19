@@ -23,7 +23,7 @@
     <Color x:Key="TextFillColorSecondary">#CC000000</Color>
     <Color x:Key="TextFillColorTertiary">#99000000</Color>
     <Color x:Key="TextFillColorDisabled">#4D000000</Color>
-    <Color x:Key="TextFillColorInverse">#FFFFFFFF</Color>
+    <Color x:Key="TextFillColorInverse">#FF000000</Color>
     <Color x:Key="AccentTextFillColorPrimary">#FF0070F3</Color>
     <Color x:Key="AccentTextFillColorSecondary">#FF0060D9</Color>
     <Color x:Key="AccentTextFillColorDisabled">#660070F3</Color>

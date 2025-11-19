@@ -2,39 +2,39 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!-- Colors -->
-    <!-- Primary Background Colors - PS5 Deep Blacks -->
-    <Color x:Key="SolidBackgroundFillColorBase">#FF000000</Color>
-    <Color x:Key="SolidBackgroundFillColorSecondary">#FF0A0A0A</Color>
-    <Color x:Key="SolidBackgroundFillColorTertiary">#FF141414</Color>
-    <Color x:Key="SolidBackgroundFillColorQuarternary">#FF1A1A1A</Color>
+    <!-- Primary Background Colors - Cosmic Red Gradient -->
+    <Color x:Key="SolidBackgroundFillColorBase">#FF1A0A0F</Color>
+    <Color x:Key="SolidBackgroundFillColorSecondary">#FF240F15</Color>
+    <Color x:Key="SolidBackgroundFillColorTertiary">#FF2D141A</Color>
+    <Color x:Key="SolidBackgroundFillColorQuarternary">#FF361920</Color>
     <Color x:Key="SolidBackgroundFillColorTransparent">#00000000</Color>
 
-    <!-- PlayStation Blue Accent Colors -->
-    <Color x:Key="SystemAccentColor">#FF0070F3</Color>
-    <Color x:Key="SystemAccentColorLight1">#FF1A85FF</Color>
-    <Color x:Key="SystemAccentColorLight2">#FF4D9FFF</Color>
-    <Color x:Key="SystemAccentColorLight3">#FF80BFFF</Color>
-    <Color x:Key="SystemAccentColorDark1">#FF0060D9</Color>
-    <Color x:Key="SystemAccentColorDark2">#FF0050BF</Color>
-    <Color x:Key="SystemAccentColorDark3">#FF0040A6</Color>
+    <!-- Cosmic Red Accent Colors -->
+    <Color x:Key="SystemAccentColor">#FFD93557</Color>
+    <Color x:Key="SystemAccentColorLight1">#FFE54D6B</Color>
+    <Color x:Key="SystemAccentColorLight2">#FFF06580</Color>
+    <Color x:Key="SystemAccentColorLight3">#FFF47D94</Color>
+    <Color x:Key="SystemAccentColorDark1">#FFC42847</Color>
+    <Color x:Key="SystemAccentColorDark2">#FFB01B37</Color>
+    <Color x:Key="SystemAccentColorDark3">#FF9C0E27</Color>
 
-    <!-- Text Colors - High Contrast White -->
+    <!-- Text Colors - Light on Dark Red -->
     <Color x:Key="TextFillColorPrimary">#FFFFFFFF</Color>
     <Color x:Key="TextFillColorSecondary">#CCFFFFFF</Color>
     <Color x:Key="TextFillColorTertiary">#99FFFFFF</Color>
     <Color x:Key="TextFillColorDisabled">#4DFFFFFF</Color>
     <Color x:Key="TextFillColorInverse">#FFFFFFFF</Color>
-    <Color x:Key="AccentTextFillColorPrimary">#FF0070F3</Color>
-    <Color x:Key="AccentTextFillColorSecondary">#FF4D9FFF</Color>
-    <Color x:Key="AccentTextFillColorDisabled">#660070F3</Color>
+    <Color x:Key="AccentTextFillColorPrimary">#FFF47D94</Color>
+    <Color x:Key="AccentTextFillColorSecondary">#FFE54D6B</Color>
+    <Color x:Key="AccentTextFillColorDisabled">#66D93557</Color>
 
-    <!-- Control Fill Colors - PS5 Style -->
-    <Color x:Key="ControlFillColorDefault">#0DFFFFFF</Color>
-    <Color x:Key="ControlFillColorSecondary">#0AFFFFFF</Color>
-    <Color x:Key="ControlFillColorTertiary">#08FFFFFF</Color>
+    <!-- Control Fill Colors - Cosmic Style -->
+    <Color x:Key="ControlFillColorDefault">#1AFFFFFF</Color>
+    <Color x:Key="ControlFillColorSecondary">#0DFFFFFF</Color>
+    <Color x:Key="ControlFillColorTertiary">#0AFFFFFF</Color>
     <Color x:Key="ControlFillColorDisabled">#05FFFFFF</Color>
     <Color x:Key="ControlFillColorTransparent">#00FFFFFF</Color>
-    <Color x:Key="ControlFillColorInputActive">#FF0A0A0A</Color>
+    <Color x:Key="ControlFillColorInputActive">#FF240F15</Color>
 
     <!-- Control Strong Fill -->
     <Color x:Key="ControlStrongFillColorDefault">#66FFFFFF</Color>
@@ -54,40 +54,40 @@
     <Color x:Key="SubtleFillColorTertiary">#05FFFFFF</Color>
     <Color x:Key="SubtleFillColorDisabled">#00FFFFFF</Color>
 
-    <!-- Control Stroke Colors - Minimal Borders -->
-    <Color x:Key="ControlStrokeColorDefault">#0DFFFFFF</Color>
-    <Color x:Key="ControlStrokeColorSecondary">#1AFFFFFF</Color>
+    <!-- Control Stroke Colors - Cosmic Borders -->
+    <Color x:Key="ControlStrokeColorDefault">#1AD93557</Color>
+    <Color x:Key="ControlStrokeColorSecondary">#26D93557</Color>
     <Color x:Key="ControlStrokeColorOnAccentDefault">#1A000000</Color>
     <Color x:Key="ControlStrokeColorOnAccentSecondary">#40000000</Color>
     <Color x:Key="ControlStrokeColorOnAccentTertiary">#33000000</Color>
     <Color x:Key="ControlStrokeColorOnAccentDisabled">#1A000000</Color>
 
     <!-- Control Strong Stroke -->
-    <Color x:Key="ControlStrongStrokeColorDefault">#66FFFFFF</Color>
-    <Color x:Key="ControlStrongStrokeColorDisabled">#26FFFFFF</Color>
+    <Color x:Key="ControlStrongStrokeColorDefault">#66D93557</Color>
+    <Color x:Key="ControlStrongStrokeColorDisabled">#26D93557</Color>
 
-    <!-- Card Colors - PS5 Elevated Cards -->
-    <Color x:Key="CardBackgroundFillColorDefault">#FF0F0F0F</Color>
-    <Color x:Key="CardBackgroundFillColorSecondary">#FF0A0A0A</Color>
-    <Color x:Key="CardStrokeColorDefault">#0DFFFFFF</Color>
-    <Color x:Key="CardStrokeColorDefaultSolid">#FF1A1A1A</Color>
+    <!-- Card Colors - Cosmic Red Cards -->
+    <Color x:Key="CardBackgroundFillColorDefault">#FF2D141A</Color>
+    <Color x:Key="CardBackgroundFillColorSecondary">#FF240F15</Color>
+    <Color x:Key="CardStrokeColorDefault">#1AD93557</Color>
+    <Color x:Key="CardStrokeColorDefaultSolid">#FF4A1F28</Color>
 
     <!-- Surface Stroke Colors -->
-    <Color x:Key="SurfaceStrokeColorDefault">#33666666</Color>
-    <Color x:Key="SurfaceStrokeColorFlyout">#0DFFFFFF</Color>
-    <Color x:Key="SurfaceStrokeColorInverse">#1AFFFFFF</Color>
+    <Color x:Key="SurfaceStrokeColorDefault">#33D93557</Color>
+    <Color x:Key="SurfaceStrokeColorFlyout">#1AD93557</Color>
+    <Color x:Key="SurfaceStrokeColorInverse">#26FFFFFF</Color>
 
     <!-- Divider -->
-    <Color x:Key="DividerStrokeColorDefault">#0DFFFFFF</Color>
+    <Color x:Key="DividerStrokeColorDefault">#1AD93557</Color>
 
     <!-- Layer Colors -->
-    <Color x:Key="LayerFillColorDefault">#CC000000</Color>
-    <Color x:Key="LayerFillColorAlt">#FF0A0A0A</Color>
+    <Color x:Key="LayerFillColorDefault">#CC1A0A0F</Color>
+    <Color x:Key="LayerFillColorAlt">#FF240F15</Color>
     <Color x:Key="LayerOnAcrylicFillColorDefault">#66000000</Color>
-    <Color x:Key="LayerOnAccentAcrylicFillColorDefault">#33FFFFFF</Color>
-    <Color x:Key="LayerOnMicaBaseAltFillColorDefault">#E6000000</Color>
-    <Color x:Key="LayerOnMicaBaseAltFillColorSecondary">#0D000000</Color>
-    <Color x:Key="LayerOnMicaBaseAltFillColorTertiary">#FF0A0A0A</Color>
+    <Color x:Key="LayerOnAccentAcrylicFillColorDefault">#33D93557</Color>
+    <Color x:Key="LayerOnMicaBaseAltFillColorDefault">#E61A0A0F</Color>
+    <Color x:Key="LayerOnMicaBaseAltFillColorSecondary">#0D1A0A0F</Color>
+    <Color x:Key="LayerOnMicaBaseAltFillColorTertiary">#FF240F15</Color>
     <Color x:Key="LayerOnMicaBaseAltFillColorTransparent">#00000000</Color>
 
     <!-- Smoke Fill -->
@@ -99,22 +99,22 @@
     <Color x:Key="SystemFillColorCritical">#FFFF4444</Color>
     <Color x:Key="SystemFillColorNeutral">#66FFFFFF</Color>
     <Color x:Key="SystemFillColorSolidNeutral">#FF808080</Color>
-    <Color x:Key="SystemFillColorAttentionBackground">#CC000000</Color>
-    <Color x:Key="SystemFillColorSuccessBackground">#FF002A0A</Color>
+    <Color x:Key="SystemFillColorAttentionBackground">#CC1A0A0F</Color>
+    <Color x:Key="SystemFillColorSuccessBackground">#FF0A2A12</Color>
     <Color x:Key="SystemFillColorCautionBackground">#FF2A1A00</Color>
     <Color x:Key="SystemFillColorCriticalBackground">#FF2A0505</Color>
     <Color x:Key="SystemFillColorNeutralBackground">#08FFFFFF</Color>
-    <Color x:Key="SystemFillColorSolidAttentionBackground">#FF0A0A0A</Color>
-    <Color x:Key="SystemFillColorSolidNeutralBackground">#FF0F0F0F</Color>
+    <Color x:Key="SystemFillColorSolidAttentionBackground">#FF240F15</Color>
+    <Color x:Key="SystemFillColorSolidNeutralBackground">#FF2D141A</Color>
 
-    <!-- Focus Colors - PS5 Blue Glow -->
-    <Color x:Key="FocusStrokeColorOuter">#FF0070F3</Color>
-    <Color x:Key="FocusStrokeColorInner">#330070F3</Color>
+    <!-- Focus Colors - Cosmic Red Glow -->
+    <Color x:Key="FocusStrokeColorOuter">#FFD93557</Color>
+    <Color x:Key="FocusStrokeColorInner">#33D93557</Color>
 
     <!-- Control On Image Fill Colors -->
-    <Color x:Key="ControlOnImageFillColorDefault">#E6000000</Color>
-    <Color x:Key="ControlOnImageFillColorSecondary">#FF0A0A0A</Color>
-    <Color x:Key="ControlOnImageFillColorTertiary">#FF050505</Color>
+    <Color x:Key="ControlOnImageFillColorDefault">#E61A0A0F</Color>
+    <Color x:Key="ControlOnImageFillColorSecondary">#FF240F15</Color>
+    <Color x:Key="ControlOnImageFillColorTertiary">#FF1A0A0F</Color>
     <Color x:Key="ControlOnImageFillColorDisabled">#00FFFFFF</Color>
 
     <!-- Brushes -->
@@ -235,38 +235,38 @@
     <SolidColorBrush x:Key="ControlOnImageFillColorDisabledBrush" Color="{StaticResource ControlOnImageFillColorDisabled}" />
 
     <!-- Additional System Brushes -->
-    <SolidColorBrush x:Key="SystemControlBackgroundAltHighBrush" Color="#FF000000" />
-    <SolidColorBrush x:Key="SystemControlBackgroundBaseLowBrush" Color="#FF000000" />
-    <SolidColorBrush x:Key="SystemControlBackgroundBaseMediumLowBrush" Color="#FF0A0A0A" />
-    <SolidColorBrush x:Key="SystemControlBackgroundChromeMediumLowBrush" Color="#FF0F0F0F" />
+    <SolidColorBrush x:Key="SystemControlBackgroundAltHighBrush" Color="#FF1A0A0F" />
+    <SolidColorBrush x:Key="SystemControlBackgroundBaseLowBrush" Color="#FF1A0A0F" />
+    <SolidColorBrush x:Key="SystemControlBackgroundBaseMediumLowBrush" Color="#FF240F15" />
+    <SolidColorBrush x:Key="SystemControlBackgroundChromeMediumLowBrush" Color="#FF2D141A" />
     <SolidColorBrush x:Key="SystemControlTransparentBrush" Color="Transparent" />
 
-    <!-- Navigation View Specific - PS5 Style -->
-    <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#FF000000" />
-    <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="#FF000000" />
-    <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF000000" />
-    <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="#0DFFFFFF" />
+    <!-- Navigation View Specific - Cosmic Red Style -->
+    <SolidColorBrush x:Key="NavigationViewDefaultPaneBackground" Color="#FF1A0A0F" />
+    <SolidColorBrush x:Key="NavigationViewExpandedPaneBackground" Color="#FF1A0A0F" />
+    <SolidColorBrush x:Key="NavigationViewContentBackground" Color="#FF1A0A0F" />
+    <SolidColorBrush x:Key="NavigationViewContentGridBorderBrush" Color="#1AD93557" />
     <SolidColorBrush x:Key="NavigationViewItemForeground" Color="#CCFFFFFF" />
     <SolidColorBrush x:Key="NavigationViewItemForegroundPointerOver" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="NavigationViewItemForegroundPressed" Color="#99FFFFFF" />
-    <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="#FF0070F3" />
-    <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FF0070F3" />
+    <SolidColorBrush x:Key="NavigationViewItemForegroundSelected" Color="#FFD93557" />
+    <SolidColorBrush x:Key="NavigationViewSelectionIndicatorForeground" Color="#FFD93557" />
 
     <!-- Flyout Specific -->
-    <SolidColorBrush x:Key="FlyoutPresenterBackground" Color="#FF0A0A0A" />
-    <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FF0A0A0A" />
-    <SolidColorBrush x:Key="FlyoutBorderThemeBrush" Color="#0DFFFFFF" />
+    <SolidColorBrush x:Key="FlyoutPresenterBackground" Color="#FF240F15" />
+    <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FF240F15" />
+    <SolidColorBrush x:Key="FlyoutBorderThemeBrush" Color="#1AD93557" />
 
     <!-- ContentDialog Specific -->
-    <SolidColorBrush x:Key="ContentDialogBackground" Color="#FF0A0A0A" />
-    <SolidColorBrush x:Key="ContentDialogBackgroundBrush" Color="#FF0A0A0A" />
-    <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="#0DFFFFFF" />
+    <SolidColorBrush x:Key="ContentDialogBackground" Color="#FF240F15" />
+    <SolidColorBrush x:Key="ContentDialogBackgroundBrush" Color="#FF240F15" />
+    <SolidColorBrush x:Key="ContentDialogBorderBrush" Color="#1AD93557" />
     <SolidColorBrush x:Key="ContentDialogDimmingThemeBrush" Color="#E6000000" />
 
     <!-- TabView Specific -->
-    <SolidColorBrush x:Key="TabViewBackground" Color="#FF000000" />
+    <SolidColorBrush x:Key="TabViewBackground" Color="#FF1A0A0F" />
     <SolidColorBrush x:Key="TabViewItemHeaderBackground" Color="#00FFFFFF" />
-    <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="#FF0F0F0F" />
+    <SolidColorBrush x:Key="TabViewItemHeaderBackgroundSelected" Color="#FF2D141A" />
     <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPointerOver" Color="#08FFFFFF" />
     <SolidColorBrush x:Key="TabViewItemHeaderBackgroundPressed" Color="#0DFFFFFF" />
     <SolidColorBrush x:Key="TabViewItemHeaderForeground" Color="#99FFFFFF" />
@@ -275,122 +275,122 @@
     <SolidColorBrush x:Key="TabViewItemHeaderForegroundPressed" Color="#99FFFFFF" />
 
     <!-- ComboBox Dropdown -->
-    <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#FF0A0A0A" />
-    <SolidColorBrush x:Key="ComboBoxDropDownBackgroundPointerOver" Color="#FF0F0F0F" />
-    <SolidColorBrush x:Key="ComboBoxDropDownBackgroundPressed" Color="#FF141414" />
-    <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#0DFFFFFF" />
+    <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#FF240F15" />
+    <SolidColorBrush x:Key="ComboBoxDropDownBackgroundPointerOver" Color="#FF2D141A" />
+    <SolidColorBrush x:Key="ComboBoxDropDownBackgroundPressed" Color="#FF361920" />
+    <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#1AD93557" />
 
-    <!-- ListBox/ListView Item Backgrounds - PS5 Selection Style -->
+    <!-- ListBox/ListView Item Backgrounds - Cosmic Selection Style -->
     <SolidColorBrush x:Key="ListViewItemBackground" Color="Transparent" />
-    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="#08FFFFFF" />
-    <SolidColorBrush x:Key="ListViewItemBackgroundPressed" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="ListViewItemBackgroundSelected" Color="#1A0070F3" />
-    <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPointerOver" Color="#260070F3" />
-    <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPressed" Color="#330070F3" />
+    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="#08D93557" />
+    <SolidColorBrush x:Key="ListViewItemBackgroundPressed" Color="#0DD93557" />
+    <SolidColorBrush x:Key="ListViewItemBackgroundSelected" Color="#1AD93557" />
+    <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPointerOver" Color="#26D93557" />
+    <SolidColorBrush x:Key="ListViewItemBackgroundSelectedPressed" Color="#33D93557" />
     <SolidColorBrush x:Key="ListViewItemForeground" Color="#CCFFFFFF" />
     <SolidColorBrush x:Key="ListViewItemForegroundPointerOver" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="ListViewItemForegroundSelected" Color="#FFFFFFFF" />
 
-    <!-- Button Specific - PS5 Style -->
-    <SolidColorBrush x:Key="ButtonBackground" Color="#08FFFFFF" />
-    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#05FFFFFF" />
-    <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#05FFFFFF" />
+    <!-- Button Specific - Cosmic Red Style -->
+    <SolidColorBrush x:Key="ButtonBackground" Color="#1AD93557" />
+    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#26D93557" />
+    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#0DD93557" />
+    <SolidColorBrush x:Key="ButtonBackgroundDisabled" Color="#08D93557" />
     <SolidColorBrush x:Key="ButtonForeground" Color="#CCFFFFFF" />
     <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#99FFFFFF" />
     <SolidColorBrush x:Key="ButtonForegroundDisabled" Color="#4DFFFFFF" />
-    <SolidColorBrush x:Key="ButtonBorderBrush" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#1AFFFFFF" />
-    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#08FFFFFF" />
+    <SolidColorBrush x:Key="ButtonBorderBrush" Color="#1AD93557" />
+    <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#26D93557" />
+    <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#1AD93557" />
+    <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#0DD93557" />
 
-    <!-- Accent Button - PlayStation Blue -->
-    <SolidColorBrush x:Key="AccentButtonBackground" Color="#FF0070F3" />
-    <SolidColorBrush x:Key="AccentButtonBackgroundPointerOver" Color="#FF1A85FF" />
-    <SolidColorBrush x:Key="AccentButtonBackgroundPressed" Color="#FF0060D9" />
-    <SolidColorBrush x:Key="AccentButtonBackgroundDisabled" Color="#330070F3" />
+    <!-- Accent Button - Vibrant Cosmic Red -->
+    <SolidColorBrush x:Key="AccentButtonBackground" Color="#FFD93557" />
+    <SolidColorBrush x:Key="AccentButtonBackgroundPointerOver" Color="#FFE54D6B" />
+    <SolidColorBrush x:Key="AccentButtonBackgroundPressed" Color="#FFC42847" />
+    <SolidColorBrush x:Key="AccentButtonBackgroundDisabled" Color="#33D93557" />
     <SolidColorBrush x:Key="AccentButtonForeground" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#CCFFFFFF" />
     <SolidColorBrush x:Key="AccentButtonForegroundDisabled" Color="#66FFFFFF" />
 
-    <!-- TextBox Specific - PS5 Style -->
-    <SolidColorBrush x:Key="TextControlBackground" Color="#FF0A0A0A" />
-    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FF0F0F0F" />
-    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FF050505" />
-    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#FF050505" />
+    <!-- TextBox Specific - Cosmic Red Style -->
+    <SolidColorBrush x:Key="TextControlBackground" Color="#FF240F15" />
+    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FF2D141A" />
+    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FF1A0A0F" />
+    <SolidColorBrush x:Key="TextControlBackgroundDisabled" Color="#FF1A0A0F" />
     <SolidColorBrush x:Key="TextControlForeground" Color="#CCFFFFFF" />
     <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="TextControlForegroundDisabled" Color="#4DFFFFFF" />
-    <SolidColorBrush x:Key="TextControlBorderBrush" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#1AFFFFFF" />
-    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#FF0070F3" />
-    <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="#08FFFFFF" />
+    <SolidColorBrush x:Key="TextControlBorderBrush" Color="#1AD93557" />
+    <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#26D93557" />
+    <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="#FFD93557" />
+    <SolidColorBrush x:Key="TextControlBorderBrushDisabled" Color="#0DD93557" />
     <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#4DFFFFFF" />
 
-    <!-- ToggleSwitch Specific - PS5 Style -->
+    <!-- ToggleSwitch Specific - Cosmic Red Style -->
     <SolidColorBrush x:Key="ToggleSwitchContentForeground" Color="#CCFFFFFF" />
     <SolidColorBrush x:Key="ToggleSwitchContentForegroundDisabled" Color="#4DFFFFFF" />
     <SolidColorBrush x:Key="ToggleSwitchFillOff" Color="#26FFFFFF" />
     <SolidColorBrush x:Key="ToggleSwitchFillOffPointerOver" Color="#33FFFFFF" />
     <SolidColorBrush x:Key="ToggleSwitchFillOffPressed" Color="#1AFFFFFF" />
     <SolidColorBrush x:Key="ToggleSwitchFillOffDisabled" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#FF0070F3" />
-    <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#FF1A85FF" />
-    <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#FF0060D9" />
-    <SolidColorBrush x:Key="ToggleSwitchFillOnDisabled" Color="#330070F3" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#FFD93557" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#FFE54D6B" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#FFC42847" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnDisabled" Color="#33D93557" />
 
-    <!-- CheckBox Specific - PS5 Style -->
-    <SolidColorBrush x:Key="CheckBoxBackgroundUnchecked" Color="#08FFFFFF" />
-    <SolidColorBrush x:Key="CheckBoxBackgroundUncheckedPointerOver" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="CheckBoxBackgroundUncheckedPressed" Color="#05FFFFFF" />
-    <SolidColorBrush x:Key="CheckBoxBackgroundUncheckedDisabled" Color="#05FFFFFF" />
-    <SolidColorBrush x:Key="CheckBoxBackgroundChecked" Color="#FF0070F3" />
-    <SolidColorBrush x:Key="CheckBoxBackgroundCheckedPointerOver" Color="#FF1A85FF" />
-    <SolidColorBrush x:Key="CheckBoxBackgroundCheckedPressed" Color="#FF0060D9" />
-    <SolidColorBrush x:Key="CheckBoxBackgroundCheckedDisabled" Color="#330070F3" />
+    <!-- CheckBox Specific - Cosmic Red Style -->
+    <SolidColorBrush x:Key="CheckBoxBackgroundUnchecked" Color="#1AD93557" />
+    <SolidColorBrush x:Key="CheckBoxBackgroundUncheckedPointerOver" Color="#26D93557" />
+    <SolidColorBrush x:Key="CheckBoxBackgroundUncheckedPressed" Color="#0DD93557" />
+    <SolidColorBrush x:Key="CheckBoxBackgroundUncheckedDisabled" Color="#08D93557" />
+    <SolidColorBrush x:Key="CheckBoxBackgroundChecked" Color="#FFD93557" />
+    <SolidColorBrush x:Key="CheckBoxBackgroundCheckedPointerOver" Color="#FFE54D6B" />
+    <SolidColorBrush x:Key="CheckBoxBackgroundCheckedPressed" Color="#FFC42847" />
+    <SolidColorBrush x:Key="CheckBoxBackgroundCheckedDisabled" Color="#33D93557" />
     <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundChecked" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedPointerOver" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedPressed" Color="#CCFFFFFF" />
     <SolidColorBrush x:Key="CheckBoxCheckGlyphForegroundCheckedDisabled" Color="#66FFFFFF" />
 
-    <!-- ProgressBar/Ring Specific - PS5 Blue -->
-    <SolidColorBrush x:Key="ProgressBarBackground" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="ProgressBarForeground" Color="#FF0070F3" />
-    <SolidColorBrush x:Key="ProgressRingForeground" Color="#FF0070F3" />
+    <!-- ProgressBar/Ring Specific - Cosmic Red -->
+    <SolidColorBrush x:Key="ProgressBarBackground" Color="#1AD93557" />
+    <SolidColorBrush x:Key="ProgressBarForeground" Color="#FFD93557" />
+    <SolidColorBrush x:Key="ProgressRingForeground" Color="#FFD93557" />
 
-    <!-- Slider Specific - PS5 Style -->
-    <SolidColorBrush x:Key="SliderTrackFill" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#1AFFFFFF" />
-    <SolidColorBrush x:Key="SliderTrackFillPressed" Color="#0DFFFFFF" />
-    <SolidColorBrush x:Key="SliderTrackFillDisabled" Color="#08FFFFFF" />
-    <SolidColorBrush x:Key="SliderTrackValueFill" Color="#FF0070F3" />
-    <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#FF1A85FF" />
-    <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#FF0060D9" />
-    <SolidColorBrush x:Key="SliderTrackValueFillDisabled" Color="#330070F3" />
+    <!-- Slider Specific - Cosmic Red Style -->
+    <SolidColorBrush x:Key="SliderTrackFill" Color="#1AD93557" />
+    <SolidColorBrush x:Key="SliderTrackFillPointerOver" Color="#26D93557" />
+    <SolidColorBrush x:Key="SliderTrackFillPressed" Color="#1AD93557" />
+    <SolidColorBrush x:Key="SliderTrackFillDisabled" Color="#0DD93557" />
+    <SolidColorBrush x:Key="SliderTrackValueFill" Color="#FFD93557" />
+    <SolidColorBrush x:Key="SliderTrackValueFillPointerOver" Color="#FFE54D6B" />
+    <SolidColorBrush x:Key="SliderTrackValueFillPressed" Color="#FFC42847" />
+    <SolidColorBrush x:Key="SliderTrackValueFillDisabled" Color="#33D93557" />
     <SolidColorBrush x:Key="SliderThumbBackground" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="SliderThumbBackgroundPointerOver" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="SliderThumbBackgroundPressed" Color="#CCFFFFFF" />
     <SolidColorBrush x:Key="SliderThumbBackgroundDisabled" Color="#4DFFFFFF" />
 
     <!-- Region Brush -->
-    <SolidColorBrush x:Key="RegionBrush" Color="#FF000000" />
+    <SolidColorBrush x:Key="RegionBrush" Color="#FF1A0A0F" />
 
-    <!-- ScrollBar Specific - PS5 Minimal Style -->
+    <!-- ScrollBar Specific - Cosmic Minimal Style -->
     <SolidColorBrush x:Key="ScrollBarBackground" Color="#00FFFFFF" />
-    <SolidColorBrush x:Key="ScrollBarPanningThumbBackground" Color="#1AFFFFFF" />
-    <SolidColorBrush x:Key="ScrollBarThumbFill" Color="#1AFFFFFF" />
-    <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#33FFFFFF" />
-    <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#4DFFFFFF" />
+    <SolidColorBrush x:Key="ScrollBarPanningThumbBackground" Color="#1AD93557" />
+    <SolidColorBrush x:Key="ScrollBarThumbFill" Color="#1AD93557" />
+    <SolidColorBrush x:Key="ScrollBarThumbFillPointerOver" Color="#33D93557" />
+    <SolidColorBrush x:Key="ScrollBarThumbFillPressed" Color="#4DD93557" />
     <SolidColorBrush x:Key="ScrollBarButtonBackground" Color="#00FFFFFF" />
-    <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#08FFFFFF" />
-    <SolidColorBrush x:Key="ScrollBarButtonBackgroundPressed" Color="#0DFFFFFF" />
+    <SolidColorBrush x:Key="ScrollBarButtonBackgroundPointerOver" Color="#08D93557" />
+    <SolidColorBrush x:Key="ScrollBarButtonBackgroundPressed" Color="#0DD93557" />
 
-    <!-- ToolTip Specific - PS5 Style -->
-    <SolidColorBrush x:Key="ToolTipBackground" Color="#F20F0F0F" />
+    <!-- ToolTip Specific - Cosmic Red Style -->
+    <SolidColorBrush x:Key="ToolTipBackground" Color="#F22D141A" />
     <SolidColorBrush x:Key="ToolTipForeground" Color="#FFFFFFFF" />
-    <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#1AFFFFFF" />
+    <SolidColorBrush x:Key="ToolTipBorderBrush" Color="#26D93557" />
 
 </ResourceDictionary>

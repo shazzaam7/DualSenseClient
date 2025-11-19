@@ -16,11 +16,11 @@
         <converters:ObjectToBooleanConverter x:Key="ObjectToBooleanConverter" />
     </UserControl.Resources>
 
-    <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
+    <Border Background="{DynamicResource ApplicationPageBackgroundThemeBrush}"
             CornerRadius="8"
-            Padding="24">
+            Padding="20">
         <ScrollViewer>
-            <StackPanel Spacing="24" MaxWidth="1200">
+            <StackPanel Spacing="16">
                 <!-- Header -->
                 <StackPanel Spacing="8">
                     <Grid ColumnDefinitions="Auto,*">

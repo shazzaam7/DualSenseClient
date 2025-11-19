@@ -46,7 +46,7 @@
                 <Border Background="{DynamicResource CardBackgroundFillColorDefaultBrush}"
                         CornerRadius="8"
                         Padding="16">
-                    <controls:ControllerProfile DataContext="{Binding ProfileViewModel}" />
+                    <controls:ControllerLights DataContext="{Binding ProfileViewModel}" />
                 </Border>
             </StackPanel>
 
