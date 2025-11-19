@@ -21,6 +21,7 @@ namespace DualSenseClient;
 public class App : Application
 {
     // Properties
+    public static IClassicDesktopStyleApplicationLifetime? Desktop = Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime;
     public static Window? MainWindow => Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop ? desktop.MainWindow : null;
     public static IServiceProvider Services { get; private set; } = null!;
 
@@ -36,7 +37,7 @@ public class App : Application
     {
         Logger.Info<App>("Framework initialization started");
 
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        if (Desktop is IClassicDesktopStyleApplicationLifetime desktop)
         {
             Logger.Debug<App>("Running as desktop application");
 
@@ -61,6 +62,15 @@ public class App : Application
             // Get MainWindow
             Logger.Debug<App>("Resolving MainWindow from services");
             MainWindow mainWindow = Services.GetRequiredService<MainWindow>();
+            TrayIconService trayIconService = Services.GetRequiredService<TrayIconService>();
+
+            // Initialize tray icon service
+            trayIconService.Initialize();
+
+            // Check if the application should start minimized
+            bool shouldStartMinimized = Services.GetRequiredService<ISettingsManager>().Application.Ui.StartMinimized;
+
+            bool isStartup = true; // Flag to track if it's the initial startup
 
             // Wire up window events
             mainWindow.Opened += (_, _) =>
@@ -68,13 +78,32 @@ public class App : Application
                 Logger.Info<App>("=== DualSense Client Started ===");
                 Logger.Info<App>($"Version: {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
                 Logger.Debug<App>("Main window opened");
+
+                // Only hide the window at initial startup if the setting is enabled
+                if (shouldStartMinimized && isStartup)
+                {
+                    isStartup = false;
+                    Logger.Info<App>("Start minimized setting is enabled, hiding window after startup");
+                    trayIconService.HideMainWindow();
+                }
             };
 
-            mainWindow.Closing += (_, _) =>
+            mainWindow.Closing += (_, e) =>
             {
                 Logger.Info<App>("Main window closing");
-                Logger.Debug<App>("Flushing logs before shutdown");
-                LogManager.Flush();
+
+                // Check if we should close to tray instead of exiting the application
+                if (trayIconService.ShouldCloseToTray())
+                {
+                    Logger.Info<App>("Minimizing to tray instead of closing");
+                    e.Cancel = true; // Cancel the close event
+                    trayIconService.HideMainWindow(); // Hide the main window
+                }
+                else
+                {
+                    Logger.Debug<App>("Flushing logs before shutdown");
+                    LogManager.Flush();
+                }
             };
 
             // Application exit handler
@@ -163,7 +192,7 @@ public class App : Application
 
         if (pluginCount > 0)
         {
-            Logger.Debug<App>($"Removed {pluginCount} data annotation validation plugin(s)");
+            Logger.Trace<App>($"Removed {pluginCount} data annotation validation plugin(s)");
         }
     }
 }

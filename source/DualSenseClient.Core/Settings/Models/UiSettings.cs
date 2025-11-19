@@ -6,6 +6,12 @@ public class UiSettings
 {
     [JsonPropertyName("theme")]
     public AppTheme Theme { get; set; } = AppTheme.Dark;
+
+    [JsonPropertyName("close_to_tray")]
+    public bool CloseToTray { get; set; } = false;
+
+    [JsonPropertyName("start_minimized")]
+    public bool StartMinimized { get; set; } = false;
 }
 
 public enum AppTheme

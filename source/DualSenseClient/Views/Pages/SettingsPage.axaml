@@ -44,6 +44,36 @@
                 </ui:SettingsExpander.Items>
             </ui:SettingsExpander>
 
+            <!-- Behavior -->
+            <ui:SettingsExpander Header="Behavior"
+                                 Description="Configure application behavior">
+                <ui:SettingsExpander.IconSource>
+                    <ic:SymbolIconSource Symbol="Window" />
+                </ui:SettingsExpander.IconSource>
+                <ui:SettingsExpander.Items>
+                    <!-- Close to Tray Toggle -->
+                    <ui:SettingsExpander Header="Close to Tray"
+                                         Description="Minimize the application to the system tray instead of closing">
+                        <ui:SettingsExpander.IconSource>
+                            <ic:SymbolIconSource Symbol="ArrowEnterLeft" />
+                        </ui:SettingsExpander.IconSource>
+                        <ui:SettingsExpander.Footer>
+                            <ToggleSwitch IsChecked="{Binding CloseToTray}" />
+                        </ui:SettingsExpander.Footer>
+                    </ui:SettingsExpander>
+                    <!-- Start Minimized Toggle -->
+                    <ui:SettingsExpander Header="Start Minimized"
+                                         Description="Start the application minimized to the system tray">
+                        <ui:SettingsExpander.IconSource>
+                            <ic:SymbolIconSource Symbol="Window" />
+                        </ui:SettingsExpander.IconSource>
+                        <ui:SettingsExpander.Footer>
+                            <ToggleSwitch IsChecked="{Binding StartMinimized}" />
+                        </ui:SettingsExpander.Footer>
+                    </ui:SettingsExpander>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
+
             <!-- Debugging -->
             <ui:SettingsExpander Header="Debugging"
                                  Description="Configure logging and other diagnostics options">

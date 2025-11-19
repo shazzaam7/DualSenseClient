@@ -27,6 +27,7 @@ public static class ServiceConfigurator
         services.AddSingleton<NavigationService>();
         services.AddSingleton<IApplicationSettings, ApplicationSettings>();
         services.AddSingleton<IProfileRenameService, ProfileRenameService>();
+        services.AddSingleton<TrayIconService>();
         services.AddSingleton<ThemeService>(provider =>
         {
             ThemeService themeService = new ThemeService();

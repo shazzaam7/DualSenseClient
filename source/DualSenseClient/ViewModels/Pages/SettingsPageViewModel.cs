@@ -37,6 +37,10 @@ public partial class SettingsPageViewModel : ViewModelBase
     public ObservableCollection<LogLevelItem> AvailableLogLevels { get; } = [];
     [ObservableProperty] private LogLevelItem? selectedLogLevel;
 
+    [ObservableProperty] private bool closeToTray;
+
+    [ObservableProperty] private bool startMinimized;
+
     // Constructor
     public SettingsPageViewModel(ISettingsManager settingsManager, ThemeService themeService)
     {
@@ -123,12 +127,20 @@ public partial class SettingsPageViewModel : ViewModelBase
             // Theme settings
             SelectedTheme = AvailableThemes.FirstOrDefault(t => t.Theme == settings.Ui.Theme);
 
+            // Close to tray settings
+            CloseToTray = settings.Ui.CloseToTray;
+
+            // Start minimized settings
+            StartMinimized = settings.Ui.StartMinimized;
+
             // Debug settings
             LogLevel logLevel = LogLevelHelper.FromString(settings.Debug.Logger.Level);
             SelectedLogLevel = AvailableLogLevels.FirstOrDefault(level => level.Level == logLevel);
 
             Logger.Info<SettingsPageViewModel>("Settings loaded");
             Logger.Info<SettingsPageViewModel>($"Theme: {settings.Ui.Theme}");
+            Logger.Info<SettingsPageViewModel>($"Close to Tray: {settings.Ui.CloseToTray}");
+            Logger.Info<SettingsPageViewModel>($"Start Minimized: {settings.Ui.StartMinimized}");
             Logger.Info<SettingsPageViewModel>($"Log Level: {settings.Debug.Logger.Level}");
         }
         catch (Exception)
@@ -166,6 +178,20 @@ public partial class SettingsPageViewModel : ViewModelBase
             SaveSettings();
             Logger.Info<SettingsPageViewModel>($"Log level changed to: {value.DisplayName}");
         }
+    }
+
+    partial void OnCloseToTrayChanged(bool value)
+    {
+        _settingsManager.Application.Ui.CloseToTray = value;
+        SaveSettings();
+        Logger.Info<SettingsPageViewModel>($"Close to tray setting changed to: {value}");
+    }
+
+    partial void OnStartMinimizedChanged(bool value)
+    {
+        _settingsManager.Application.Ui.StartMinimized = value;
+        SaveSettings();
+        Logger.Info<SettingsPageViewModel>($"Start minimized setting changed to: {value}");
     }
 
     private void SaveSettings()
