@@ -3,6 +3,7 @@ using DualSenseClient.Core.DualSense;
 using DualSenseClient.Core.DualSense.Actions;
 using DualSenseClient.Core.Logging;
 using DualSenseClient.Core.Settings;
+using DualSenseClient.Core.Settings.Models;
 using DualSenseClient.ViewModels;
 using DualSenseClient.ViewModels.Controls;
 using DualSenseClient.ViewModels.Pages;
@@ -26,6 +27,23 @@ public static class ServiceConfigurator
         services.AddSingleton<NavigationService>();
         services.AddSingleton<IApplicationSettings, ApplicationSettings>();
         services.AddSingleton<IProfileRenameService, ProfileRenameService>();
+        services.AddSingleton<ThemeService>(provider =>
+        {
+            ThemeService themeService = new ThemeService();
+            ISettingsManager settingsManager = provider.GetRequiredService<ISettingsManager>();
+            try
+            {
+                ApplicationSettingsStore settings = settingsManager.Application;
+                AppTheme savedTheme = settings.Ui.Theme;
+                themeService.SetTheme(savedTheme);
+                Logger.Info<ServiceProvider>($"Applied saved theme during service initialization: {{savedTheme}}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error<ServiceProvider>($"Failed to apply saved theme: {ex.Message}");
+            }
+            return themeService;
+        });
 
         // ViewModels
         services.AddSingleton<ControllerSelectorViewModel>();
@@ -63,6 +81,9 @@ public static class ServiceConfigurator
 
         // Complete dualsense manager initialization after all services are registered
         dualSenseManager.CompleteInitialization();
+        
+        // Initialize ThemeService
+        _ = serviceProvider.GetRequiredService<ThemeService>();
 
         return serviceProvider;
     }

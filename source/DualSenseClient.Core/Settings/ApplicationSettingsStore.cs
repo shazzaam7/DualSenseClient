@@ -8,6 +8,9 @@ public class ApplicationSettingsStore
     [JsonPropertyName("controllers")]
     public ControllerSettings Controllers { get; set; } = new ControllerSettings();
 
+    [JsonPropertyName("ui")]
+    public UiSettings Ui { get; set; } = new UiSettings();
+
     [JsonPropertyName("debug")]
     public DebuggingSettings Debug { get; set; } = new DebuggingSettings();
 }
