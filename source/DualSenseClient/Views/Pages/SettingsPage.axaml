@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="using:FluentAvalonia.UI.Controls"
              xmlns:vm="clr-namespace:DualSenseClient.ViewModels.Pages"
+             xmlns:ic="using:FluentIcons.Avalonia.Fluent"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="DualSenseClient.Views.Pages.SettingsPage"
              x:DataType="vm:SettingsPageViewModel">
@@ -16,9 +17,60 @@
                        FontSize="24"
                        FontWeight="SemiBold"
                        Foreground="{DynamicResource TextFillColorPrimaryBrush}" />
-            <TextBlock Text="Settings functionality will be implemented here"
-                       FontSize="14"
-                       Foreground="{DynamicResource TextFillColorSecondaryBrush}" />
+            <ui:SettingsExpander Header="Appearance"
+                                 Description="Customize the look and feel of the application">
+                <ui:SettingsExpander.IconSource>
+                    <ic:SymbolIconSource Symbol="PaintBrush" />
+                </ui:SettingsExpander.IconSource>
+                <ui:SettingsExpander.Items>
+                    <!-- Theme Selector -->
+                    <ui:SettingsExpander Header="Theme"
+                                         Description="Change the theme of DualSense Client">
+                        <ui:SettingsExpander.IconSource>
+                            <ic:SymbolIconSource Symbol="WeatherMoon" />
+                        </ui:SettingsExpander.IconSource>
+                        <ui:SettingsExpander.Footer>
+                            <ComboBox ItemsSource="{Binding AvailableThemes}"
+                                      SelectedItem="{Binding SelectedTheme}"
+                                      MinWidth="150">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayName}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </ui:SettingsExpander.Footer>
+                    </ui:SettingsExpander>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
+
+            <!-- Debugging -->
+            <ui:SettingsExpander Header="Debugging"
+                                 Description="Configure logging and other diagnostics options">
+                <ui:SettingsExpander.IconSource>
+                    <ic:SymbolIconSource Symbol="Bug" />
+                </ui:SettingsExpander.IconSource>
+                <ui:SettingsExpander.Items>
+                    <!-- Log Level Selector -->
+                    <ui:SettingsExpander Header="Log Level"
+                                         Description="{Binding SelectedLogLevel.Description}">
+                        <ui:SettingsExpander.IconSource>
+                            <ic:SymbolIconSource Symbol="DocumentText" />
+                        </ui:SettingsExpander.IconSource>
+                        <ui:SettingsExpander.Footer>
+                            <ComboBox ItemsSource="{Binding AvailableLogLevels}"
+                                      SelectedItem="{Binding SelectedLogLevel}"
+                                      MinWidth="150">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DisplayName}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </ui:SettingsExpander.Footer>
+                    </ui:SettingsExpander>
+                </ui:SettingsExpander.Items>
+            </ui:SettingsExpander>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
