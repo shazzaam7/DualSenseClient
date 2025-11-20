@@ -38,7 +38,7 @@ public class DualSenseController : IDisposable
     public BatteryState Battery { get; private set; } = new BatteryState();
     public ConnectionStatus ConnectionStatus { get; private set; } = new ConnectionStatus();
     public LightbarColor CurrentLightbarColor { get; private set; } = new LightbarColor(0, 0, 255);
-    public LightbarBehavior CurrentLightbarBehavior { get; private set; }
+    public LightbarBehavior CurrentLightbarBehavior { get; private set; } = LightbarBehavior.Custom;
     public PlayerLed CurrentPlayerLeds { get; private set; }
     public PlayerLedBrightness CurrentPlayerLedBrightness { get; private set; }
     public MicLed CurrentMicLed { get; private set; }
