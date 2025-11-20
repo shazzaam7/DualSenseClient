@@ -12,7 +12,7 @@ public class BatteryPlayerLedHandler : ISpecialActionHandler
         float level = controller.Battery.BatteryLevel;
         PlayerLed leds = PlayerLed.None;
         
-        if (level >= 12.5f) leds |= PlayerLed.LED_1;
+        if (level >= 12f) leds |= PlayerLed.LED_1;
         if (level >= 25f) leds |= PlayerLed.LED_2;
         if (level >= 50f) leds |= PlayerLed.LED_3;
         if (level >= 75f) leds |= PlayerLed.LED_4;
