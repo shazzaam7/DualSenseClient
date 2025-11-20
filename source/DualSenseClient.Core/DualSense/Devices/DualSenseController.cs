@@ -817,7 +817,7 @@ public class DualSenseController : IDisposable
         {
             try
             {
-                byte[] report = ConnectionType == ConnectionType.Bluetooth ? BuildBluetoothOutputReport() : BuildUsbOutputReport();
+                byte[] report = BuildOutputReport(ConnectionType == ConnectionType.Bluetooth);
                 Logger.Trace<DualSenseController>($"Sending {ConnectionType} output report: {report.Length} bytes");
 
                 _stream.Write(report);
@@ -834,38 +834,55 @@ public class DualSenseController : IDisposable
         }
     }
 
-    private byte[] BuildBluetoothOutputReport()
+    private byte[] BuildOutputReport(bool isBluetooth)
     {
-        byte[] report = new byte[78];
-        report[0] = 0x31; // BT Report ID
-        report[1] = 0x02; // BT header flag
+        // Initialize report with appropriate size
+        byte[] report = new byte[isBluetooth ? 78 : 48];
+
+        // Calculate offset (BT has 1 extra byte at the beginning)
+        int offset = isBluetooth ? 1 : 0;
+
+        // Report ID
+        report[0] = isBluetooth ? (byte)0x31 : (byte)0x02;
+
+        // BT-specific header
+        if (isBluetooth)
+        {
+            report[1] = 0x02;
+        }
 
         // Feature mask
-        report[2] = 0xFF;
-        report[3] = 0xF7;
-
-        // Lightbar enable flags
-        // AllowLightBrightnessChange (0), AllowColorLightFadeAnimation (1)
-        report[40] = 0x03;
-
-        // Lightbar behavior
-        report[43] = (byte)CurrentLightbarBehavior;
-
-        // Player LED brightness
-        report[44] = (byte)CurrentPlayerLedBrightness;
-
-        // Player LEDs
-        report[45] = (byte)(0x20 | (byte)CurrentPlayerLeds);
-
-        // RGB colors
-        report[46] = CurrentLightbarColor.Red;
-        report[47] = CurrentLightbarColor.Green;
-        report[48] = CurrentLightbarColor.Blue;
+        report[1 + offset] = 0xFF;
+        report[2 + offset] = 0xF7;
 
         // Mic LED
-        report[10] = (byte)CurrentMicLed;
+        report[9 + offset] = (byte)CurrentMicLed;
 
-        // Calculate and append CRC32
+        // Lightbar enable flags
+        // AllowLightBrightnessChange (0x01), AllowColorLightFadeAnimation (0x02)
+        report[39 + offset] = 0x03;
+
+        // Lightbar behavior
+        report[42 + offset] = (byte)CurrentLightbarBehavior;
+
+        // Player LED brightness
+        report[43 + offset] = (byte)CurrentPlayerLedBrightness;
+
+        // Player LEDs (0x20 for immediate change, remove for fade-in animation)
+        report[44 + offset] = (byte)(0x20 | (byte)CurrentPlayerLeds);
+
+        // RGB colors
+        report[45 + offset] = CurrentLightbarColor.Red;
+        report[46 + offset] = CurrentLightbarColor.Green;
+        report[47 + offset] = CurrentLightbarColor.Blue;
+
+        if (!isBluetooth)
+        {
+            // USB Output Report
+            return report;
+        }
+
+        // Calculate and append CRC32 for Bluetooth
         uint crc = CRC32DualSense.Compute(report, 0, 74);
         report[74] = (byte)(crc & 0xFF);
         report[75] = (byte)((crc >> 8) & 0xFF);
@@ -874,40 +891,7 @@ public class DualSenseController : IDisposable
 
         Logger.Trace<DualSenseController>($"BT Report - CRC: 0x{crc:X8}, Bytes: [{report[74]:X2} {report[75]:X2} {report[76]:X2} {report[77]:X2}]");
 
-        return report;
-    }
-
-    private byte[] BuildUsbOutputReport()
-    {
-        byte[] report = new byte[48];
-        report[0] = 0x02; // USB Report ID
-
-        // Feature mask
-        report[1] = 0xFF;
-        report[2] = 0xF7;
-
-        // Lightbar enable flags
-        // AllowLightBrightnessChange (0), AllowColorLightFadeAnimation (1)
-        report[39] = 0x03;
-
-        // Lightbar behavior
-        report[42] = (byte)CurrentLightbarBehavior;
-
-        // Player LED brightness
-        report[43] = (byte)CurrentPlayerLedBrightness;
-
-        // Player LEDs
-        report[44] = (byte)(0x20 | (byte)CurrentPlayerLeds);
-
-        // RGB colors
-        report[45] = CurrentLightbarColor.Red;
-        report[46] = CurrentLightbarColor.Green;
-        report[47] = CurrentLightbarColor.Blue;
-
-        // Mic LED
-        report[9] = (byte)CurrentMicLed;
-
-        return report;
+        return report; // BT Output Report
     }
 
     /// <summary>
