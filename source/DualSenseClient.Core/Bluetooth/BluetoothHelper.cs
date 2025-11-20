@@ -13,7 +13,8 @@ internal class BluetoothHelper
 
         try
         {
-            string? mac = TryFindBluetoothDevice() ?? TryFromSerial(device);
+            // Only use platform-specific Bluetooth API on Windows
+            string? mac = IsWindowsPlatform() ? TryFindBluetoothDevice() ?? TryFromSerial(device) : TryFromSerial(device);
             Logger.Debug<BluetoothHelper>(mac != null ? $"Successfully extracted MAC address: {mac}" : "Failed to extract MAC address");
             return mac;
         }
@@ -58,6 +59,13 @@ internal class BluetoothHelper
 
     private static string? TryFindBluetoothDevice()
     {
+        // Only try to find Bluetooth devices on Windows
+        if (!IsWindowsPlatform())
+        {
+            Logger.Trace<BluetoothHelper>("Platform is not Windows, skipping Bluetooth device search");
+            return null;
+        }
+
         Logger.Trace<BluetoothHelper>("Searching for DualSense controller via Bluetooth API");
 
         WindowsBluetooth.BLUETOOTH_FIND_RADIO_PARAMS radioParams = new WindowsBluetooth.BLUETOOTH_FIND_RADIO_PARAMS
@@ -143,6 +151,14 @@ internal class BluetoothHelper
     {
         Logger.Info<BluetoothHelper>($"Attempting to disconnect Bluetooth device: {mac}");
 
+        // Only try to disconnect Bluetooth devices on Windows
+        if (!IsWindowsPlatform())
+        {
+            Logger.Info<BluetoothHelper>("Platform is not Windows, skipping Bluetooth disconnect");
+            // On non-Windows platforms, return true to indicate there's nothing to disconnect
+            return true;
+        }
+
         try
         {
             byte[] btAddr = new byte[8];
@@ -196,6 +212,11 @@ internal class BluetoothHelper
             Logger.LogExceptionDetails<BluetoothHelper>(ex, includeEnvironmentInfo: false);
             return false;
         }
+    }
+
+    private static bool IsWindowsPlatform()
+    {
+        return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
     }
 
     private static string FormatMac(string mac)
