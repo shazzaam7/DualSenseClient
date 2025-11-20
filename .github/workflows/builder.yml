@@ -68,6 +68,7 @@ jobs:
   create-release:
     name: Create Release
     needs: build
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/release.yml
     with:
       is_stable: ${{ inputs.is_stable || false }}
