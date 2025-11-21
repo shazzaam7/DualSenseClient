@@ -27,7 +27,7 @@ public class TrayIconService : IDisposable
     {
         _selectedControllerService = selectedControllerService;
         _settingsManager = settingsManager;
-        _viewModel = new TrayIconViewModel(ShowMainWindow);
+        _viewModel = new TrayIconViewModel(ShowMainWindow, _selectedControllerService);
 
         // Subscribe to available controllers collection changes
         _selectedControllerService.AvailableControllers.CollectionChanged += (_, _) =>
@@ -103,17 +103,38 @@ public class TrayIconService : IDisposable
         nativeMenu.Items.Add(showItem);
 
         // Add controller items if there are any controllers
-        if (_controllers.Any())
+        if (_controllers.Count != 0)
         {
             nativeMenu.Items.Add(new NativeMenuItemSeparator());
 
             foreach (ControllerViewModelBase controller in _controllers)
             {
-                NativeMenuItem controllerItem = new NativeMenuItem($"{controller.Name} ({controller.BatteryText})")
+                // Create submenu for each controller
+                NativeMenu controllerSubMenu = new NativeMenu();
+
+                // Main controller selection item
+                NativeMenuItem selectControllerItem = new NativeMenuItem("Select")
                 {
                     Command = new RelayCommand(() => SelectController(controller))
                 };
-                nativeMenu.Items.Add(controllerItem);
+                controllerSubMenu.Add(selectControllerItem);
+
+                // Add disconnect option only if controller is connected via Bluetooth
+                if (controller.ConnectionType == "Bluetooth")
+                {
+                    NativeMenuItem disconnectItem = new NativeMenuItem("Disconnect")
+                    {
+                        Command = new RelayCommand(() => _viewModel.DisconnectControllerCommand.Execute(controller))
+                    };
+                    controllerSubMenu.Add(disconnectItem);
+                }
+
+                // Add submenu as a parent item
+                NativeMenuItem controllerParentItem = new NativeMenuItem($"{controller.Name} - {controller.BatteryText}")
+                {
+                    Menu = controllerSubMenu
+                };
+                nativeMenu.Items.Add(controllerParentItem);
             }
         }
 
@@ -162,11 +183,32 @@ public class TrayIconService : IDisposable
 
                 foreach (ControllerViewModelBase controller in _controllers)
                 {
-                    NativeMenuItem controllerItem = new NativeMenuItem($"{controller.Name} - {controller.BatteryText}")
+                    // Create submenu for each controller
+                    NativeMenu controllerSubMenu = new NativeMenu();
+
+                    // Main controller selection item
+                    NativeMenuItem selectControllerItem = new NativeMenuItem("Select")
                     {
                         Command = new RelayCommand(() => SelectController(controller))
                     };
-                    menu.Items.Add(controllerItem);
+                    controllerSubMenu.Add(selectControllerItem);
+
+                    // Add disconnect option only if controller is connected via Bluetooth
+                    if (controller.ConnectionType == "Bluetooth")
+                    {
+                        NativeMenuItem disconnectItem = new NativeMenuItem("Disconnect")
+                        {
+                            Command = new RelayCommand(() => _viewModel.DisconnectControllerCommand.Execute(controller))
+                        };
+                        controllerSubMenu.Add(disconnectItem);
+                    }
+
+                    // Add submenu as a parent item
+                    NativeMenuItem controllerParentItem = new NativeMenuItem($"{controller.Name} - {controller.BatteryText}")
+                    {
+                        Menu = controllerSubMenu
+                    };
+                    menu.Items.Add(controllerParentItem);
                 }
             }
 
