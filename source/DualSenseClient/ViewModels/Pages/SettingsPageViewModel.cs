@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Threading;
@@ -40,6 +40,8 @@ public partial class SettingsPageViewModel : ViewModelBase
     [ObservableProperty] private bool closeToTray;
 
     [ObservableProperty] private bool startMinimized;
+
+    [ObservableProperty] private bool trayBatteryTracking;
 
     // Constructor
     public SettingsPageViewModel(ISettingsManager settingsManager, ThemeService themeService)
@@ -133,6 +135,9 @@ public partial class SettingsPageViewModel : ViewModelBase
             // Start minimized settings
             StartMinimized = settings.Ui.StartMinimized;
 
+            // Tray battery tracking settings
+            TrayBatteryTracking = settings.Ui.TrayBatteryTracking;
+
             // Debug settings
             LogLevel logLevel = LogLevelHelper.FromString(settings.Debug.Logger.Level);
             SelectedLogLevel = AvailableLogLevels.FirstOrDefault(level => level.Level == logLevel);
@@ -141,6 +146,7 @@ public partial class SettingsPageViewModel : ViewModelBase
             Logger.Info<SettingsPageViewModel>($"Theme: {settings.Ui.Theme}");
             Logger.Info<SettingsPageViewModel>($"Close to Tray: {settings.Ui.CloseToTray}");
             Logger.Info<SettingsPageViewModel>($"Start Minimized: {settings.Ui.StartMinimized}");
+            Logger.Info<SettingsPageViewModel>($"Tray Battery Tracking: {settings.Ui.TrayBatteryTracking}");
             Logger.Info<SettingsPageViewModel>($"Log Level: {settings.Debug.Logger.Level}");
         }
         catch (Exception)
@@ -192,6 +198,13 @@ public partial class SettingsPageViewModel : ViewModelBase
         _settingsManager.Application.Ui.StartMinimized = value;
         SaveSettings();
         Logger.Info<SettingsPageViewModel>($"Start minimized setting changed to: {value}");
+    }
+
+    partial void OnTrayBatteryTrackingChanged(bool value)
+    {
+        _settingsManager.Application.Ui.TrayBatteryTracking = value;
+        SaveSettings();
+        Logger.Info<SettingsPageViewModel>($"Tray battery tracking setting changed to: {value}");
     }
 
     private void SaveSettings()

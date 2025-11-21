@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform;
 using CommunityToolkit.Mvvm.Input;
 using DualSenseClient.Core.Logging;
@@ -41,6 +43,20 @@ public class TrayIconService : IDisposable
                 UpdateTrayIcon();
             }
         };
+
+        // Subscribe to settings changes to update tray
+        _settingsManager.SettingsChanged += OnSettingsChanged;
+    }
+
+    private void OnSettingsChanged(object? sender, ApplicationSettingsStore settings)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        // Refresh tray icon when the battery tracking setting changes
+        UpdateTrayIcon();
     }
 
     public void Initialize()
@@ -228,9 +244,18 @@ public class TrayIconService : IDisposable
             // Controller selected
             try
             {
-                // Update tray icon based on battery level of selected controller
-                string iconPath = GetIconPathForBatteryLevel(selectedController);
-                _trayIcon.Icon = new WindowIcon(AssetLoader.Open(new Uri(iconPath)));
+                // Check if tray battery tracking is enabled
+                if (_settingsManager.Application.Ui.TrayBatteryTracking)
+                {
+                    // Update tray icon based on battery level of selected controller
+                    _trayIcon.Icon = GetIconFromBatteryLevel(selectedController);
+                }
+                else
+                {
+                    // Use default icon if battery tracking is disabled
+                    string defaultIconPath = "avares://DualSenseClient/Assets/icon.ico";
+                    _trayIcon.Icon = new WindowIcon(AssetLoader.Open(new Uri(defaultIconPath)));
+                }
             }
             catch (Exception ex)
             {
@@ -265,19 +290,58 @@ public class TrayIconService : IDisposable
         }
     }
 
-    private string GetIconPathForBatteryLevel(ControllerViewModelBase controller)
+    private WindowIcon GetIconFromBatteryLevel(ControllerViewModelBase controller)
     {
-        // TODO: Update icon based on battery level
-        // Right now we're using app icon
-        if (controller.IsCharging)
+        // Create a 16x16 Tray Icon
+        PixelSize pixelSize = new PixelSize(16, 16);
+        RenderTargetBitmap renderTarget = new RenderTargetBitmap(pixelSize, new Vector(96, 96)); // 96 DPI
+
+        using (DrawingContext context = renderTarget.CreateDrawingContext())
         {
-            // Could return a charging icon if available
-            return "avares://DualSenseClient/Assets/icon.ico";
+            // Transparent background
+            context.FillRectangle(Brushes.Transparent, new Rect(0, 0, 16, 16));
+
+            // Determine the text color based on battery level/charging status
+            Color textColor;
+            if (controller.IsCharging)
+            {
+                textColor = Color.FromRgb(0, 123, 255); // Blue for charging
+            }
+            else
+            {
+                float level = Math.Clamp((float)controller.BatteryLevel / 100f, 0f, 1f);
+
+                byte red = (byte)(255 * (1f - level));
+                byte green = (byte)(255 * level);
+                byte blue = 0;
+
+                textColor = Color.FromRgb(red, green, blue);
+            }
+
+            // Draw the battery level text
+            FormattedText text = new FormattedText(
+                controller.BatteryLevel.ToString("F0"),
+                System.Globalization.CultureInfo.InvariantCulture,
+                FlowDirection.LeftToRight,
+                Typeface.Default,
+                14, // Font size
+                new SolidColorBrush(textColor)
+            );
+
+            // Measure the text size manually
+            Size textSize = new Size(text.Width, text.Height);
+            Point textPosition = new Point(
+                (16 - textSize.Width) / 2,
+                (16 - textSize.Height) / 2 - 1 // Slightly adjust position
+            );
+
+            context.DrawText(text, textPosition);
         }
 
-        // For different battery levels, you could return different icons
-        // This is a placeholder implementation
-        return "avares://DualSenseClient/Assets/icon.ico";
+        using MemoryStream memoryStream = new MemoryStream();
+        renderTarget.Save(memoryStream);
+        memoryStream.Position = 0;
+        return new WindowIcon(memoryStream);
     }
 
     public void ShowMainWindow()

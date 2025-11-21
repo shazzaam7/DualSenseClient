@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 
 namespace DualSenseClient.Core.Settings.Models;
 
@@ -12,6 +12,9 @@ public class UiSettings
 
     [JsonPropertyName("start_minimized")]
     public bool StartMinimized { get; set; } = false;
+
+    [JsonPropertyName("tray_battery_tracking")]
+    public bool TrayBatteryTracking { get; set; } = true;
 }
 
 public enum AppTheme
