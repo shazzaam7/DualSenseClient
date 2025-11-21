@@ -1,4 +1,4 @@
-<h1 align="center">🎮 DualSense Client</h1>
+<h1 align="center"><img src="assets/icon.png" alt="DualSense Manager Icon" width="28" height="28"> DualSense Client</h1>
 
 <p align="center">
   <b>Unofficial DualSense Manager for Windows</b><br>
@@ -18,6 +18,16 @@
   <a href="https://github.com/shazzaam7/DualSenseClient/releases/tag/nightly"><img src="https://img.shields.io/github/v/release/shazzaam7/DualSenseClient?include_prereleases&label=Pre-Release&color=orange" alt="Pre-Release"></a>
 </p>
 
+<p align="center">
+  <a href="https://ko-fi.com/shazzaam">
+    <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi">
+  </a>
+</p>
+
+<p align="center">
+  <img src="assets/Screenshot.png" alt="Program Screenshot">
+</p>
+
 ---
 
 ## 🧾 Overview
@@ -29,42 +39,37 @@
 ## 🌟 Features
 
 ### 🎨 Light Control
-
-- **Lightbar Color**: Full RGB control with color picker, sliders, and preset colors
-- **Player LEDs**: Individually toggle player LEDs (1-5) with brightness control
-- **Microphone LED**: Configure microphone LED state (off, on, or pulsing)
+- Full RGB lightbar control with presets and custom colors
+- Player LED control (1-5) with brightness options
+- Microphone LED configuration (off/on/pulse)
+- Quick light presets and reset functions
 
 ### 📁 Profile Management
-
-- **Profile Creation**: Create and manage multiple controller profiles
-- **Profile Switching**: Quick select between different controller configurations
-- **Profile Export/Import**: Share and backup your profiles
-- **Profile Renaming & Duplication**: Organize your profiles with custom names
+- Create, edit, and manage multiple controller profiles
+- Import/export profiles (JSON format)
+- Profile renaming and duplication
+- Assign profiles to specific controllers
 
 ### ⚡ Special Actions
-
-- **Custom Button Combinations**: Create custom button combinations to trigger special actions
-- **Battery Indicator Actions**: Show battery level through lightbar or player LEDs
-- **Action Management**: Add, edit, and delete special actions as needed
+- Custom button combinations for special functions
+- Battery level indicators (via lightbar/LEDs)
+- Controller disconnection via button combos
 
 ### 📊 Real-time Monitoring
-
-- **Controller State Monitoring**: View real-time controller inputs and states
-- **Battery Level**: Monitor battery percentage
-- **Connection Status**: Track connection status and controller information
+- Monitor all controller inputs and states
+- View touchpad, motion sensor, and battery data
+- Track connection status and LED states
 
 ### 🎮 Device Management
+- Support for multiple DualSense controllers
+- Automatic MAC address-based identification
+- Connection type detection (USB/Bluetooth)
 
-- **Multi-Controller Support**: Connect and manage multiple DualSense controllers simultaneously
-- **Controller Identification**: Automatic detection and identification of connected controllers
-- **Connection Monitoring**: Real-time connection status and device information
-
-### 🔧 Advanced Controls
-
-- **Light Presets**: Quick access to common lightbar colors
-- **Quick Actions**: Apply all settings with a single click
-- **Profile Capturing**: Capture current controller state as a new profile
-- **Reset Functions**: Reset lights to default or turn all off
+### ⚙️ Settings & Configuration
+- Theme selection and UI customization
+- Minimize to tray and start minimized options
+- Adjustable logging levels
+- Tray battery tracking
 
 ---
 
@@ -88,7 +93,7 @@
 ### Prerequisites
 
 - Windows 10 or later
-- .NET 8.0 or later
+- .NET 9.0 or later
 - PlayStation 5 DualSense controller (wired or Bluetooth connection)
 
 ### Installation
@@ -101,9 +106,8 @@
 ### Quick Start
 
 1. Connect your DualSense controller to your PC (via USB or Bluetooth)
-2. Allow any permission prompts for the application
-3. Navigate to the Profile page to customize your settings
-4. Create and apply your first profile or adjust individual settings
+2. Navigate to the Profile page to customize your settings
+3. Create and apply your first profile or adjust individual settings
 
 ---
 
