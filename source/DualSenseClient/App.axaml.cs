@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
-using DualSenseClient.Core.DualSense;
-using DualSenseClient.Core.Logging;
 using DualSenseClient.Core.Settings;
 using DualSenseClient.Services;
 using DualSenseClient.Views;
@@ -76,7 +74,7 @@ public class App : Application
             mainWindow.Opened += (_, _) =>
             {
                 Logger.Info<App>("=== DualSense Client Started ===");
-                Logger.Info<App>($"Version: {System.Reflection.Assembly.GetExecutingAssembly().GetName().Version}");
+                Logger.Info<App>($"Version: {Services.GetRequiredService<ISettingsManager>().Application.GetVersion()}");
                 Logger.Debug<App>("Main window opened");
 
                 // Only hide the window at initial startup if the setting is enabled

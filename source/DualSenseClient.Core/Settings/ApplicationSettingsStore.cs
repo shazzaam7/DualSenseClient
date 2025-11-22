@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Reflection;
+using System.Text.Json.Serialization;
+using DualSenseClient.Core.Logging;
 using DualSenseClient.Core.Settings.Models;
 
 namespace DualSenseClient.Core.Settings;
@@ -13,4 +15,44 @@ public class ApplicationSettingsStore
 
     [JsonPropertyName("debug")]
     public DebuggingSettings Debug { get; set; } = new DebuggingSettings();
+
+    [JsonPropertyName("update_check")]
+    public UpdateCheckSettings UpdateCheck { get; set; } = new UpdateCheckSettings();
+
+    public string GetVersion()
+    {
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        if (UpdateCheck.NightlyBuild)
+        {
+            try
+            {
+                // Return informational version for nightly release
+                AssemblyInformationalVersionAttribute? informationalVersionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+                if (informationalVersionAttribute?.InformationalVersion != null)
+                {
+                    return informationalVersionAttribute.InformationalVersion.Split('+')[0];
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error<SettingsManager>("Failed to fetch nightly version");
+                Logger.LogExceptionDetails<SettingsManager>(ex);
+                return "0.0.0";
+            }
+        }
+
+        try
+        {
+            // Return assembly version for stable release
+            // Get first 3 components, use 0 for missing parts
+            Version? version = assembly.GetName().Version;
+            return version == null ? "0.0.0" : $"{version.Major}.{version.Minor}.{version.Build}";
+        }
+        catch (Exception ex)
+        {
+            Logger.Error<SettingsManager>("Failed to fetch stable version");
+            Logger.LogExceptionDetails<SettingsManager>(ex);
+            return "0.0.0";
+        }
+    }
 }

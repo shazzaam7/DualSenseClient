@@ -9,7 +9,7 @@
                      x:Class="DualSenseClient.Views.MainWindow"
                      x:DataType="vm:MainWindowViewModel"
                      Icon="/Assets/icon.ico"
-                     Title="DualSense Manager"
+                     Title="{Binding WindowTitle}"
                      MinWidth="700"
                      MinHeight="420">
     <Design.DataContext>
