@@ -43,6 +43,8 @@ public partial class SettingsPageViewModel : ViewModelBase
 
     [ObservableProperty] private bool trayBatteryTracking;
 
+    public string ApplicationVersion => _settingsManager.Application.GetVersion();
+
     // Constructor
     public SettingsPageViewModel(ISettingsManager settingsManager, ThemeService themeService)
     {
