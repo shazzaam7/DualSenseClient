@@ -39,11 +39,19 @@ jobs:
         with:
           dotnet-version: 9.0.x
 
+      - name: Extract commit SHA
+        id: commit
+        run: echo "sha_short=$(git rev-parse --short=7 HEAD)" >> $GITHUB_OUTPUT
+        shell: bash
+
       - name: Restore dependencies
         run: dotnet restore "source/DualSenseClient/DualSenseClient.csproj"
 
       - name: Build
-        run: dotnet build "source/DualSenseClient/DualSenseClient.csproj" -c Release
+        run: |
+          dotnet build "source/DualSenseClient/DualSenseClient.csproj" `
+            -c Release `
+            -p:AssemblyInformationalVersion=${{ steps.commit.outputs.sha_short }}
 
       - name: Run Unit Tests
         run: dotnet test "test/DualSenseClient.Tests/DualSenseClient.Tests.csproj" -c Release --no-build --verbosity normal
@@ -56,6 +64,7 @@ jobs:
             --self-contained false `
             -p:PublishReadyToRun=false `
             -p:PublishSingleFile=false `
+            -p:AssemblyInformationalVersion=${{ steps.commit.outputs.sha_short }} `
             -o publish/
 
       - name: Upload artifact
