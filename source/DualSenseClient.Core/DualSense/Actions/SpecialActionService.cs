@@ -91,11 +91,31 @@ public class SpecialActionService
             .OrderByDescending(action => action.Combination.Buttons.Count)
             .ToList();
 
-        foreach (SpecialActionSettings action in sortedActions.Where(action => _stateTracker.IsButtonCombinationHeld(controllerId, action.Combination)))
+        // Group actions by their combination length to process them in priority order
+        IEnumerable<IGrouping<int, SpecialActionSettings>> groupedActions = sortedActions.GroupBy(action => action.Combination.Buttons.Count);
+
+        foreach (IGrouping<int, SpecialActionSettings> group in groupedActions)
         {
-            EnsureStateSaved(controllerId, controller);
-            ExecuteSpecialAction(controller, action);
-            return; // Execute only first matching action
+            bool groupHasMatches = false;
+
+            // For each group of actions (same combination length), check for matching combinations
+            foreach (SpecialActionSettings action in group)
+            {
+                if (!_stateTracker.IsButtonCombinationHeld(controllerId, action.Combination))
+                {
+                    continue;
+                }
+                EnsureStateSaved(controllerId, controller);
+                ExecuteSpecialAction(controller, action);
+                groupHasMatches = true;
+            }
+
+            // If any actions from this length were executed, don't process shorter combinations
+            // This ensures longer combinations take priority over shorter ones
+            if (groupHasMatches)
+            {
+                break;
+            }
         }
     }
 
